@@ -2,6 +2,9 @@ package net.patowen.songanalyzer;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class SeekLayer extends TrackLayer {
 	private TrackStatus status;
@@ -31,5 +34,13 @@ public class SeekLayer extends TrackLayer {
 	
 	public int getPreferredHeight() {
 		return 64;
+	}
+	
+	public void save(DataOutputStream stream) throws IOException {
+		
+	}
+	
+	public void load(DataInputStream stream) throws IOException {
+		
 	}
 }

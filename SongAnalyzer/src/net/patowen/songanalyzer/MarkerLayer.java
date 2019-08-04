@@ -3,6 +3,9 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.TreeSet;
 
 public class MarkerLayer extends TrackLayer {
@@ -99,5 +102,19 @@ public class MarkerLayer extends TrackLayer {
 	
 	public int getPreferredHeight() {
 		return 64;
+	}
+	
+	public void save(DataOutputStream stream) throws IOException {
+		stream.writeInt(marks.size());
+		for (double mark : marks) {
+			stream.writeDouble(mark);
+		}
+	}
+	
+	public void load(DataInputStream stream) throws IOException {
+		int numMarks = stream.readInt();
+		for (int i=0; i<numMarks; i++) {
+			marks.add(stream.readDouble());
+		}
 	}
 }

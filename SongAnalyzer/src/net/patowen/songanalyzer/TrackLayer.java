@@ -2,6 +2,9 @@ package net.patowen.songanalyzer;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public abstract class TrackLayer {
 	private int height;
@@ -35,4 +38,7 @@ public abstract class TrackLayer {
 	
 	public abstract int getMinimumHeight();
 	public abstract int getPreferredHeight();
+	
+	public abstract void save(DataOutputStream stream) throws IOException;
+	public abstract void load(DataInputStream stream) throws IOException;
 }

@@ -14,11 +14,23 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class TrackView {
 	private JPanel trackPanel;
@@ -41,10 +53,14 @@ public class TrackView {
 	private int resizingLayerStartHeight;
 	private int resizingLayerStartMouseY;
 	
+	private File currentFile;
+	
 	@SuppressWarnings("serial")
 	public TrackView(AudioStream stream) {
 		JFrame frame = new JFrame("Test");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		currentFile = null;
 		
 		trackPanel = new JPanel() {
 			public void paintComponent(Graphics g) {
@@ -123,6 +139,109 @@ public class TrackView {
 		frame.setVisible(true);
 	}
 	
+	public void save(DataOutputStream stream) throws IOException {
+		stream.writeInt(layers.size());
+		for (TrackLayer layer : layers) {
+			stream.writeInt(getLayerType(layer));
+			layer.save(stream);
+		}
+	}
+	
+	public void load(DataInputStream stream) throws IOException {
+		layers.clear();
+		int numLayers = stream.readInt();
+		for (int i=0; i<numLayers; i++) {
+			TrackLayer layer = createLayer(stream.readInt());
+			layer.load(stream);
+		}
+	}
+	
+	public TrackLayer createLayer(int layerType) {
+		switch (layerType) {
+		case 0: return new SeekLayer(status);
+		case 1: return new MarkerLayer(status);
+		default: throw new IllegalArgumentException("Invalid layer type: " + layerType);
+		}
+	}
+	
+	public int getLayerType(TrackLayer layer) {
+		if (layer instanceof SeekLayer) return 0;
+		if (layer instanceof MarkerLayer) return 1;
+		throw new IllegalArgumentException("Unknown TrackLayer subclass");
+	}
+	
+	public DataOutputStream getDataOutputStream(File file) {
+		try {
+			DataOutputStream stream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+			return stream;
+		} catch (FileNotFoundException e) {
+			return null;
+		}
+	}
+	
+	public DataInputStream getDataInputStream(File file) {
+		try {
+			DataInputStream stream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+			return stream;
+		} catch (FileNotFoundException e) {
+			return null;
+		}
+	}
+	
+	public void fulfillSaveRequest(boolean forceDialog) {
+		File pendingFile = currentFile;
+		DataOutputStream stream = null;
+		if (!forceDialog && currentFile != null) {
+			stream = getDataOutputStream(currentFile);
+		}
+		
+		if (stream == null) {
+			JFileChooser chooser = new JFileChooser();
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Song Analysis", "sng");
+			chooser.setFileFilter(filter);
+			int returnValue = chooser.showSaveDialog(trackPanel);
+			if (returnValue == JFileChooser.APPROVE_OPTION) {
+				File chosenFile = chooser.getSelectedFile();
+				if (!chosenFile.exists() && !chosenFile.getName().endsWith(".sng")) {
+					chosenFile = new File(chosenFile.getPath() + ".sng");
+				}
+				if (chosenFile.exists()) {
+					int confirmResult = JOptionPane.showConfirmDialog(trackPanel, "Are you sure you want to overwrite " + chosenFile.getName() + "?", "Confirm overwrite", JOptionPane.YES_NO_OPTION);
+					if (confirmResult != JOptionPane.YES_OPTION) {
+						return;
+					}
+				}
+				stream = getDataOutputStream(chosenFile);
+				pendingFile = chosenFile;
+			} else if (returnValue == JFileChooser.CANCEL_OPTION) {
+				return;
+			} else if (returnValue == JFileChooser.ERROR_OPTION) {
+				JOptionPane.showMessageDialog(trackPanel, "Unexpected error with save dialog", "Unexpected error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+		}
+		
+		if (stream == null) {
+			JOptionPane.showMessageDialog(trackPanel, "Cannot save where you requested. Do you have permission?", "Cannot save", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		try {
+			save(stream);
+			stream.close();
+			currentFile = pendingFile;
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(trackPanel, "Unexpected error occured while saving", "Unexpected error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	public void fulfillOpenRequest() {
+		JFileChooser chooser = new JFileChooser();
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Song Analysis", "sng");
+		chooser.setFileFilter(filter);
+		int returnValue = chooser.showOpenDialog(trackPanel);
+	}
+	
 	public void startPlaying() {
 		playBarUpdateTimer.restart();
 		status.audioStream.play(1);
@@ -143,6 +262,8 @@ public class TrackView {
 		} else if ((e.getKeyCode() == KeyEvent.VK_Z && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) || (e.getKeyCode() == KeyEvent.VK_Y && e.isControlDown() && !e.isShiftDown() && !e.isAltDown())) {
 			status.userActionList.redo();
 			status.refresh();
+		} else if (e.getKeyCode() == KeyEvent.VK_S && e.isControlDown() && !e.isAltDown()) {
+			fulfillSaveRequest(e.isShiftDown());
 		} else {
 			if (activeLayer != null) {
 				activeLayer.keyPressed(e);
