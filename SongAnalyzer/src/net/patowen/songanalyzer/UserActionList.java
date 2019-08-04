@@ -32,4 +32,9 @@ public class UserActionList {
 			currentAction++;
 		}
 	}
+	
+	public void clear() {
+		actions.clear();
+		currentAction = 0;
+	}
 }

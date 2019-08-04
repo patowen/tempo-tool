@@ -57,8 +57,43 @@ public class TrackView {
 	private File defaultFolder;
 	private File currentFile;
 	
-	@SuppressWarnings("serial")
 	public TrackView(AudioStream stream) {
+		playBarUpdateTimer = new Timer(0, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (!status.audioStream.isPlaying()) {
+					playBarUpdateTimer.stop();
+				}
+				status.updatePlayBar();
+				status.refresh();
+			}
+		});
+		playBarUpdateTimer.setDelay(10);
+		
+		ticker = stream.getTicker();
+		
+		initFrame();
+		status = new TrackStatus(trackPanel, stream);
+		
+		layers = new ArrayList<>();
+//		layers.add(new SeekLayer(status));
+//		MarkerLayer markerLayer = new MarkerLayer(status);
+//		ticker.addSource(markerLayer.getTickerSource());
+//		layers.add(markerLayer);
+//		MarkerLayer markerLayer2 = new MarkerLayer(status);
+//		ticker.addSource(markerLayer2.getTickerSource());
+//		markerLayer2.addTestMarks();
+//		layers.add(markerLayer2);
+		
+		activeLayer = null;
+		
+		initialLoad();
+		
+		resizingLayer = false;
+		
+	}
+	
+	@SuppressWarnings("serial")
+	public void initFrame() {
 		JFrame frame = new JFrame("Test");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -101,44 +136,19 @@ public class TrackView {
 			}
 		});
 		
-		playBarUpdateTimer = new Timer(0, new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (!status.audioStream.isPlaying()) {
-					playBarUpdateTimer.stop();
-				}
-				status.updatePlayBar();
-				status.refresh();
-			}
-		});
-		
-		ticker = stream.getTicker();
-
-		status = new TrackStatus(trackPanel, stream);
-		
-		layers = new ArrayList<>();
-		layers.add(new SeekLayer(status));
-		MarkerLayer markerLayer = new MarkerLayer(status);
-		ticker.addSource(markerLayer.getTickerSource());
-		layers.add(markerLayer);
-		MarkerLayer markerLayer2 = new MarkerLayer(status);
-//		ticker.addSource(markerLayer2.getTickerSource());
-		markerLayer2.addTestMarks();
-		layers.add(markerLayer2);
-		
-		activeLayer = null;
-		
-		initialLoad();
-		
-		
-		playBarUpdateTimer.setDelay(10);
-		
-		resizingLayer = false;
-		
 		frame.add(trackPanel);
 		
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+	}
+	
+	public void reset() {
+		layers.clear();
+		activeLayer = null;
+		ticker.removeAllSources();
+		status.playBarPos = 0;
+		status.userActionList.clear();
 	}
 	
 	public void save(DataOutputStream stream) throws IOException {
@@ -150,7 +160,7 @@ public class TrackView {
 	}
 	
 	public void load(DataInputStream stream) throws IOException {
-		layers.clear();
+		reset();
 		int numLayers = stream.readInt();
 		for (int i=0; i<numLayers; i++) {
 			TrackLayer layer = createLayer(stream.readInt());
@@ -162,7 +172,10 @@ public class TrackView {
 	public TrackLayer createLayer(int layerType) {
 		switch (layerType) {
 		case 0: return new SeekLayer(status);
-		case 1: return new MarkerLayer(status);
+		case 1:
+			MarkerLayer markerLayer = new MarkerLayer(status);
+			ticker.addSource(markerLayer.getTickerSource());
+			return markerLayer;
 		default: throw new IllegalArgumentException("Invalid layer type: " + layerType);
 		}
 	}
@@ -203,6 +216,7 @@ public class TrackView {
 				if (stream == null) {
 					prefs.remove("currentFile");
 					currentFile = null;
+					reset();
 				} else {
 					load(stream);
 				}
@@ -210,7 +224,10 @@ public class TrackView {
 			catch (IOException e) {
 				prefs.remove("currentFile");
 				currentFile = null;
+				reset();
 			}
+		} else {
+			reset();
 		}
 	}
 	

@@ -22,6 +22,10 @@ public class Ticker {
 		sources.remove(source);
 	}
 	
+	public void removeAllSources() {
+		sources.clear();
+	}
+	
 	public void reset(double startPos) {
 		lastPlayedTick = null;
 		nextTick = computeNextTickInclusive(startPos);
