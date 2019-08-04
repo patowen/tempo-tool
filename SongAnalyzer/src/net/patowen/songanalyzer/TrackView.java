@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.prefs.Preferences;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -53,14 +54,13 @@ public class TrackView {
 	private int resizingLayerStartHeight;
 	private int resizingLayerStartMouseY;
 	
+	private File defaultFolder;
 	private File currentFile;
 	
 	@SuppressWarnings("serial")
 	public TrackView(AudioStream stream) {
 		JFrame frame = new JFrame("Test");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		currentFile = null;
 		
 		trackPanel = new JPanel() {
 			public void paintComponent(Graphics g) {
@@ -127,6 +127,8 @@ public class TrackView {
 		
 		activeLayer = null;
 		
+		initialLoad();
+		
 		
 		playBarUpdateTimer.setDelay(10);
 		
@@ -188,6 +190,29 @@ public class TrackView {
 		}
 	}
 	
+	public void initialLoad() {
+		Preferences prefs = Preferences.userRoot();
+		String defaultFolderPath = prefs.get("defaultFolder", null);
+		defaultFolder = defaultFolderPath == null ? null : new File(defaultFolderPath);
+		String currentFilePath = prefs.get("currentFile", null);
+		currentFile = currentFilePath == null ? null : new File(currentFilePath);
+		
+		if (currentFile != null) {
+			DataInputStream stream = getDataInputStream(currentFile);
+			if (stream == null) {
+				prefs.remove("currentFile");
+				currentFile = null;
+			} else {
+				try {
+					load(stream);
+				} catch (IOException e) {
+					prefs.remove("currentFile");
+					currentFile = null;
+				}
+			}
+		}
+	}
+	
 	public void fulfillSaveRequest(boolean forceDialog) {
 		File pendingFile = currentFile;
 		DataOutputStream stream = null;
@@ -199,6 +224,7 @@ public class TrackView {
 			JFileChooser chooser = new JFileChooser();
 			FileNameExtensionFilter filter = new FileNameExtensionFilter("Song Analysis", "sng");
 			chooser.setFileFilter(filter);
+			chooser.setCurrentDirectory(defaultFolder);
 			int returnValue = chooser.showSaveDialog(trackPanel);
 			if (returnValue == JFileChooser.APPROVE_OPTION) {
 				File chosenFile = chooser.getSelectedFile();
@@ -230,16 +256,51 @@ public class TrackView {
 			save(stream);
 			stream.close();
 			currentFile = pendingFile;
+			Preferences.userRoot().put("currentFile", currentFile.getAbsolutePath());
+			defaultFolder = currentFile.getParentFile();
+			Preferences.userRoot().put("defaultFolder", defaultFolder.getAbsolutePath());
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(trackPanel, "Unexpected error occured while saving", "Unexpected error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
 	public void fulfillOpenRequest() {
+		File pendingFile = currentFile;
+		DataInputStream stream = null;
+		
 		JFileChooser chooser = new JFileChooser();
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("Song Analysis", "sng");
 		chooser.setFileFilter(filter);
+		chooser.setCurrentDirectory(defaultFolder);
 		int returnValue = chooser.showOpenDialog(trackPanel);
+		if (returnValue == JFileChooser.APPROVE_OPTION) {
+			File chosenFile = chooser.getSelectedFile();
+			stream = getDataInputStream(chosenFile);
+			pendingFile = chosenFile;
+		} else if (returnValue == JFileChooser.CANCEL_OPTION) {
+			return;
+		} else if (returnValue == JFileChooser.ERROR_OPTION) {
+			JOptionPane.showMessageDialog(trackPanel, "Unexpected error with open dialog", "Unexpected error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		if (stream == null) {
+			JOptionPane.showMessageDialog(trackPanel, "Cannot open the requested file. Does it exist?", "Cannot open", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		try {
+			load(stream);
+			stream.close();
+			currentFile = pendingFile;
+			Preferences.userRoot().put("currentFile", currentFile.getAbsolutePath());
+			defaultFolder = currentFile.getParentFile();
+			Preferences.userRoot().put("defaultFolder", defaultFolder.getAbsolutePath());
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(trackPanel, "Unexpected error occured while reading file", "Unexpected error", JOptionPane.ERROR_MESSAGE);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(trackPanel, "File appears to be corrupted", "Cannot load", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 	
 	public void startPlaying() {
@@ -264,6 +325,8 @@ public class TrackView {
 			status.refresh();
 		} else if (e.getKeyCode() == KeyEvent.VK_S && e.isControlDown() && !e.isAltDown()) {
 			fulfillSaveRequest(e.isShiftDown());
+		} else if (e.getKeyCode() == KeyEvent.VK_O && e.isControlDown() && !e.isShiftDown() && !e.isAltDown()) {
+			fulfillOpenRequest();
 		} else {
 			if (activeLayer != null) {
 				activeLayer.keyPressed(e);
