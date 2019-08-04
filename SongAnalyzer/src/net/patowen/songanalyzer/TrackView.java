@@ -155,6 +155,7 @@ public class TrackView {
 		for (int i=0; i<numLayers; i++) {
 			TrackLayer layer = createLayer(stream.readInt());
 			layer.load(stream);
+			layers.add(layer);
 		}
 	}
 	
@@ -198,17 +199,17 @@ public class TrackView {
 		currentFile = currentFilePath == null ? null : new File(currentFilePath);
 		
 		if (currentFile != null) {
-			DataInputStream stream = getDataInputStream(currentFile);
-			if (stream == null) {
-				prefs.remove("currentFile");
-				currentFile = null;
-			} else {
-				try {
-					load(stream);
-				} catch (IOException e) {
+			try (DataInputStream stream = getDataInputStream(currentFile)) {
+				if (stream == null) {
 					prefs.remove("currentFile");
 					currentFile = null;
+				} else {
+					load(stream);
 				}
+			}
+			catch (IOException e) {
+				prefs.remove("currentFile");
+				currentFile = null;
 			}
 		}
 	}
