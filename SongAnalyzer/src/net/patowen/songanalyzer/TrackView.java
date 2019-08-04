@@ -55,86 +55,33 @@ public class TrackView {
 		trackPanel.setFocusable(true);
 		trackPanel.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_1) {
-					startPlaying();
-				} else if (e.getKeyCode() == KeyEvent.VK_2) {
-					stopPlaying();
-				} else if (e.getKeyCode() == KeyEvent.VK_Z && e.isControlDown() && !e.isShiftDown() && !e.isAltDown()) {
-					status.userActionList.undo();
-					status.refresh();
-				} else if ((e.getKeyCode() == KeyEvent.VK_Z && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) || (e.getKeyCode() == KeyEvent.VK_Y && e.isControlDown() && !e.isShiftDown() && !e.isAltDown())) {
-					status.userActionList.redo();
-					status.refresh();
-				} else {
-					if (activeLayer != null) {
-						activeLayer.keyPressed(e);
-					}
-				}
+				TrackView.this.keyPressed(e);
 			}
 		});
 		
 		trackPanel.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				MouseRegion mouseRegion = getMouseRegion(e.getX(), e.getY());
-				if (mouseRegion.isLayerBoundary) {
-					trackPanel.setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
-					resizingLayer = true;
-					resizingLayerIndex = mouseRegion.layerIndex;
-					TrackLayer layer = layers.get(resizingLayerIndex);
-					resizingLayerStartHeight = layer.getHeight();
-					resizingLayerStartMouseY = e.getY();
-				}
-				if (mouseRegion.isLayer) {
-					TrackLayer layer = layers.get(mouseRegion.layerIndex);
-					activeLayer = layer;
-					status.refresh();
-					layer.mousePressed(e, e.getX() - mouseRegion.cornerX, e.getY() - mouseRegion.cornerY);
-				}
-				if (mouseRegion.isTab) {
-					TrackLayer layer = layers.get(mouseRegion.layerIndex);
-					activeLayer = layer;
-					status.refresh();
-				}
+				TrackView.this.mousePressed(e);
 			}
 			
 			public void mouseReleased(MouseEvent e) {
-				resizingLayer = false;
-				MouseRegion mouseRegion = getMouseRegion(e.getX(), e.getY());
-				if (mouseRegion.isLayerBoundary) {
-					trackPanel.setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
-				} else {
-					trackPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-				}
+				TrackView.this.mouseReleased(e);
 			}
 		});
 		
 		trackPanel.addMouseMotionListener(new MouseMotionAdapter() {
 			public void mouseMoved(MouseEvent e) {
-				MouseRegion mouseRegion = getMouseRegion(e.getX(), e.getY());
-				if (mouseRegion.isLayerBoundary || resizingLayer) {
-					trackPanel.setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
-				} else {
-					trackPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-				}
+				TrackView.this.mouseMoved(e);
 			}
 			
 			public void mouseDragged(MouseEvent e) {
-				if (resizingLayer) {
-					trackPanel.setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
-					TrackLayer layer = layers.get(resizingLayerIndex);
-					layer.trySetHeight(resizingLayerStartHeight + (e.getY() - resizingLayerStartMouseY));
-					status.refresh();
-				} else {
-					trackPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-				}
+				TrackView.this.mouseDragged(e);
 			}
 		});
 		
 		trackPanel.addMouseWheelListener(new MouseWheelListener() {
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				double zoomFactor = Math.exp(e.getPreciseWheelRotation() * 0.1);
-				status.bounds.zoom(status.bounds.pixelToSeconds(e.getX() - outerBorderWidth), zoomFactor);
-				status.refresh();
+				TrackView.this.mouseWheelMoved(e);
 			}
 		});
 		
@@ -183,6 +130,83 @@ public class TrackView {
 	
 	public void stopPlaying() {
 		status.audioStream.pause();
+	}
+	
+	public void keyPressed(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_1) {
+			startPlaying();
+		} else if (e.getKeyCode() == KeyEvent.VK_2) {
+			stopPlaying();
+		} else if (e.getKeyCode() == KeyEvent.VK_Z && e.isControlDown() && !e.isShiftDown() && !e.isAltDown()) {
+			status.userActionList.undo();
+			status.refresh();
+		} else if ((e.getKeyCode() == KeyEvent.VK_Z && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) || (e.getKeyCode() == KeyEvent.VK_Y && e.isControlDown() && !e.isShiftDown() && !e.isAltDown())) {
+			status.userActionList.redo();
+			status.refresh();
+		} else {
+			if (activeLayer != null) {
+				activeLayer.keyPressed(e);
+			}
+		}
+	}
+	
+	public void mousePressed(MouseEvent e) {
+		MouseRegion mouseRegion = getMouseRegion(e.getX(), e.getY());
+		if (mouseRegion.isLayerBoundary) {
+			trackPanel.setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
+			resizingLayer = true;
+			resizingLayerIndex = mouseRegion.layerIndex;
+			TrackLayer layer = layers.get(resizingLayerIndex);
+			resizingLayerStartHeight = layer.getHeight();
+			resizingLayerStartMouseY = e.getY();
+		}
+		if (mouseRegion.isLayer) {
+			TrackLayer layer = layers.get(mouseRegion.layerIndex);
+			activeLayer = layer;
+			status.refresh();
+			layer.mousePressed(e, e.getX() - mouseRegion.cornerX, e.getY() - mouseRegion.cornerY);
+		}
+		if (mouseRegion.isTab) {
+			TrackLayer layer = layers.get(mouseRegion.layerIndex);
+			activeLayer = layer;
+			status.refresh();
+		}
+	}
+	
+	public void mouseReleased(MouseEvent e) {
+		resizingLayer = false;
+		MouseRegion mouseRegion = getMouseRegion(e.getX(), e.getY());
+		if (mouseRegion.isLayerBoundary) {
+			trackPanel.setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
+		} else {
+			trackPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}
+	}
+	
+	public void mouseMoved(MouseEvent e) {
+		MouseRegion mouseRegion = getMouseRegion(e.getX(), e.getY());
+		if (mouseRegion.isLayerBoundary || resizingLayer) {
+			trackPanel.setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
+		} else {
+			trackPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}
+	}
+	
+	public void mouseDragged(MouseEvent e) {
+		if (resizingLayer) {
+			trackPanel.setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
+			TrackLayer layer = layers.get(resizingLayerIndex);
+			layer.trySetHeight(resizingLayerStartHeight + (e.getY() - resizingLayerStartMouseY));
+			status.refresh();
+		} else {
+			trackPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}
+	}
+	
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		double zoomFactor = Math.exp(e.getPreciseWheelRotation() * 0.1);
+		status.bounds.zoom(status.bounds.pixelToSeconds(e.getX() - outerBorderWidth), zoomFactor);
+		status.refresh();
 	}
 	
 	public void renderPanel(Graphics2D g) {
