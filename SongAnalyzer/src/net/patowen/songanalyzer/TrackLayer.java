@@ -6,22 +6,12 @@ import java.awt.event.MouseEvent;
 public abstract class TrackLayer {
 	private int height;
 	
-	private boolean selected;
-	
 	public TrackLayer() {
 		height = getPreferredHeight();
 	}
 	
 	public final int getHeight() {
 		return height;
-	}
-	
-	public final void setSelected(boolean selected) {
-		this.selected = selected;
-	}
-	
-	public final boolean isSelected() {
-		return selected;
 	}
 	
 	public final void trySetHeight(int requestedHeight) {

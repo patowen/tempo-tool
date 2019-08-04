@@ -1,6 +1,7 @@
 package net.patowen.songanalyzer;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.TreeSet;
 
@@ -14,9 +15,6 @@ public class MarkerLayer extends TrackLayer {
 	public MarkerLayer(TrackStatus status) {
 		this.status = status;
 		marks = new TreeSet<>();
-		for (int i=0; i<60; i++) {
-			marks.add((double)i);
-		}
 		
 		tickerSource = new TickerSource() {
 			public Double getNextTickInclusive(double pos) {
@@ -27,6 +25,20 @@ public class MarkerLayer extends TrackLayer {
 				return marks.higher(pos);
 			}
 		};
+	}
+	
+	public void addMark(double mark) {
+		marks.add(mark);
+	}
+	
+	public void removeMark(double mark) {
+		marks.remove(mark);
+	}
+	
+	public void addTestMarks() {
+		for (int i=0; i<60; i++) {
+			marks.add((double)i);
+		}
 	}
 	
 	@Override
@@ -48,8 +60,10 @@ public class MarkerLayer extends TrackLayer {
 		if (e.isShiftDown()) {
 			double pos = status.bounds.pixelToSeconds(mouseX);
 			if (e.getButton() == MouseEvent.BUTTON1) {
-				marks.add(pos);
-				status.refresh();
+				if (!marks.contains(pos)) {
+					status.userActionList.applyAction(new UserActionAddMark(this, pos));
+					status.refresh();
+				}
 			}
 			if (e.getButton() == MouseEvent.BUTTON3 && !marks.isEmpty()) {
 				Double lower = marks.floor(pos);
@@ -62,10 +76,20 @@ public class MarkerLayer extends TrackLayer {
 				}
 				int closerPixel = status.bounds.secondsToPixel(closer);
 				if (mouseX >= closerPixel - markSelectionRange && mouseX <= closerPixel + markSelectionRange) {
-					marks.remove(closer);
+					status.userActionList.applyAction(new UserActionRemoveMark(this, closer));
+					status.refresh();
 				}
-				status.refresh();
 			}
+		}
+	}
+	
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_N) {
+			status.updatePlayBar();
+			double mark = status.playBarPos;
+			status.userActionList.applyAction(new UserActionAddMark(this, mark));
+			status.refresh();
 		}
 	}
 	

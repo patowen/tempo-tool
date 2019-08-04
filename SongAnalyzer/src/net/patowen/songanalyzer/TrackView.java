@@ -24,6 +24,7 @@ public class TrackView {
 	private JPanel trackPanel;
 	
 	private ArrayList<TrackLayer> layers;
+	private TrackLayer activeLayer;
 	
 	private TrackStatus status;
 	private Ticker ticker;
@@ -58,6 +59,16 @@ public class TrackView {
 					startPlaying();
 				} else if (e.getKeyCode() == KeyEvent.VK_2) {
 					stopPlaying();
+				} else if (e.getKeyCode() == KeyEvent.VK_Z && e.isControlDown() && !e.isShiftDown() && !e.isAltDown()) {
+					status.userActionList.undo();
+					status.refresh();
+				} else if ((e.getKeyCode() == KeyEvent.VK_Z && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) || (e.getKeyCode() == KeyEvent.VK_Y && e.isControlDown() && !e.isShiftDown() && !e.isAltDown())) {
+					status.userActionList.redo();
+					status.refresh();
+				} else {
+					if (activeLayer != null) {
+						activeLayer.keyPressed(e);
+					}
 				}
 			}
 		});
@@ -75,22 +86,13 @@ public class TrackView {
 				}
 				if (mouseRegion.isLayer) {
 					TrackLayer layer = layers.get(mouseRegion.layerIndex);
+					activeLayer = layer;
+					status.refresh();
 					layer.mousePressed(e, e.getX() - mouseRegion.cornerX, e.getY() - mouseRegion.cornerY);
 				}
 				if (mouseRegion.isTab) {
-					if (e.isControlDown()) {
-						TrackLayer layer = layers.get(mouseRegion.layerIndex);
-						layer.setSelected(!layer.isSelected());
-					} else {
-						for (int i=0; i<layers.size(); i++) {
-							TrackLayer layer = layers.get(i);
-							if (i == mouseRegion.layerIndex) {
-								layer.setSelected(true);
-							} else {
-								layer.setSelected(false);
-							}
-						}
-					}
+					TrackLayer layer = layers.get(mouseRegion.layerIndex);
+					activeLayer = layer;
 					status.refresh();
 				}
 			}
@@ -155,6 +157,12 @@ public class TrackView {
 		MarkerLayer markerLayer = new MarkerLayer(status);
 		ticker.addSource(markerLayer.getTickerSource());
 		layers.add(markerLayer);
+		MarkerLayer markerLayer2 = new MarkerLayer(status);
+//		ticker.addSource(markerLayer2.getTickerSource());
+		markerLayer2.addTestMarks();
+		layers.add(markerLayer2);
+		
+		activeLayer = null;
 		
 		
 		playBarUpdateTimer.setDelay(10);
@@ -202,7 +210,7 @@ public class TrackView {
 			g.drawLine(trackTabWidth, 0, trackTabWidth, layerHeight);
 			g.drawLine(0, layerHeight, innerWidth, layerHeight);
 			
-			if (layer.isSelected()) {
+			if (layer == activeLayer) {
 				g.setColor(Color.GREEN);
 				g.fillRect(0, 0, trackTabWidth, layerHeight);
 			}
