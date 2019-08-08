@@ -48,7 +48,7 @@ public class Ticker {
 	
 	public void markNextTickPlayed() {
 		lastPlayedTick = nextTick;
-		nextTick = lastPlayedTick + 1;
+		nextTick = computeNextTickExclusive(lastPlayedTick);
 	}
 	
 	private Double computeNextTickInclusive(double pos) {
