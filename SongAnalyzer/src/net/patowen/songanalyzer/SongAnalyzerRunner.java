@@ -7,7 +7,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class SongAnalyzerRunner {
 	public static void main(String[] args) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
-		AudioStreamFile stream = new AudioStreamFile(new File("C:\\Users\\Patrick\\Desktop\\test.wav"));
+		AudioStream stream = new AudioStream(new File("C:\\Users\\Patrick\\Desktop\\test.wav"));
 		System.gc();
 		new TrackView(stream);
 	}
