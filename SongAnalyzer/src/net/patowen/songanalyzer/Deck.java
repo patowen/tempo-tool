@@ -6,6 +6,8 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
+import net.patowen.songanalyzer.TrackView.MouseRegion;
+
 // The deck is main area of the application, a stack of track layers with a play bar.
 public class Deck {
 	private GlobalStatus status;
@@ -58,24 +60,34 @@ public class Deck {
 		g.drawLine(pos, 0, pos, height);
 	}
 	
-	private class MouseRegion {
-		int cornerX;
-		int cornerY;
-		int layerIndex;
-		boolean isLayer;
-		boolean isLayerBoundary;
-		boolean isTab;
-		
-		public MouseRegion(int cornerX, int cornerY) {
-			this.cornerX = cornerX;
-			this.cornerY = cornerY;
-			isLayerBoundary = false;
-			isLayer = false;
-			isTab = false;
+	private MouseRegion getMouseRegion(int mouseX, int mouseY) {
+		int refY = outerBorderHeight;
+		if (mouseY < refY) {
+			return null;
 		}
+		for (int i = 0; i < layers.size(); i++) {
+			TrackLayer layer = layers.get(i);
+			if (mouseY - refY < layer.getHeight() - interBorderSelectionRange) {
+				if (mouseX >= outerBorderWidth && mouseX < outerBorderWidth + trackTabWidth) {
+					return new MouseRegionTab(layer);
+				} else if (mouseX >= outerBorderWidth + trackTabWidth + trackTabBorderWidth && mouseX < trackPanel.getWidth() - outerBorderWidth) {
+					return new MouseRegionLayer(layer, mouseX - (outerBorderWidth + trackTabWidth + trackTabBorderWidth), mouseY - refY);
+				} else {
+					return null;
+				}
+			} else if (mouseY - refY < layer.getHeight() + interBorderHeight + interBorderSelectionRange) {
+				return new MouseRegionLayerBoundary(layer);
+			}
+			refY += layer.getHeight() + interBorderHeight;
+		}
+		return null;
 	}
 	
-	private class MouseRegionLayer {
+	private interface MouseRegion {
+		
+	}
+	
+	private class MouseRegionLayer implements MouseRegion {
 		TrackLayer layer;
 		int mouseX;
 		int mouseY;
@@ -84,6 +96,22 @@ public class Deck {
 			this.layer = layer;
 			this.mouseX = mouseX;
 			this.mouseY = mouseY;
+		}
+	}
+	
+	private class MouseRegionLayerBoundary implements MouseRegion {
+		TrackLayer layer;
+		
+		public MouseRegionLayerBoundary(TrackLayer layer) {
+			this.layer = layer;
+		}
+	}
+	
+	private class MouseRegionTab implements MouseRegion {
+		TrackLayer layer;
+		
+		public MouseRegionTab(TrackLayer layer) {
+			this.layer = layer;
 		}
 	}
 }
