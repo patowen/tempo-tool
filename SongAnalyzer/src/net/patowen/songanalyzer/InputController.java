@@ -13,7 +13,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	
 	private AugmentedInputHandler activeInput;
 	
-	private Point mousePos;
+	private Point mousePos; // Used only for mouse-hover key presses
 	
 	public InputController(Component component) {
 		activeInput = null;
@@ -26,15 +26,31 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	
 	@Override
 	public void mousePressed(MouseEvent e) {
-		//mouseNode = rootNode.getMouseNode(e.getX(), e.getY());
+		InputType inputType = new InputTypeMouse(e.getButton(), e.isControlDown(), e.isShiftDown(), e.isAltDown());
+		InputHandler inputHandler = rootNode.getInputHandler(inputType, e.getX(), e.getY());
+		Point relativePoint = getRelativePoint(inputHandler.parentNode.getPos(), e.getPoint());
+		
+		if (inputHandler instanceof InputHandler.Standard) {
+			InputHandler.Standard standard = (InputHandler.Standard) inputHandler;
+			standard.inputAction.onInput(relativePoint, standard.factor);
+		} else if (inputHandler instanceof InputHandler.Dragging) {
+			if (activeInput == null) { // TODO
+				InputHandler.Dragging dragging = (InputHandler.Dragging) inputHandler;
+				dragging.inputAction.onStart(relativePoint);
+				activeInput = new AugmentedInputHandler(dragging, e.getPoint());
+			}
+		}
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if (activeInput != null && activeInput.inputType.equals(new InputTypeMouse(e.getButton(), e.isControlDown(), e.isShiftDown(), e.isAltDown()))) {
-			activeInput.inputHandler.onEnd(e.getX() - activeInput.startX, e.getY() - activeInput.startY);
+		if (activeInput != null) {
+			InputType inputType = new InputTypeMouse(e.getButton(), e.isControlDown(), e.isShiftDown(), e.isAltDown());
+			if (activeInput.dragging.inputType.equals(inputType)) {
+				activeInput.dragging.inputAction.onEnd(getRelativePoint(e.getPoint(), activeInput.start));
+			}
+			activeInput = null;
 		}
-		activeInput = null;
 	}
 	
 	@Override
@@ -44,35 +60,42 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		handleMouseMotion(e);
+		mousePos = e.getPoint();
 	}
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		handleMouseMotion(e);
-	}
-	
-	private void handleMouseMotion(MouseEvent e) {
+		mousePos = e.getPoint();
 		if (activeInput != null) {
-			activeInput.inputHandler.onDrag(e.getX() - activeInput.startX, e.getY() - activeInput.startY);
+			activeInput.dragging.inputAction.onDrag(getRelativePoint(e.getPoint(), activeInput.start));
 		}
 	}
 	
 	@Override
-	public void mouseEntered(MouseEvent e) {}
+	public void mouseEntered(MouseEvent e) {
+		mousePos = e.getPoint();
+	}
 	
 	@Override
-	public void mouseExited(MouseEvent e) {}
+	public void mouseExited(MouseEvent e) {
+		mousePos = null;
+	}
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {}
 	
+	private Point getRelativePoint(Point origin, Point point) {
+		return new Point(point.x - origin.x, point.y - origin.y);
+	}
+	
 	private class AugmentedInputHandler {
-		InputType inputType;
+		InputHandler.Dragging dragging;
+		Point start;
 		
-		InputHandler inputHandler;
-		
-		int startX, startY;
+		public AugmentedInputHandler(InputHandler.Dragging dragging, Point start) {
+			this.dragging = dragging;
+			this.start = start;
+		}
 	}
 }
 
@@ -99,7 +122,7 @@ Marker mack inputs:
 	Horizontal arrow keys - Move selected marks by amount dependent on zoom level and modifier keys. Action canceled if collision occurs
 	Ctrl-A - Select all
 	Delete - Delete selected marks
-	TODO: Marks need to be more complicated than just doubles. Consider custom data structure
+	TODO: Marks may need to be more complicated than just doubles. Consider custom data structure
 
 Beat mack inputs:
 	Left click - Select anchors (See marker mack inputs for details)

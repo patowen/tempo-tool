@@ -1,17 +1,15 @@
 package net.patowen.songanalyzer;
 
-public interface InputHandler {
-	void onStart(int nodeRelativeX, int nodeRelativeY, double value);
+public abstract class InputHandler {
+	public GuiNode parentNode;
+	public InputType inputType;
 	
-	default void onDrag(int startRelativeX, int startRelativeY) {
-		
+	public static final class Standard extends InputHandler {
+		public InputActionStandard inputAction;
+		public double factor;
 	}
 	
-	default void onCancel(int startRelativeX, int startRelativeY) {
-		
-	}
-	
-	default void onEnd(int startRelativeX, int startRelativeY) {
-		
+	public static final class Dragging extends InputHandler {
+		public InputActionDrag inputAction;
 	}
 }

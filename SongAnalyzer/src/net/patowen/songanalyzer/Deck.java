@@ -2,6 +2,7 @@ package net.patowen.songanalyzer;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
@@ -145,5 +146,17 @@ public class Deck implements GuiNode {
 		} else {
 			return this;
 		}
+	}
+
+	@Override
+	public InputHandler getInputHandler(InputType inputType, int mouseX, int mouseY) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Point getPos() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
