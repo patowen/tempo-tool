@@ -82,7 +82,7 @@ Tab inputs:
 	Click tab - Select mack (Clicking on standard mack space will normally select the mack as well)
 	Shift-click tab - Bind mack to selected mack, or unbind (toggle)
 		Seek macks contribute bound marker macks to the ticker. Marker macks are bound to seek macks by default
-		Beat macks can only place beats based on bound marker macks.
+		Beat macks try to place beats based on bound marker macks.
 
 Seek mack inputs:
 	Left click - Move playbar to appropriate location
@@ -97,6 +97,7 @@ Marker mack inputs:
 	Right click - Place/delete marks based on whether shift is pressed
 	N - Place mark at playbar location
 	Horizontal arrow keys - Move selected marks by amount dependent on zoom level and modifier keys. Action canceled if collision occurs
+	Ctrl-A - Select all
 	Delete - Delete selected marks
 	TODO: Marks need to be more complicated than just doubles. Consider custom data structure
 
@@ -108,7 +109,18 @@ Beat mack inputs:
 	??? - Show graph of beat rate over time
 	??? - Show graph of offset of nearest mark to each beat
 	??? - Zoom graph vertically
-	??? - Reset vertical zoom
+	??? - Reset vertical zoom of graph
+	??? - Find best fit
+	??? - Set tempo by hand
+	??? - Lock/unlock tempo
+	??? - Toggle force constant tempo
+	
+	Notes:
+		Beats start based on the first mark and end based on the last mark.
+		Anchors can be placed anywhere and mark a boundary of a piecewise function.
+		Sometimes, at an anchor, the tempo is altered, but sometimes, even the phase is altered, starting afresh.
+		The tempo can change smoothly between anchors.
+		A beat does not have to occur at an anchor.
 	
 Global inputs:
 	S key - While held, seek bar inputs will be in place.
