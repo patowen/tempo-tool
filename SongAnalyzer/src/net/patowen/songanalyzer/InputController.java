@@ -119,8 +119,20 @@ Beat mack inputs:
 		Beats start based on the first mark and end based on the last mark.
 		Anchors can be placed anywhere and mark a boundary of a piecewise function.
 		Sometimes, at an anchor, the tempo is altered, but sometimes, even the phase is altered, starting afresh.
-		The tempo can change smoothly between anchors.
+		The tempo can change smoothly between anchors. Any function definition is based on endpoints.
 		A beat does not have to occur at an anchor.
+		In finding best fit, anchors can have phase locked at 0, position locked in place, or both (adding constraints).
+		Anchors can be moved forward or backwards by beat, but for simplicity, phase will be set to 0 without moving beats.
+		Some operations involve selecting a region between anchors. Finding best fit is one example
+		Some operations involve selecting one side of an anchor. Moving an anchor is one example (to know how much to move it)
+		Best fit operations can query marks outside range, but not beats outside range
+		
+		Region states:
+			Blank - Do not include any beats.
+			Fixed to anchor - Phase at endpoints and beat count is fixed; moving anchors moves all beats
+			Fixed to time - Moving anchors keeps beats in place.
+			Locked - Anchors cannot be moved at all
+			(Anchors can choose what to be fixed to independently)
 	
 Global inputs:
 	S key - While held, seek bar inputs will be in place.

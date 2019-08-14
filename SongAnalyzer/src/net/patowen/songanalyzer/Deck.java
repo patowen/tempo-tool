@@ -138,7 +138,7 @@ public class Deck implements GuiNode {
 		}
 		
 		if (mouseRegion instanceof MouseRegionLayer) {
-			return ((MouseRegionLayer) mouseRegion).layer;
+			return null;//((MouseRegionLayer) mouseRegion).layer;
 		} else {
 			return this;
 		}
