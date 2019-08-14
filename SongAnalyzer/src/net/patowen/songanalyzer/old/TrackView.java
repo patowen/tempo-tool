@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer;
+package net.patowen.songanalyzer.old;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -32,6 +32,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import net.patowen.songanalyzer.InputController;
 
 public class TrackView {
 	private JPanel trackPanel;

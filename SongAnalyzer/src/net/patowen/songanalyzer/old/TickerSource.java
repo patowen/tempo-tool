@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer;
+package net.patowen.songanalyzer.old;
 
 public interface TickerSource {
 	public Double getNextTickInclusive(double pos);

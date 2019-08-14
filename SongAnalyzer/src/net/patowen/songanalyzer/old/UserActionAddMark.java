@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer;
+package net.patowen.songanalyzer.old;
 
 public class UserActionAddMark implements UserAction {
 	private MarkerLayer layer;

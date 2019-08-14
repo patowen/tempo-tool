@@ -6,6 +6,9 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
+import net.patowen.songanalyzer.old.TrackBounds;
+import net.patowen.songanalyzer.old.TrackLayer;
+
 // The deck is main area of the application, a stack of track layers with a play bar.
 public class Deck implements GuiNode {
 	private GlobalStatus status;
