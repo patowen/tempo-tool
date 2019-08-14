@@ -90,6 +90,8 @@ public class TrackView {
 		
 		resizingLayer = false;
 		
+		InputController ic = new InputController(trackPanel);
+		
 	}
 	
 	@SuppressWarnings("serial")
