@@ -116,7 +116,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 		return new Point(point.x - origin.x, point.y - origin.y);
 	}
 	
-	private class AugmentedInputHandler {
+	private static class AugmentedInputHandler {
 		InputHandler.Dragging dragging;
 		Point start;
 		
