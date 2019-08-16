@@ -144,7 +144,7 @@ public class Deck implements GuiNode {
 		return null;
 	}
 	
-	private class MackSlot {
+	private static class MackSlot {
 		Mack mack;
 		int height;
 		
