@@ -12,7 +12,7 @@ public interface GuiNode {
 	
 	//public GuiNode getMouseNode(int mouseX, int mouseY);
 	
-	public InputHandler getInputHandler(InputType inputType, Point point);
+	public InputHandler getInputHandler(InputType inputType, Point origin, Point point);
 	
 	public Point getPos(); // Returns the absolute position of the gui node
 }

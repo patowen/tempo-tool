@@ -38,7 +38,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 		if (activeInput != null) {
 			InputType inputType = new InputTypeMouse(e.getButton(), e.isControlDown(), e.isShiftDown(), e.isAltDown());
 			if (activeInput.dragging.inputType.fuzzyEquals(inputType)) {
-				activeInput.dragging.inputAction.onEnd(getRelativePoint(e.getPoint(), activeInput.start));
+				activeInput.dragging.inputAction.onEnd(getRelativePoint(activeInput.start, e.getPoint()));
 			}
 			activeInput = null;
 		}
@@ -60,7 +60,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	public void mouseDragged(MouseEvent e) {
 		mousePos = e.getPoint();
 		if (activeInput != null) {
-			activeInput.dragging.inputAction.onDrag(getRelativePoint(e.getPoint(), activeInput.start));
+			activeInput.dragging.inputAction.onDrag(getRelativePoint(activeInput.start, e.getPoint()));
 		}
 	}
 	
@@ -90,8 +90,8 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	public void keyReleased(KeyEvent e) {}
 	
 	private void handleAction(InputType inputType, double value) {
-		InputHandler inputHandler = rootNode.getInputHandler(inputType, mousePos);
-		Point relativePoint = getRelativePoint(inputHandler.parentNode.getPos(), mousePos);
+		InputHandler inputHandler = rootNode.getInputHandler(inputType, new Point(0, 0), mousePos);
+		Point relativePoint = getRelativePoint(inputHandler.origin, mousePos);
 		
 		if (inputHandler.cancelsDrag && activeInput != null) {
 			activeInput.dragging.inputAction.onCancel();

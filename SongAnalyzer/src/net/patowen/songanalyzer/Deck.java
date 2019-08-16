@@ -134,7 +134,7 @@ public class Deck implements GuiNode {
 	}
 
 	@Override
-	public InputHandler getInputHandler(InputType inputType, Point mouse) {
+	public InputHandler getInputHandler(InputType inputType, Point origin, Point mouse) {
 		// TODO Auto-generated method stub
 		return null;
 	}

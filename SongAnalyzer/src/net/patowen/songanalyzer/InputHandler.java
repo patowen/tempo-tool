@@ -1,7 +1,9 @@
 package net.patowen.songanalyzer;
 
+import java.awt.Point;
+
 public abstract class InputHandler {
-	public GuiNode parentNode;
+	public Point origin;
 	public InputType inputType;
 	public boolean cancelsDrag;
 	
