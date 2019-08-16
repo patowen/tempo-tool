@@ -8,13 +8,12 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
 import net.patowen.songanalyzer.old.TrackBounds;
-import net.patowen.songanalyzer.old.TrackLayer;
 
 // The deck is main area of the application, a stack of track layers with a play bar.
 public class Deck implements GuiNode {
 	private GlobalStatus status;
-	private ArrayList<TrackLayer> layers;
-	private TrackLayer activeLayer;
+	private ArrayList<MackSlot> mackSlots;
+	private MackSlot activeMackSlot;
 	private TrackBounds bounds;
 	
 	private int width, height;
@@ -30,20 +29,20 @@ public class Deck implements GuiNode {
 		if (mouseY < refY) {
 			return null;
 		}
-		for (int i = 0; i < layers.size(); i++) {
-			TrackLayer layer = layers.get(i);
-			if (mouseY - refY < layer.getHeight() - interBorderSelectionRange) {
+		for (int i = 0; i < mackSlots.size(); i++) {
+			MackSlot mackSlot = mackSlots.get(i);
+			if (mouseY - refY < mackSlot.height - interBorderSelectionRange) {
 				if (mouseX >= outerBorderWidth && mouseX < outerBorderWidth + trackTabWidth) {
-					return new MouseRegionTab(layer);
+					return new MouseRegionTab(mackSlot);
 				} else if (mouseX >= outerBorderWidth + trackTabWidth + trackTabBorderWidth && mouseX < width - outerBorderWidth) {
-					return new MouseRegionLayer(layer, mouseX - (outerBorderWidth + trackTabWidth + trackTabBorderWidth), mouseY - refY);
+					return new MouseRegionMack(mackSlot.mack, mouseX - (outerBorderWidth + trackTabWidth + trackTabBorderWidth), mouseY - refY);
 				} else {
 					return null;
 				}
-			} else if (mouseY - refY < layer.getHeight() + interBorderHeight + interBorderSelectionRange) {
-				return new MouseRegionLayerBoundary(layer);
+			} else if (mouseY - refY < mackSlot.height + interBorderHeight + interBorderSelectionRange) {
+				return new MouseRegionMackBoundary(mackSlot);
 			}
-			refY += layer.getHeight() + interBorderHeight;
+			refY += mackSlot.height + interBorderHeight;
 		}
 		return null;
 	}
@@ -52,31 +51,31 @@ public class Deck implements GuiNode {
 		
 	}
 	
-	private class MouseRegionLayer implements MouseRegion {
-		TrackLayer layer;
+	private class MouseRegionMack implements MouseRegion {
+		Mack mack;
 		int mouseX;
 		int mouseY;
 		
-		public MouseRegionLayer(TrackLayer layer, int mouseX, int mouseY) {
-			this.layer = layer;
+		public MouseRegionMack(Mack mack, int mouseX, int mouseY) {
+			this.mack = mack;
 			this.mouseX = mouseX;
 			this.mouseY = mouseY;
 		}
 	}
 	
-	private class MouseRegionLayerBoundary implements MouseRegion {
-		TrackLayer layer;
+	private class MouseRegionMackBoundary implements MouseRegion {
+		MackSlot mackSlot;
 		
-		public MouseRegionLayerBoundary(TrackLayer layer) {
-			this.layer = layer;
+		public MouseRegionMackBoundary(MackSlot mackSlot) {
+			this.mackSlot = mackSlot;
 		}
 	}
 	
 	private class MouseRegionTab implements MouseRegion {
-		TrackLayer layer;
+		MackSlot mackSlot;
 		
-		public MouseRegionTab(TrackLayer layer) {
-			this.layer = layer;
+		public MouseRegionTab(MackSlot mackSlot) {
+			this.mackSlot = mackSlot;
 		}
 	}
 	
@@ -105,13 +104,13 @@ public class Deck implements GuiNode {
 		int innerWidth = width - outerBorderWidth * 2;
 		int trackWidth = innerWidth - trackTabWidth - trackTabBorderWidth;
 		bounds.setWidth(trackWidth);
-		for (TrackLayer layer : layers) {
-			int layerHeight = layer.getHeight();
+		for (MackSlot mackSlot : mackSlots) {
+			int layerHeight = mackSlot.height;
 			AffineTransform savedTransform2 = g.getTransform();
 			g.translate(trackTabWidth + trackTabBorderWidth, 0);
 			Shape savedClip = g.getClip();
 			g.clipRect(0, 0, trackWidth, layerHeight);
-			layer.render(g, trackWidth, layerHeight);
+			mackSlot.mack.render(g); // trackWidth, layerHeight
 			g.setClip(savedClip);
 			g.setTransform(savedTransform2);
 			g.setColor(Color.WHITE);
@@ -119,7 +118,7 @@ public class Deck implements GuiNode {
 			g.drawLine(trackTabWidth, 0, trackTabWidth, layerHeight);
 			g.drawLine(0, layerHeight, innerWidth, layerHeight);
 			
-			if (layer == activeLayer) {
+			if (mackSlot == activeMackSlot) {
 				g.setColor(Color.GREEN);
 				g.fillRect(0, 0, trackTabWidth, layerHeight);
 			}
@@ -143,5 +142,15 @@ public class Deck implements GuiNode {
 	public Point getPos() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	private class MackSlot {
+		Mack mack;
+		int height;
+		
+		public MackSlot(Mack mack) {
+			this.mack = mack;
+			this.height = mack.getDefaultHeight();
+		}
 	}
 }

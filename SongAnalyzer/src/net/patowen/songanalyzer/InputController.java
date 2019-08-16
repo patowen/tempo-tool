@@ -191,5 +191,6 @@ Global inputs:
 	Ctrl-Shift-Z or Ctrl-Y - Redo
 	Ctrl-S or Ctrl-Shift-S - Save (Shift makes it force a dialog box)
 	Ctrl-O - Open
+	TODO: Mack synthesis
 
  */
