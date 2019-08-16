@@ -47,11 +47,11 @@ public class Deck implements GuiNode {
 		return null;
 	}
 	
-	private interface MouseRegion {
+	private static interface MouseRegion {
 		
 	}
 	
-	private class MouseRegionMack implements MouseRegion {
+	private static class MouseRegionMack implements MouseRegion {
 		Mack mack;
 		int mouseX;
 		int mouseY;
@@ -63,7 +63,7 @@ public class Deck implements GuiNode {
 		}
 	}
 	
-	private class MouseRegionMackBoundary implements MouseRegion {
+	private static class MouseRegionMackBoundary implements MouseRegion {
 		MackSlot mackSlot;
 		
 		public MouseRegionMackBoundary(MackSlot mackSlot) {
@@ -71,7 +71,7 @@ public class Deck implements GuiNode {
 		}
 	}
 	
-	private class MouseRegionTab implements MouseRegion {
+	private static class MouseRegionTab implements MouseRegion {
 		MackSlot mackSlot;
 		
 		public MouseRegionTab(MackSlot mackSlot) {
