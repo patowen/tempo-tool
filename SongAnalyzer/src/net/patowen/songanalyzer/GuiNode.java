@@ -10,9 +10,9 @@ public interface GuiNode {
 	
 	public void render(Graphics2D g);
 	
-	public GuiNode getMouseNode(int mouseX, int mouseY);
+	//public GuiNode getMouseNode(int mouseX, int mouseY);
 	
-	public InputHandler getInputHandler(InputType inputType, int mouseX, int mouseY);
+	public InputHandler getInputHandler(InputType inputType, Point point);
 	
 	public Point getPos(); // Returns the absolute position of the gui node
 }

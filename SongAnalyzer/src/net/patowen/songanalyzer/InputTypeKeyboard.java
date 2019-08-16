@@ -29,4 +29,12 @@ public final class InputTypeKeyboard implements InputType {
 	public int hashCode() {
 		return 0x200000 + button * 8 + (ctrl ? 4 : 0) + (shift ? 2 : 0) + (alt ? 1 : 0);
 	}
+	
+	@Override
+	public boolean fuzzyEquals(InputType inputType) {
+		if (!(inputType instanceof InputTypeKeyboard)) {
+			return false;
+		}
+		return ((InputTypeKeyboard) inputType).button == button;
+	}
 }

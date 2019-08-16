@@ -2,13 +2,15 @@ package net.patowen.songanalyzer;
 
 import java.awt.Component;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener {
+public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 	private GuiNode rootNode;
 	
 	private AugmentedInputHandler activeInput;
@@ -27,26 +29,15 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	@Override
 	public void mousePressed(MouseEvent e) {
 		InputType inputType = new InputTypeMouse(e.getButton(), e.isControlDown(), e.isShiftDown(), e.isAltDown());
-		InputHandler inputHandler = rootNode.getInputHandler(inputType, e.getX(), e.getY());
-		Point relativePoint = getRelativePoint(inputHandler.parentNode.getPos(), e.getPoint());
-		
-		if (inputHandler instanceof InputHandler.Standard) {
-			InputHandler.Standard standard = (InputHandler.Standard) inputHandler;
-			standard.inputAction.onInput(relativePoint, standard.factor);
-		} else if (inputHandler instanceof InputHandler.Dragging) {
-			if (activeInput == null) { // TODO
-				InputHandler.Dragging dragging = (InputHandler.Dragging) inputHandler;
-				dragging.inputAction.onStart(relativePoint);
-				activeInput = new AugmentedInputHandler(dragging, e.getPoint());
-			}
-		}
+		mousePos = e.getPoint();
+		handleAction(inputType, 1);
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if (activeInput != null) {
 			InputType inputType = new InputTypeMouse(e.getButton(), e.isControlDown(), e.isShiftDown(), e.isAltDown());
-			if (activeInput.dragging.inputType.equals(inputType)) {
+			if (activeInput.dragging.inputType.fuzzyEquals(inputType)) {
 				activeInput.dragging.inputAction.onEnd(getRelativePoint(e.getPoint(), activeInput.start));
 			}
 			activeInput = null;
@@ -55,7 +46,9 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		//mouseNode = rootNode.getMouseNode(e.getX(), e.getY());
+		InputType inputType = new InputTypeScroll(e.isControlDown(), e.isShiftDown(), e.isAltDown());
+		mousePos = e.getPoint();
+		handleAction(inputType, e.getPreciseWheelRotation());
 	}
 	
 	@Override
@@ -83,8 +76,43 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {}
+
+	@Override
+	public void keyTyped(KeyEvent e) {}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		InputType inputType = new InputTypeKeyboard(e.getKeyCode(), e.isControlDown(), e.isShiftDown(), e.isAltDown());
+		handleAction(inputType, 1);
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {}
+	
+	private void handleAction(InputType inputType, double value) {
+		InputHandler inputHandler = rootNode.getInputHandler(inputType, mousePos);
+		Point relativePoint = getRelativePoint(inputHandler.parentNode.getPos(), mousePos);
+		
+		if (inputHandler.cancelsDrag && activeInput != null) {
+			activeInput.dragging.inputAction.onCancel();
+		}
+		
+		if (inputHandler instanceof InputHandler.Standard) {
+			InputHandler.Standard standard = (InputHandler.Standard) inputHandler;
+			standard.inputAction.onInput(relativePoint, value * standard.factor);
+		} else if (inputHandler instanceof InputHandler.Dragging) {
+			if (activeInput == null) {
+				InputHandler.Dragging dragging = (InputHandler.Dragging) inputHandler;
+				dragging.inputAction.onStart(relativePoint);
+				activeInput = new AugmentedInputHandler(dragging, mousePos);
+			}
+		}
+	}
 	
 	private Point getRelativePoint(Point origin, Point point) {
+		if (point == null) {
+			return null;
+		}
 		return new Point(point.x - origin.x, point.y - origin.y);
 	}
 	
@@ -122,7 +150,6 @@ Marker mack inputs:
 	Horizontal arrow keys - Move selected marks by amount dependent on zoom level and modifier keys. Action canceled if collision occurs
 	Ctrl-A - Select all
 	Delete - Delete selected marks
-	TODO: Marks may need to be more complicated than just doubles. Consider custom data structure
 
 Beat mack inputs:
 	Left click - Select anchors (See marker mack inputs for details)

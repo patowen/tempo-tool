@@ -132,24 +132,9 @@ public class Deck implements GuiNode {
 		int pos = bounds.secondsToPixel(status.getPlayPos()) + outerBorderWidth + trackTabWidth + trackTabBorderWidth;
 		g.drawLine(pos, 0, pos, height);
 	}
-	
-	@Override
-	public GuiNode getMouseNode(int mouseX, int mouseY) {
-		MouseRegion mouseRegion = getMouseRegion(mouseX, mouseY);
-		
-		if (mouseRegion == null) {
-			return this;
-		}
-		
-		if (mouseRegion instanceof MouseRegionLayer) {
-			return null;//((MouseRegionLayer) mouseRegion).layer;
-		} else {
-			return this;
-		}
-	}
 
 	@Override
-	public InputHandler getInputHandler(InputType inputType, int mouseX, int mouseY) {
+	public InputHandler getInputHandler(InputType inputType, Point mouse) {
 		// TODO Auto-generated method stub
 		return null;
 	}

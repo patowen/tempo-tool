@@ -29,4 +29,12 @@ public final class InputTypeMouse implements InputType {
 	public int hashCode() {
 		return 0x100000 + button * 8 + (ctrl ? 4 : 0) + (shift ? 2 : 0) + (alt ? 1 : 0);
 	}
+	
+	@Override
+	public boolean fuzzyEquals(InputType inputType) {
+		if (!(inputType instanceof InputTypeMouse)) {
+			return false;
+		}
+		return ((InputTypeMouse) inputType).button == button;
+	}
 }

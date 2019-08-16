@@ -3,6 +3,7 @@ package net.patowen.songanalyzer;
 public abstract class InputHandler {
 	public GuiNode parentNode;
 	public InputType inputType;
+	public boolean cancelsDrag;
 	
 	public static final class Standard extends InputHandler {
 		public InputActionStandard inputAction;

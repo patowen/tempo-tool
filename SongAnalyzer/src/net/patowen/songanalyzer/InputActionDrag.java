@@ -7,7 +7,7 @@ public interface InputActionDrag {
 	
 	void onDrag(Point startRelative);
 	
-	void onCancel(Point startRelative);
+	void onCancel();
 	
 	void onEnd(Point startRelative);
 }
