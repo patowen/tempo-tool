@@ -4,12 +4,13 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
 import net.patowen.songanalyzer.old.TrackBounds;
 
-// The deck is main area of the application, a stack of track layers with a play bar.
+// The deck is main area of the application, a stack of macks (track layers) with a play bar.
 public class Deck implements View {
 	private GlobalStatus status;
 	private ArrayList<MackSlot> mackSlots;
@@ -23,6 +24,15 @@ public class Deck implements View {
 	
 	private int trackTabWidth = 8, trackTabBorderWidth = 1;
 	
+	public Deck(GlobalStatus status) {
+		this.status = status;
+		mackSlots = new ArrayList<>();
+		
+		for (int i=0; i<3; i++) {
+			mackSlots.add(new MackSlot(new MackSeek()));
+		}
+	}
+	
 	private MouseRegion getMouseRegion(int mouseX, int mouseY) {
 		int refY = outerBorderHeight;
 		if (mouseY < refY) {
@@ -34,7 +44,7 @@ public class Deck implements View {
 				if (mouseX >= outerBorderWidth && mouseX < outerBorderWidth + trackTabWidth) {
 					return new MouseRegionTab(mackSlot);
 				} else if (mouseX >= outerBorderWidth + trackTabWidth + trackTabBorderWidth && mouseX < width - outerBorderWidth) {
-					return new MouseRegionMack(mackSlot, mouseX - (outerBorderWidth + trackTabWidth + trackTabBorderWidth), mouseY - refY);
+					return new MouseRegionMack(mackSlot, new Point(mouseX - (outerBorderWidth + trackTabWidth + trackTabBorderWidth), mouseY - refY));
 				} else {
 					return null;
 				}
@@ -52,13 +62,11 @@ public class Deck implements View {
 	
 	private static class MouseRegionMack implements MouseRegion {
 		MackSlot mackSlot;
-		int mouseX;
-		int mouseY;
+		Point mousePos;
 		
-		public MouseRegionMack(MackSlot mackSlot, int mouseX, int mouseY) {
+		public MouseRegionMack(MackSlot mackSlot, Point mousePos) {
 			this.mackSlot = mackSlot;
-			this.mouseX = mouseX;
-			this.mouseY = mouseY;
+			this.mousePos = mousePos;
 		}
 	}
 	
@@ -96,7 +104,7 @@ public class Deck implements View {
 		g.translate(outerBorderWidth, outerBorderHeight);
 		int innerWidth = width - outerBorderWidth * 2;
 		int trackWidth = innerWidth - trackTabWidth - trackTabBorderWidth;
-		bounds.setWidth(trackWidth);
+//		bounds.setWidth(trackWidth);
 		for (MackSlot mackSlot : mackSlots) {
 			int layerHeight = mackSlot.height;
 			AffineTransform savedTransform2 = g.getTransform();
@@ -121,8 +129,8 @@ public class Deck implements View {
 		
 		g.setTransform(savedTransform);
 		g.setColor(Color.GREEN);
-		int pos = bounds.secondsToPixel(status.getPlayPos()) + outerBorderWidth + trackTabWidth + trackTabBorderWidth;
-		g.drawLine(pos, 0, pos, height);
+//		int pos = bounds.secondsToPixel(status.getPlayPos()) + outerBorderWidth + trackTabWidth + trackTabBorderWidth;
+//		g.drawLine(pos, 0, pos, height);
 	}
 
 	@Override
@@ -131,7 +139,16 @@ public class Deck implements View {
 			MouseRegion mouseRegion = getMouseRegion(mousePos.x, mousePos.y);
 			if (mouseRegion instanceof MouseRegionMack) {
 				MouseRegionMack mouseRegionMack = (MouseRegionMack) mouseRegion;
-				mouseRegionMack.mackSlot.mack.getInputHandler(inputType, mousePos);
+				mouseRegionMack.mackSlot.mack.getInputHandler(inputType, mouseRegionMack.mousePos);
+			} else if (mouseRegion instanceof MouseRegionMackBoundary) {
+				if (inputType.equals(new InputTypeMouse(MouseEvent.BUTTON1, false, false, false))) {
+					InputHandler.Dragging dragging = new InputHandler.Dragging();
+					dragging.cancelsDrag = true;
+					dragging.inputType = inputType;
+					dragging.mousePos = mousePos;
+					dragging.inputAction = new ActionMackResize(((MouseRegionMackBoundary) mouseRegion).mackSlot);
+					return dragging;
+				}
 			}
 		}
 		// TODO Auto-generated method stub
@@ -142,7 +159,6 @@ public class Deck implements View {
 		int innerWidth = width - outerBorderWidth * 2 - trackTabWidth - trackTabBorderWidth;
 		int y = outerBorderHeight;
 		for (MackSlot mackSlot : mackSlots) {
-			mackSlot.pos = new Point(outerBorderWidth + trackTabWidth + trackTabBorderWidth, y);
 			mackSlot.mack.setSize(innerWidth, mackSlot.height);
 			y += mackSlot.height + interBorderHeight;
 		}
@@ -151,11 +167,44 @@ public class Deck implements View {
 	private static class MackSlot {
 		Mack mack;
 		int height;
-		Point pos;
 		
 		public MackSlot(Mack mack) {
 			this.mack = mack;
 			this.height = mack.getDefaultHeight();
 		}
+	}
+	
+	private class ActionMackResize implements InputActionDrag {
+		private MackSlot mackSlot;
+		private int initialHeight;
+		
+		public ActionMackResize(MackSlot mackSlot) {
+			this.mackSlot = mackSlot;
+			this.initialHeight = mackSlot.height;
+		}
+		
+		@Override
+		public void onStart(Point nodeRelative) {}
+		
+		@Override
+		public void onDrag(Point startRelative) {
+			mackSlot.height = initialHeight + startRelative.y;
+			int minimumHeight = mackSlot.mack.getMinimumHeight();
+			if (mackSlot.height < minimumHeight) {
+				mackSlot.height = minimumHeight;
+			}
+			computeLayout();
+			status.repaint();
+		}
+		
+		@Override
+		public void onCancel() {
+			mackSlot.height = initialHeight;
+			computeLayout();
+			status.repaint();
+		}
+		
+		@Override
+		public void onEnd(Point startRelative) {}
 	}
 }

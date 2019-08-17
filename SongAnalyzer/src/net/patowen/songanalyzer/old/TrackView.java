@@ -33,8 +33,6 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import net.patowen.songanalyzer.InputController;
-
 public class TrackView {
 	private JPanel trackPanel;
 	
@@ -91,9 +89,6 @@ public class TrackView {
 		initialLoad();
 		
 		resizingLayer = false;
-		
-		InputController ic = new InputController(trackPanel);
-		
 	}
 	
 	@SuppressWarnings("serial")

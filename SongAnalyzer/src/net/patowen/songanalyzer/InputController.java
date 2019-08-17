@@ -17,13 +17,15 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	
 	private Point mousePos; // Used only for mouse-hover key presses
 	
-	public InputController(Component component) {
+	public InputController(Component component, View rootNode) {
 		activeInput = null;
 		mousePos = component.getMousePosition();
 		
 		component.addMouseListener(this);
 		component.addMouseMotionListener(this);
 		component.addMouseWheelListener(this);
+		
+		this.rootNode = rootNode;
 	}
 	
 	@Override
@@ -38,9 +40,11 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 		if (activeInput != null) {
 			InputType inputType = new InputTypeMouse(e.getButton(), e.isControlDown(), e.isShiftDown(), e.isAltDown());
 			if (activeInput.dragging.inputType.fuzzyEquals(inputType)) {
-				activeInput.dragging.inputAction.onEnd(Utils.getRelativePoint(activeInput.start, e.getPoint()));
+				Point startRelative = Utils.getRelativePoint(activeInput.start, e.getPoint());
+				activeInput.dragging.inputAction.onDrag(startRelative);
+				activeInput.dragging.inputAction.onEnd(startRelative);
+				activeInput = null;
 			}
-			activeInput = null;
 		}
 	}
 	
@@ -91,6 +95,10 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	
 	private void handleAction(InputType inputType, double value) {
 		InputHandler inputHandler = rootNode.getInputHandler(inputType, mousePos);
+		
+		if (inputHandler == null) {
+			return;
+		}
 		
 		if (inputHandler.cancelsDrag && activeInput != null) {
 			activeInput.dragging.inputAction.onCancel();

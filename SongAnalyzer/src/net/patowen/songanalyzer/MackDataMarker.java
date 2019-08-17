@@ -2,7 +2,8 @@ package net.patowen.songanalyzer;
 
 import java.util.TreeSet;
 
-public class MackDataMarker implements MackData {
+// TODO: Remove
+public class MackDataMarker {
 	private TreeSet<Double> marks;
 	
 	public MackDataMarker() {
@@ -13,7 +14,6 @@ public class MackDataMarker implements MackData {
 		return marks;
 	}
 	
-	@Override
 	public int getType() {
 		return 1;
 	}
