@@ -1,10 +1,6 @@
 package net.patowen.songanalyzer;
 
-import java.awt.Point;
-
 public abstract class InputHandler {
-	public Point mousePos;
-	public InputType inputType;
 	public boolean cancelsDrag;
 	
 	public static final class Standard extends InputHandler {

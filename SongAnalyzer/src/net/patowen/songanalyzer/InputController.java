@@ -39,7 +39,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	public void mouseReleased(MouseEvent e) {
 		if (activeInput != null) {
 			InputType inputType = new InputTypeMouse(e.getButton(), e.isControlDown(), e.isShiftDown(), e.isAltDown());
-			if (activeInput.dragging.inputType.fuzzyEquals(inputType)) {
+			if (activeInput.inputType.fuzzyEquals(inputType)) {
 				Point startRelative = Utils.getRelativePoint(activeInput.start, e.getPoint());
 				activeInput.dragging.inputAction.onDrag(startRelative);
 				activeInput.dragging.inputAction.onEnd(startRelative);
@@ -94,24 +94,24 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	public void keyReleased(KeyEvent e) {}
 	
 	private void handleAction(InputType inputType, double value) {
-		InputHandler inputHandler = rootNode.getInputHandler(inputType, mousePos);
+		InputBundle inputBundle = rootNode.getInputBundle(inputType, mousePos);
 		
-		if (inputHandler == null) {
+		if (inputBundle == null) {
 			return;
 		}
 		
-		if (inputHandler.cancelsDrag && activeInput != null) {
+		if (inputBundle.inputHandler.cancelsDrag && activeInput != null) {
 			activeInput.dragging.inputAction.onCancel();
 		}
 		
-		if (inputHandler instanceof InputHandler.Standard) {
-			InputHandler.Standard standard = (InputHandler.Standard) inputHandler;
-			standard.inputAction.onInput(inputHandler.mousePos, value * standard.factor);
-		} else if (inputHandler instanceof InputHandler.Dragging) {
+		if (inputBundle.inputHandler instanceof InputHandler.Standard) {
+			InputHandler.Standard standard = (InputHandler.Standard) inputBundle.inputHandler;
+			standard.inputAction.onInput(inputBundle.mousePos, value * standard.factor);
+		} else if (inputBundle.inputHandler instanceof InputHandler.Dragging) {
 			if (activeInput == null) {
-				InputHandler.Dragging dragging = (InputHandler.Dragging) inputHandler;
-				dragging.inputAction.onStart(inputHandler.mousePos);
-				activeInput = new ActiveInput(dragging, mousePos);
+				InputHandler.Dragging dragging = (InputHandler.Dragging) inputBundle.inputHandler;
+				dragging.inputAction.onStart(inputBundle.mousePos);
+				activeInput = new ActiveInput(dragging, mousePos, inputType);
 			}
 		}
 	}
@@ -119,10 +119,12 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	private static class ActiveInput {
 		InputHandler.Dragging dragging;
 		Point start;
+		InputType inputType;
 		
-		public ActiveInput(InputHandler.Dragging dragging, Point start) {
+		public ActiveInput(InputHandler.Dragging dragging, Point start, InputType inputType) {
 			this.dragging = dragging;
 			this.start = start;
+			this.inputType = inputType;
 		}
 	}
 }

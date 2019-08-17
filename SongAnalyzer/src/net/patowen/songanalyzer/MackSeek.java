@@ -33,7 +33,7 @@ public class MackSeek implements Mack {
 	}
 	
 	@Override
-	public InputHandler getInputHandler(InputType inputType, Point mousePos) {
+	public InputBundle getInputBundle(InputType inputType, Point mousePos) {
 		return null;
 	}
 }
