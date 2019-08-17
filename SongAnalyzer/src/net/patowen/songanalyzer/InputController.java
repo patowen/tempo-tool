@@ -11,7 +11,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
-	private GuiNode rootNode;
+	private View rootNode;
 	
 	private AugmentedInputHandler activeInput;
 	

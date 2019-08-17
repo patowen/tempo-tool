@@ -3,7 +3,7 @@ package net.patowen.songanalyzer;
 import java.awt.Graphics2D;
 import java.awt.Point;
 
-public interface GuiNode {
+public interface View {
 	public void setPos(int x, int y);
 	
 	public void setSize(int width, int height);

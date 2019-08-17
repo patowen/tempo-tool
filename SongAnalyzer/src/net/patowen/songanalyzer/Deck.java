@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import net.patowen.songanalyzer.old.TrackBounds;
 
 // The deck is main area of the application, a stack of track layers with a play bar.
-public class Deck implements GuiNode {
+public class Deck implements View {
 	private GlobalStatus status;
 	private ArrayList<MackSlot> mackSlots;
 	private MackSlot activeMackSlot;
