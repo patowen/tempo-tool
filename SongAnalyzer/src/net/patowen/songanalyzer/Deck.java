@@ -52,11 +52,11 @@ public class Deck implements View {
 	}
 	
 	private static class MouseRegionMack implements MouseRegion {
-		Mack mack;
+		MackView mack;
 		int mouseX;
 		int mouseY;
 		
-		public MouseRegionMack(Mack mack, int mouseX, int mouseY) {
+		public MouseRegionMack(MackView mack, int mouseX, int mouseY) {
 			this.mack = mack;
 			this.mouseX = mouseX;
 			this.mouseY = mouseY;
@@ -133,22 +133,16 @@ public class Deck implements View {
 	}
 
 	@Override
-	public InputHandler getInputHandler(InputType inputType, Point origin, Point mouse) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Point getPos() {
+	public InputHandler getInputHandler(InputType inputType, Point mousePos) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	private static class MackSlot {
-		Mack mack;
+		MackView mack;
 		int height;
 		
-		public MackSlot(Mack mack) {
+		public MackSlot(MackView mack) {
 			this.mack = mack;
 			this.height = mack.getDefaultHeight();
 		}

@@ -10,9 +10,5 @@ public interface View {
 	
 	public void render(Graphics2D g);
 	
-	//public GuiNode getMouseNode(int mouseX, int mouseY);
-	
-	public InputHandler getInputHandler(InputType inputType, Point origin, Point point);
-	
-	public Point getPos(); // Returns the absolute position of the gui node
+	public InputHandler getInputHandler(InputType inputType, Point mousePos);
 }

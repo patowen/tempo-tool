@@ -90,8 +90,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	public void keyReleased(KeyEvent e) {}
 	
 	private void handleAction(InputType inputType, double value) {
-		InputHandler inputHandler = rootNode.getInputHandler(inputType, new Point(0, 0), mousePos);
-		Point relativePoint = getRelativePoint(inputHandler.origin, mousePos);
+		InputHandler inputHandler = rootNode.getInputHandler(inputType, mousePos);
 		
 		if (inputHandler.cancelsDrag && activeInput != null) {
 			activeInput.dragging.inputAction.onCancel();
@@ -99,11 +98,11 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 		
 		if (inputHandler instanceof InputHandler.Standard) {
 			InputHandler.Standard standard = (InputHandler.Standard) inputHandler;
-			standard.inputAction.onInput(relativePoint, value * standard.factor);
+			standard.inputAction.onInput(inputHandler.mousePos, value * standard.factor);
 		} else if (inputHandler instanceof InputHandler.Dragging) {
 			if (activeInput == null) {
 				InputHandler.Dragging dragging = (InputHandler.Dragging) inputHandler;
-				dragging.inputAction.onStart(relativePoint);
+				dragging.inputAction.onStart(inputHandler.mousePos);
 				activeInput = new AugmentedInputHandler(dragging, mousePos);
 			}
 		}

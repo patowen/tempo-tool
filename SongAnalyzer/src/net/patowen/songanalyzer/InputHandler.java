@@ -3,7 +3,7 @@ package net.patowen.songanalyzer;
 import java.awt.Point;
 
 public abstract class InputHandler {
-	public Point origin;
+	public Point mousePos;
 	public InputType inputType;
 	public boolean cancelsDrag;
 	
