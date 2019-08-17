@@ -17,7 +17,6 @@ public class Deck implements View {
 	private TrackBounds bounds;
 	
 	private int width, height;
-	private int x, y;
 	
 	private int outerBorderWidth = 1, outerBorderHeight = 1, interBorderHeight = 1;
 	private int interBorderSelectionRange = 3;
@@ -35,7 +34,7 @@ public class Deck implements View {
 				if (mouseX >= outerBorderWidth && mouseX < outerBorderWidth + trackTabWidth) {
 					return new MouseRegionTab(mackSlot);
 				} else if (mouseX >= outerBorderWidth + trackTabWidth + trackTabBorderWidth && mouseX < width - outerBorderWidth) {
-					return new MouseRegionMack(mackSlot.mack, mouseX - (outerBorderWidth + trackTabWidth + trackTabBorderWidth), mouseY - refY);
+					return new MouseRegionMack(mackSlot, mouseX - (outerBorderWidth + trackTabWidth + trackTabBorderWidth), mouseY - refY);
 				} else {
 					return null;
 				}
@@ -52,12 +51,12 @@ public class Deck implements View {
 	}
 	
 	private static class MouseRegionMack implements MouseRegion {
-		MackView mack;
+		MackSlot mackSlot;
 		int mouseX;
 		int mouseY;
 		
-		public MouseRegionMack(MackView mack, int mouseX, int mouseY) {
-			this.mack = mack;
+		public MouseRegionMack(MackSlot mackSlot, int mouseX, int mouseY) {
+			this.mackSlot = mackSlot;
 			this.mouseX = mouseX;
 			this.mouseY = mouseY;
 		}
@@ -77,12 +76,6 @@ public class Deck implements View {
 		public MouseRegionTab(MackSlot mackSlot) {
 			this.mackSlot = mackSlot;
 		}
-	}
-	
-	@Override
-	public void setPos(int x, int y) {
-		this.x = x;
-		this.y = y;
 	}
 	
 	@Override
@@ -134,15 +127,33 @@ public class Deck implements View {
 
 	@Override
 	public InputHandler getInputHandler(InputType inputType, Point mousePos) {
+		if (inputType.isMouseBased()) {
+			MouseRegion mouseRegion = getMouseRegion(mousePos.x, mousePos.y);
+			if (mouseRegion instanceof MouseRegionMack) {
+				MouseRegionMack mouseRegionMack = (MouseRegionMack) mouseRegion;
+				mouseRegionMack.mackSlot.mack.getInputHandler(inputType, mousePos);
+			}
+		}
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
+	private void computeLayout() {
+		int innerWidth = width - outerBorderWidth * 2 - trackTabWidth - trackTabBorderWidth;
+		int y = outerBorderHeight;
+		for (MackSlot mackSlot : mackSlots) {
+			mackSlot.pos = new Point(outerBorderWidth + trackTabWidth + trackTabBorderWidth, y);
+			mackSlot.mack.setSize(innerWidth, mackSlot.height);
+			y += mackSlot.height + interBorderHeight;
+		}
+	}
+	
 	private static class MackSlot {
-		MackView mack;
+		Mack mack;
 		int height;
+		Point pos;
 		
-		public MackSlot(MackView mack) {
+		public MackSlot(Mack mack) {
 			this.mack = mack;
 			this.height = mack.getDefaultHeight();
 		}

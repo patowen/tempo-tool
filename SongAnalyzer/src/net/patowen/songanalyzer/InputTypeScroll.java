@@ -35,4 +35,9 @@ public final class InputTypeScroll implements InputType {
 		}
 		return true;
 	}
+
+	@Override
+	public boolean isMouseBased() {
+		return true;
+	}
 }

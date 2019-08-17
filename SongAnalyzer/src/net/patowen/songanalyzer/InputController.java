@@ -13,7 +13,7 @@ import java.awt.event.MouseWheelListener;
 public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 	private View rootNode;
 	
-	private AugmentedInputHandler activeInput;
+	private ActiveInput activeInput;
 	
 	private Point mousePos; // Used only for mouse-hover key presses
 	
@@ -38,7 +38,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 		if (activeInput != null) {
 			InputType inputType = new InputTypeMouse(e.getButton(), e.isControlDown(), e.isShiftDown(), e.isAltDown());
 			if (activeInput.dragging.inputType.fuzzyEquals(inputType)) {
-				activeInput.dragging.inputAction.onEnd(getRelativePoint(activeInput.start, e.getPoint()));
+				activeInput.dragging.inputAction.onEnd(Utils.getRelativePoint(activeInput.start, e.getPoint()));
 			}
 			activeInput = null;
 		}
@@ -60,7 +60,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	public void mouseDragged(MouseEvent e) {
 		mousePos = e.getPoint();
 		if (activeInput != null) {
-			activeInput.dragging.inputAction.onDrag(getRelativePoint(activeInput.start, e.getPoint()));
+			activeInput.dragging.inputAction.onDrag(Utils.getRelativePoint(activeInput.start, e.getPoint()));
 		}
 	}
 	
@@ -103,23 +103,16 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 			if (activeInput == null) {
 				InputHandler.Dragging dragging = (InputHandler.Dragging) inputHandler;
 				dragging.inputAction.onStart(inputHandler.mousePos);
-				activeInput = new AugmentedInputHandler(dragging, mousePos);
+				activeInput = new ActiveInput(dragging, mousePos);
 			}
 		}
 	}
 	
-	private Point getRelativePoint(Point origin, Point point) {
-		if (point == null) {
-			return null;
-		}
-		return new Point(point.x - origin.x, point.y - origin.y);
-	}
-	
-	private static class AugmentedInputHandler {
+	private static class ActiveInput {
 		InputHandler.Dragging dragging;
 		Point start;
 		
-		public AugmentedInputHandler(InputHandler.Dragging dragging, Point start) {
+		public ActiveInput(InputHandler.Dragging dragging, Point start) {
 			this.dragging = dragging;
 			this.start = start;
 		}

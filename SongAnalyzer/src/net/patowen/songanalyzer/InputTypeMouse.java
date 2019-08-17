@@ -37,4 +37,9 @@ public final class InputTypeMouse implements InputType {
 		}
 		return ((InputTypeMouse) inputType).button == button;
 	}
+
+	@Override
+	public boolean isMouseBased() {
+		return true;
+	}
 }

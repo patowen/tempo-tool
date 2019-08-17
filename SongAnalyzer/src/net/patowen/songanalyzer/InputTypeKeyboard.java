@@ -37,4 +37,9 @@ public final class InputTypeKeyboard implements InputType {
 		}
 		return ((InputTypeKeyboard) inputType).button == button;
 	}
+
+	@Override
+	public boolean isMouseBased() {
+		return false;
+	}
 }

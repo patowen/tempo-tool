@@ -1,6 +1,7 @@
 package net.patowen.songanalyzer;
 
-public interface MackView extends View {
+public interface Mack extends View {
+	public int getType();
 	public abstract int getMinimumHeight();
 	public abstract int getDefaultHeight();
 }
