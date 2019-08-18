@@ -63,6 +63,7 @@ public class Deck implements View {
 	public void setSize(int width, int height) {
 		this.width = width;
 		this.height = height;
+		computeLayout();
 	}
 	
 	@Override
@@ -126,10 +127,8 @@ public class Deck implements View {
 	
 	public void computeLayout() {
 		int innerWidth = width - outerBorderWidth * 2 - trackTabWidth - trackTabBorderWidth;
-		int y = outerBorderHeight;
 		for (MackSlot mackSlot : mackSlots) {
 			mackSlot.mack.setSize(innerWidth, mackSlot.height);
-			y += mackSlot.height + interBorderHeight;
 		}
 	}
 	
