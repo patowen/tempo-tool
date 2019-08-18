@@ -52,7 +52,7 @@ public class Deck implements View {
 					return null;
 				}
 			} else if (mouseY - refY < mackSlot.height + interBorderHeight + interBorderSelectionRange) {
-				return new DeckInput.MouseRegionMackBoundary(mackSlot);
+				return new DeckInput.MouseRegionMackBoundary(deckInput, mackSlot);
 			}
 			refY += mackSlot.height + interBorderHeight;
 		}
@@ -108,17 +108,11 @@ public class Deck implements View {
 	}
 
 	@Override
-	public InputBundle getInputBundle(InputType inputType, Point mousePos) {
+	public InputHandler applyInputAction(InputType inputType, Point mousePos, double value) {
 		if (inputType.isMouseBased()) {
 			DeckInput.MouseRegion mouseRegion = getMouseRegion(mousePos.x, mousePos.y);
-			if (mouseRegion instanceof DeckInput.MouseRegionMack) {
-				DeckInput.MouseRegionMack mouseRegionMack = (DeckInput.MouseRegionMack) mouseRegion;
-				mouseRegionMack.mackSlot.mack.getInputBundle(inputType, mouseRegionMack.mousePos);
-			} else if (mouseRegion instanceof DeckInput.MouseRegionMackBoundary) {
-				if (inputType.fuzzyEquals(new InputTypeMouse(MouseEvent.BUTTON1, false, false, false))) {
-					// TODO: Use mousePos
-					return new InputBundle(deckInput.resize, mousePos);
-				}
+			if (mouseRegion != null) {
+				return mouseRegion.handleInput(inputType, value);
 			}
 		}
 		// TODO Auto-generated method stub

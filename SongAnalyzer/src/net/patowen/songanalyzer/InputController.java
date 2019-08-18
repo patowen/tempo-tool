@@ -94,23 +94,21 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	public void keyReleased(KeyEvent e) {}
 	
 	private void handleAction(InputType inputType, double value) {
-		InputBundle inputBundle = rootNode.getInputBundle(inputType, mousePos);
+		InputHandler inputHandler = rootNode.applyInputAction(inputType, mousePos, value);
 		
-		if (inputBundle == null) {
+		if (inputHandler == null) {
 			return;
 		}
 		
-		if (inputBundle.inputHandler.cancelsDrag && activeInput != null) {
+		if (inputHandler.cancelsDrag && activeInput != null) {
 			activeInput.dragging.inputAction.onCancel();
 		}
 		
-		if (inputBundle.inputHandler instanceof InputHandler.Standard) {
-			InputHandler.Standard standard = (InputHandler.Standard) inputBundle.inputHandler;
-			standard.inputAction.onInput(inputBundle.mousePos, value * standard.factor);
-		} else if (inputBundle.inputHandler instanceof InputHandler.Dragging) {
+		if (inputHandler instanceof InputHandler.Standard) {
+			// Fully handled already
+		} else if (inputHandler instanceof InputHandler.Dragging) {
 			if (activeInput == null) {
-				InputHandler.Dragging dragging = (InputHandler.Dragging) inputBundle.inputHandler;
-				dragging.inputAction.onStart(inputBundle.mousePos);
+				InputHandler.Dragging dragging = (InputHandler.Dragging) inputHandler;
 				activeInput = new ActiveInput(dragging, mousePos, inputType);
 			}
 		}

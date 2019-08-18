@@ -1,6 +1,7 @@
 package net.patowen.songanalyzer;
 
 import java.awt.Point;
+import java.awt.event.MouseEvent;
 
 import net.patowen.songanalyzer.Deck.MackSlot;
 
@@ -8,36 +9,32 @@ public class DeckInput {
 	private final Deck deck;
 	private final GlobalStatus globalStatus;
 	
-	public final InputHandler.Dragging resize;
+	//public final InputHandler.Dragging resize;
+	//public final ActionResize actionResize;
 	
 	public DeckInput(Deck deck, GlobalStatus globalStatus) {
 		this.deck = deck;
 		this.globalStatus = globalStatus;
-		this.resize = prepareResize();
 	}
 	
-	public InputHandler.Dragging prepareResize() {
+	public InputHandler.Dragging prepareResize(MackSlot mackSlot) {
 		InputHandler.Dragging resize = new InputHandler.Dragging();
 		resize.cancelsDrag = true;
-		resize.inputAction = new ActionResize(deck, globalStatus);
+		resize.inputAction = new ActionResize(deck, globalStatus, mackSlot);
 		return resize;
 	}
 	
-	private static final class ActionResize implements InputActionDrag {
+	public static final class ActionResize implements InputActionDrag {
 		private final Deck deck;
 		private final GlobalStatus globalStatus;
 		
 		private Deck.MackSlot mackSlot;
 		private int initialHeight;
 		
-		public ActionResize(Deck deck, GlobalStatus globalStatus) {
+		public ActionResize(Deck deck, GlobalStatus globalStatus, MackSlot mackSlot) {
 			this.deck = deck;
 			this.globalStatus = globalStatus;
-		}
-		
-		@Override
-		public void onStart(Point nodeRelative) {
-			this.mackSlot = ((MouseRegionMackBoundary)deck.getMouseRegion(nodeRelative.x, nodeRelative.y)).mackSlot;
+			this.mackSlot = mackSlot;
 			this.initialHeight = mackSlot.height;
 		}
 		
@@ -64,7 +61,7 @@ public class DeckInput {
 	}
 	
 	static interface MouseRegion {
-		
+		public InputHandler handleInput(InputType inputType, double value);
 	}
 	
 	static class MouseRegionMack implements MouseRegion {
@@ -75,13 +72,26 @@ public class DeckInput {
 			this.mackSlot = mackSlot;
 			this.mousePos = mousePos;
 		}
+		
+		public InputHandler handleInput(InputType inputType, double value) {
+			return mackSlot.mack.applyInputAction(inputType, mousePos, value);
+		}
 	}
 	
 	static class MouseRegionMackBoundary implements MouseRegion {
+		DeckInput deckInput;
 		MackSlot mackSlot;
 		
-		public MouseRegionMackBoundary(MackSlot mackSlot) {
+		public MouseRegionMackBoundary(DeckInput deckInput, MackSlot mackSlot) {
+			this.deckInput = deckInput;
 			this.mackSlot = mackSlot;
+		}
+		
+		public InputHandler handleInput(InputType inputType, double value) {
+			if (inputType.fuzzyEquals(new InputTypeMouse(MouseEvent.BUTTON1, false, false, false))) {
+				return deckInput.prepareResize(mackSlot);
+			}
+			return null;
 		}
 	}
 	
@@ -90,6 +100,10 @@ public class DeckInput {
 		
 		public MouseRegionTab(MackSlot mackSlot) {
 			this.mackSlot = mackSlot;
+		}
+		
+		public InputHandler handleInput(InputType inputType, double value) {
+			return null;
 		}
 	}
 }

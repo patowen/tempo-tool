@@ -8,5 +8,5 @@ public interface View {
 	
 	void render(Graphics2D g);
 	
-	InputBundle getInputBundle(InputType inputType, Point mousePos);
+	InputHandler applyInputAction(InputType inputType, Point mousePos, double value);
 }
