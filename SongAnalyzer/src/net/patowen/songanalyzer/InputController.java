@@ -11,6 +11,8 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
+	private Component component;
+	
 	private View rootNode;
 	
 	private ActiveInput activeInput;
@@ -26,6 +28,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 		component.addMouseWheelListener(this);
 		
 		this.rootNode = rootNode;
+		this.component = component;
 	}
 	
 	@Override
@@ -58,6 +61,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		mousePos = e.getPoint();
+		handleMouseHoverFeedback();
 	}
 	
 	@Override
@@ -66,16 +70,19 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 		if (activeInput != null) {
 			activeInput.dragging.inputAction.onDrag(Utils.getRelativePoint(activeInput.start, e.getPoint()));
 		}
+		handleMouseHoverFeedback();
 	}
 	
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		mousePos = e.getPoint();
+		handleMouseHoverFeedback();
 	}
 	
 	@Override
 	public void mouseExited(MouseEvent e) {
 		mousePos = null;
+		handleMouseHoverFeedback();
 	}
 	
 	@Override
@@ -110,6 +117,19 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 			if (activeInput == null) {
 				InputHandler.Dragging dragging = (InputHandler.Dragging) inputHandler;
 				activeInput = new ActiveInput(dragging, mousePos, inputType);
+			}
+		}
+	}
+	
+	private void handleMouseHoverFeedback() {
+		if (activeInput == null) {
+			MouseHoverFeedback feedback = rootNode.applyMouseHover(mousePos);
+			if (mousePos != null) {
+				if (feedback == null) {
+					this.component.setCursor(null);
+				} else {
+					this.component.setCursor(feedback.getCursor());
+				}
 			}
 		}
 	}

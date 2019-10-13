@@ -9,4 +9,6 @@ public interface View {
 	void render(Graphics2D g);
 	
 	InputHandler applyInputAction(InputType inputType, Point mousePos, double value);
+	
+	MouseHoverFeedback applyMouseHover(Point mousePos);
 }

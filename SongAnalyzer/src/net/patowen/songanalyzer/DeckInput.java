@@ -1,5 +1,6 @@
 package net.patowen.songanalyzer;
 
+import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
@@ -62,6 +63,7 @@ public class DeckInput {
 	
 	static interface MouseRegion {
 		public InputHandler handleInput(InputType inputType, double value);
+		public MouseHoverFeedback applyMouseHover();
 	}
 	
 	static class MouseRegionMack implements MouseRegion {
@@ -75,6 +77,10 @@ public class DeckInput {
 		
 		public InputHandler handleInput(InputType inputType, double value) {
 			return mackSlot.mack.applyInputAction(inputType, mousePos, value);
+		}
+		
+		public MouseHoverFeedback applyMouseHover() {
+			return mackSlot.mack.applyMouseHover(mousePos);
 		}
 	}
 	
@@ -93,6 +99,10 @@ public class DeckInput {
 			}
 			return null;
 		}
+		
+		public MouseHoverFeedback applyMouseHover() {
+			return new MouseHoverFeedback(new Cursor(Cursor.S_RESIZE_CURSOR));
+		}
 	}
 	
 	static class MouseRegionTab implements MouseRegion {
@@ -103,6 +113,10 @@ public class DeckInput {
 		}
 		
 		public InputHandler handleInput(InputType inputType, double value) {
+			return null;
+		}
+		
+		public MouseHoverFeedback applyMouseHover() {
 			return null;
 		}
 	}

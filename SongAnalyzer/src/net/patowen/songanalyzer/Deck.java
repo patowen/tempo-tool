@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
-import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
@@ -114,8 +113,22 @@ public class Deck implements View {
 			if (mouseRegion != null) {
 				return mouseRegion.handleInput(inputType, value);
 			}
+			return null;
 		}
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public MouseHoverFeedback applyMouseHover(Point mousePos) {
+		if (mousePos == null) {
+			return null;
+		}
+		
+		DeckInput.MouseRegion mouseRegion = getMouseRegion(mousePos.x, mousePos.y);
+		if (mouseRegion != null) {
+			return mouseRegion.applyMouseHover();
+		}
 		return null;
 	}
 	

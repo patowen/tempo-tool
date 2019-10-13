@@ -36,4 +36,8 @@ public class MackSeek implements Mack {
 	public InputHandler applyInputAction(InputType inputType, Point mousePos, double value) {
 		return null;
 	}
+	
+	public MouseHoverFeedback applyMouseHover(Point mousePos) {
+		return null;
+	}
 }
