@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer.old;
+package net.patowen.songanalyzer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -15,6 +15,8 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.Timer;
+
+import net.patowen.songanalyzer.old.Ticker;
 
 public class AudioStream {
 	private int length;

@@ -33,6 +33,8 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import net.patowen.songanalyzer.AudioStream;
+
 public class TrackView {
 	private JPanel trackPanel;
 	

@@ -171,7 +171,7 @@ Marker mack inputs:
 	Ctrl-A - Select all
 	Delete - Delete selected marks
 
-Beat mack inputs:
+Beat mack inputs (Amendment - don't rely on marks, they're only there for guidance):
 	Left click - Select anchors (See marker mack inputs for details)
 	Right click - Place/delete anchors based on whether shift is pressed based on bound marker macks.
 	Horizontal arrow keys - Move selected anchors left or right by one mark
