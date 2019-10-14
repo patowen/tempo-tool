@@ -42,16 +42,20 @@ public class Deck implements View {
 		}
 		for (int i = 0; i < mackSlots.size(); i++) {
 			MackSlot mackSlot = mackSlots.get(i);
-			if (mouseY - refY < mackSlot.height - interBorderSelectionRange) {
-				if (mouseX >= outerBorderWidth && mouseX < outerBorderWidth + trackTabWidth) {
+			if (mouseX >= outerBorderWidth && mouseX < outerBorderWidth + trackTabWidth) {
+				if (mouseY - refY < mackSlot.height - interBorderSelectionRange) {
 					return new DeckInput.MouseRegionTab(mackSlot);
-				} else if (mouseX >= outerBorderWidth + trackTabWidth + trackTabBorderWidth && mouseX < width - outerBorderWidth) {
-					return new DeckInput.MouseRegionMack(mackSlot, new Point(mouseX - (outerBorderWidth + trackTabWidth + trackTabBorderWidth), mouseY - refY));
-				} else {
-					return null;
+				} else if (mouseY - refY < mackSlot.height + interBorderHeight + interBorderSelectionRange) {
+					return new DeckInput.MouseRegionMackBoundary(deckInput, mackSlot);
 				}
-			} else if (mouseY - refY < mackSlot.height + interBorderHeight + interBorderSelectionRange) {
-				return new DeckInput.MouseRegionMackBoundary(deckInput, mackSlot);
+			} else if (mouseX >= outerBorderWidth + trackTabWidth + trackTabBorderWidth && mouseX < width - outerBorderWidth) {
+				if (mouseY - refY < 0) {
+					return null;
+				} else if (mouseY - refY < mackSlot.height) {
+					return new DeckInput.MouseRegionMack(mackSlot, new Point(mouseX - (outerBorderWidth + trackTabWidth + trackTabBorderWidth), mouseY - refY));
+				}
+			} else {
+				return null;
 			}
 			refY += mackSlot.height + interBorderHeight;
 		}
