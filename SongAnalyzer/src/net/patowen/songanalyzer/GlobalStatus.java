@@ -24,6 +24,9 @@ public class GlobalStatus {
 	}
 	
 	public double getPlayPos() {
+		if (audioStream == null) {
+			return 0;
+		}
 		return audioStream.getPos();
 	}
 	

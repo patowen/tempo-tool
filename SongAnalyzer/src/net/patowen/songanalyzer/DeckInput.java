@@ -10,9 +10,6 @@ public class DeckInput {
 	private final Deck deck;
 	private final GlobalStatus globalStatus;
 	
-	//public final InputHandler.Dragging resize;
-	//public final ActionResize actionResize;
-	
 	public DeckInput(Deck deck, GlobalStatus globalStatus) {
 		this.deck = deck;
 		this.globalStatus = globalStatus;

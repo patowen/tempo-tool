@@ -30,6 +30,8 @@ public class Deck implements View {
 		this.deckInput = new DeckInput(this, status);
 		mackSlots = new ArrayList<>();
 		
+		bounds = new TrackBounds(0, 10);
+		
 		for (int i=0; i<3; i++) {
 			mackSlots.add(new MackSlot(new MackSeek()));
 		}
@@ -106,8 +108,9 @@ public class Deck implements View {
 		
 		g.setTransform(savedTransform);
 		g.setColor(Color.GREEN);
-//		int pos = bounds.secondsToPixel(status.getPlayPos()) + outerBorderWidth + trackTabWidth + trackTabBorderWidth;
-//		g.drawLine(pos, 0, pos, height);
+		
+		int pos = bounds.secondsToPixel(status.getPlayPos()) + outerBorderWidth + trackTabWidth + trackTabBorderWidth;
+		g.drawLine(pos, 0, pos, height);
 	}
 
 	@Override
