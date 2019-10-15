@@ -10,24 +10,20 @@ import java.util.ArrayList;
 import net.patowen.songanalyzer.old.TrackBounds;
 
 // The deck is main area of the application, a stack of macks (track layers) with a play bar.
-public class Deck implements View {
+public class Deck implements View, DimWidthControlled, DimHeightControlled {
 	private GlobalStatus status;
 	private ArrayList<SuperMack> superMacks;
 	private SuperMack activeSuperMack;
 	private TrackBounds bounds;
 	
-	private DeckInput deckInput;
-	
 	private int width, height;
 	
 	private int outerBorderWidth = 1, outerBorderHeight = 1, interBorderHeight = 1;
-	private int interBorderSelectionRange = 3;
 	
 	private int trackTabWidth = 8, trackTabBorderWidth = 1;
 	
 	public Deck(GlobalStatus status) {
 		this.status = status;
-		this.deckInput = new DeckInput(this, status);
 		superMacks = new ArrayList<>();
 		
 		bounds = new TrackBounds(0, 10);
@@ -37,38 +33,18 @@ public class Deck implements View {
 		}
 	}
 	
-	DeckInput.MouseRegion getMouseRegion(int mouseX, int mouseY) {
-		int refY = outerBorderHeight;
-		if (mouseY < refY) {
-			return null;
+	@Override
+	public void setWidth(int width) {
+		this.width = width;
+		
+		for (SuperMack superMack : superMacks) {
+			superMack.setWidth(width - outerBorderWidth * 2);
 		}
-		for (int i = 0; i < superMacks.size(); i++) {
-			SuperMack superMack = superMacks.get(i);
-			if (mouseX >= outerBorderWidth && mouseX < outerBorderWidth + trackTabWidth) {
-				if (mouseY - refY < superMack.getHeight() - interBorderSelectionRange) {
-					return new DeckInput.MouseRegionTab(superMack);
-				} else if (mouseY - refY < superMack.getHeight() + interBorderHeight + interBorderSelectionRange) {
-					return new DeckInput.MouseRegionMackBoundary(deckInput, superMack);
-				}
-			} else if (mouseX >= outerBorderWidth + trackTabWidth + trackTabBorderWidth && mouseX < width - outerBorderWidth) {
-				if (mouseY - refY < 0) {
-					return null;
-				} else if (mouseY - refY < superMack.getHeight()) {
-					return new DeckInput.MouseRegionMack(superMack, new Point(mouseX - (outerBorderWidth + trackTabWidth + trackTabBorderWidth), mouseY - refY));
-				}
-			} else {
-				return null;
-			}
-			refY += superMack.getHeight() + interBorderHeight;
-		}
-		return null;
 	}
 	
 	@Override
-	public void setSize(int width, int height) {
-		this.width = width;
+	public void setHeight(int height) {
 		this.height = height;
-		computeLayout();
 	}
 	
 	@Override
@@ -115,6 +91,9 @@ public class Deck implements View {
 
 	@Override
 	public InputAction applyInputAction(InputType inputType, Point mousePos, double value) {
+		// TODO: Loop through all SuperMacks and apply the input action without checking first.
+		// Proposal: Have views themselves determine if the cursor is in bounds. Don't leave
+		// the responsibility to the parent view.
 		if (inputType.isMouseBased()) {
 			DeckInput.MouseRegion mouseRegion = getMouseRegion(mousePos.x, mousePos.y);
 			if (mouseRegion != null) {
@@ -137,11 +116,5 @@ public class Deck implements View {
 			return mouseRegion.applyMouseHover();
 		}
 		return null;
-	}
-	
-	public void computeLayout() {
-		for (SuperMack superMack : superMacks) {
-			superMack.setWidth(width - outerBorderWidth * 2);
-		}
 	}
 }

@@ -12,7 +12,7 @@ public class SuperMackInput {
 		}
 		
 		@Override
-		public boolean onStart(Point pos) {
+		public boolean onAction(Point pos, double value) {
 			initialHeight = superMack.getHeight();
 			return true;
 		}
