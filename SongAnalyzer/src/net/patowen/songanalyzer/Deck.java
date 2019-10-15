@@ -12,8 +12,8 @@ import net.patowen.songanalyzer.old.TrackBounds;
 // The deck is main area of the application, a stack of macks (track layers) with a play bar.
 public class Deck implements View {
 	private GlobalStatus status;
-	private ArrayList<MackSlot> mackSlots;
-	private MackSlot activeMackSlot;
+	private ArrayList<SuperMack> superMacks;
+	private SuperMack activeSuperMack;
 	private TrackBounds bounds;
 	
 	private DeckInput deckInput;
@@ -28,12 +28,12 @@ public class Deck implements View {
 	public Deck(GlobalStatus status) {
 		this.status = status;
 		this.deckInput = new DeckInput(this, status);
-		mackSlots = new ArrayList<>();
+		superMacks = new ArrayList<>();
 		
 		bounds = new TrackBounds(0, 10);
 		
 		for (int i=0; i<3; i++) {
-			mackSlots.add(new MackSlot(new MackSeek()));
+			superMacks.add(new SuperMack(new MackSeek()));
 		}
 	}
 	
@@ -42,24 +42,24 @@ public class Deck implements View {
 		if (mouseY < refY) {
 			return null;
 		}
-		for (int i = 0; i < mackSlots.size(); i++) {
-			MackSlot mackSlot = mackSlots.get(i);
+		for (int i = 0; i < superMacks.size(); i++) {
+			SuperMack superMack = superMacks.get(i);
 			if (mouseX >= outerBorderWidth && mouseX < outerBorderWidth + trackTabWidth) {
-				if (mouseY - refY < mackSlot.height - interBorderSelectionRange) {
-					return new DeckInput.MouseRegionTab(mackSlot);
-				} else if (mouseY - refY < mackSlot.height + interBorderHeight + interBorderSelectionRange) {
-					return new DeckInput.MouseRegionMackBoundary(deckInput, mackSlot);
+				if (mouseY - refY < superMack.getHeight() - interBorderSelectionRange) {
+					return new DeckInput.MouseRegionTab(superMack);
+				} else if (mouseY - refY < superMack.getHeight() + interBorderHeight + interBorderSelectionRange) {
+					return new DeckInput.MouseRegionMackBoundary(deckInput, superMack);
 				}
 			} else if (mouseX >= outerBorderWidth + trackTabWidth + trackTabBorderWidth && mouseX < width - outerBorderWidth) {
 				if (mouseY - refY < 0) {
 					return null;
-				} else if (mouseY - refY < mackSlot.height) {
-					return new DeckInput.MouseRegionMack(mackSlot, new Point(mouseX - (outerBorderWidth + trackTabWidth + trackTabBorderWidth), mouseY - refY));
+				} else if (mouseY - refY < superMack.getHeight()) {
+					return new DeckInput.MouseRegionMack(superMack, new Point(mouseX - (outerBorderWidth + trackTabWidth + trackTabBorderWidth), mouseY - refY));
 				}
 			} else {
 				return null;
 			}
-			refY += mackSlot.height + interBorderHeight;
+			refY += superMack.getHeight() + interBorderHeight;
 		}
 		return null;
 	}
@@ -84,13 +84,13 @@ public class Deck implements View {
 		int innerWidth = width - outerBorderWidth * 2;
 		int trackWidth = innerWidth - trackTabWidth - trackTabBorderWidth;
 //		bounds.setWidth(trackWidth);
-		for (MackSlot mackSlot : mackSlots) {
-			int layerHeight = mackSlot.height;
+		for (SuperMack superMack : superMacks) {
+			int layerHeight = superMack.getHeight();
 			AffineTransform savedTransform2 = g.getTransform();
 			g.translate(trackTabWidth + trackTabBorderWidth, 0);
 			Shape savedClip = g.getClip();
 			g.clipRect(0, 0, trackWidth, layerHeight);
-			mackSlot.mack.render(g); // trackWidth, layerHeight
+			superMack.render(g); // trackWidth, layerHeight
 			g.setClip(savedClip);
 			g.setTransform(savedTransform2);
 			g.setColor(Color.WHITE);
@@ -98,7 +98,7 @@ public class Deck implements View {
 			g.drawLine(trackTabWidth, 0, trackTabWidth, layerHeight);
 			g.drawLine(0, layerHeight, innerWidth, layerHeight);
 			
-			if (mackSlot == activeMackSlot) {
+			if (superMack == activeSuperMack) {
 				g.setColor(Color.GREEN);
 				g.fillRect(0, 0, trackTabWidth, layerHeight);
 			}
@@ -114,7 +114,7 @@ public class Deck implements View {
 	}
 
 	@Override
-	public InputHandler applyInputAction(InputType inputType, Point mousePos, double value) {
+	public InputAction applyInputAction(InputType inputType, Point mousePos, double value) {
 		if (inputType.isMouseBased()) {
 			DeckInput.MouseRegion mouseRegion = getMouseRegion(mousePos.x, mousePos.y);
 			if (mouseRegion != null) {
@@ -140,19 +140,8 @@ public class Deck implements View {
 	}
 	
 	public void computeLayout() {
-		int innerWidth = width - outerBorderWidth * 2 - trackTabWidth - trackTabBorderWidth;
-		for (MackSlot mackSlot : mackSlots) {
-			mackSlot.mack.setSize(innerWidth, mackSlot.height);
-		}
-	}
-	
-	static class MackSlot {
-		Mack mack;
-		int height;
-		
-		public MackSlot(Mack mack) {
-			this.mack = mack;
-			this.height = mack.getDefaultHeight();
+		for (SuperMack superMack : superMacks) {
+			superMack.setWidth(width - outerBorderWidth * 2);
 		}
 	}
 }

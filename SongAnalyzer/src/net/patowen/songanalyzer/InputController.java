@@ -44,8 +44,9 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 			InputType inputType = new InputTypeMouse(e.getButton(), e.isControlDown(), e.isShiftDown(), e.isAltDown());
 			if (activeInput.inputType.fuzzyEquals(inputType)) {
 				Point startRelative = Utils.getRelativePoint(activeInput.start, e.getPoint());
-				activeInput.dragging.inputAction.onDrag(startRelative);
-				activeInput.dragging.inputAction.onEnd(startRelative);
+				activeInput.drag.onDrag(startRelative);
+				activeInput.drag.onEnd(startRelative);
+				component.repaint();
 				activeInput = null;
 			}
 		}
@@ -68,7 +69,8 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	public void mouseDragged(MouseEvent e) {
 		mousePos = e.getPoint();
 		if (activeInput != null) {
-			activeInput.dragging.inputAction.onDrag(Utils.getRelativePoint(activeInput.start, e.getPoint()));
+			activeInput.drag.onDrag(Utils.getRelativePoint(activeInput.start, e.getPoint()));
+			component.repaint();
 		}
 		handleMouseHoverFeedback();
 	}
@@ -101,24 +103,24 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	public void keyReleased(KeyEvent e) {}
 	
 	private void handleAction(InputType inputType, double value) {
-		InputHandler inputHandler = rootNode.applyInputAction(inputType, mousePos, value);
+		InputAction inputAction = rootNode.applyInputAction(inputType, mousePos, value);
 		
-		if (inputHandler == null) {
+		if (inputAction == null) {
 			return;
 		}
 		
-		if (inputHandler.cancelsDrag && activeInput != null) {
-			activeInput.dragging.inputAction.onCancel();
+		if (inputAction.cancelsDrag() && activeInput != null) {
+			activeInput.drag.onCancel();
 		}
 		
-		if (inputHandler instanceof InputHandler.Standard) {
-			// Fully handled already
-		} else if (inputHandler instanceof InputHandler.Dragging) {
+		if (inputAction instanceof InputActionDrag) {
 			if (activeInput == null) {
-				InputHandler.Dragging dragging = (InputHandler.Dragging) inputHandler;
-				activeInput = new ActiveInput(dragging, mousePos, inputType);
+				InputActionDrag drag = (InputActionDrag) inputAction;
+				activeInput = new ActiveInput(drag, mousePos, inputType);
 			}
 		}
+		
+		component.repaint();
 	}
 	
 	private void handleMouseHoverFeedback() {
@@ -135,12 +137,12 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	}
 	
 	private static class ActiveInput {
-		InputHandler.Dragging dragging;
+		InputActionDrag drag;
 		Point start;
 		InputType inputType;
 		
-		public ActiveInput(InputHandler.Dragging dragging, Point start, InputType inputType) {
-			this.dragging = dragging;
+		public ActiveInput(InputActionDrag drag, Point start, InputType inputType) {
+			this.drag = drag;
 			this.start = start;
 			this.inputType = inputType;
 		}

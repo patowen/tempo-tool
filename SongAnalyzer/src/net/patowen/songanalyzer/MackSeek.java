@@ -7,10 +7,12 @@ import java.util.HashMap;
 public class MackSeek implements Mack {
 	private int width, height;
 	
-	private HashMap<InputType, InputHandler> inputs;
+	private InputDictionary inputDictionary;
 	
 	public MackSeek() {
-		inputs.put(new InputTypeScroll(false, false, false), new InputHandler.Standard());
+		inputDictionary = new InputDictionary();
+		inputDictionary.addInputMapping(new InputMapping(new Zoom(), new InputTypeScroll(false, false, false), 1));
+		inputDictionary.constructDictionary();
 	}
 	
 	@Override
@@ -40,8 +42,8 @@ public class MackSeek implements Mack {
 	}
 	
 	@Override
-	public InputHandler applyInputAction(InputType inputType, Point mousePos, double value) {
-		return null;
+	public InputAction applyInputAction(InputType inputType, Point mousePos, double value) {
+		return inputDictionary.applyInput(inputType, mousePos, value);
 	}
 	
 	public MouseHoverFeedback applyMouseHover(Point mousePos) {
@@ -49,6 +51,10 @@ public class MackSeek implements Mack {
 	}
 	
 	private static class Zoom implements InputActionStandard {
-		// TODO: Inputs need to be more manipulatable than this.
+		@Override
+		public boolean onAction(Point pos, double value) {
+			// TODO Auto-generated method stub
+			return false;
+		}
 	}
 }
