@@ -3,8 +3,6 @@ package net.patowen.songanalyzer;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
 import net.patowen.songanalyzer.old.TrackBounds;

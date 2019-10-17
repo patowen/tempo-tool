@@ -38,11 +38,11 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 	}
 	
 	public void trySetHeight(int height) {
-		this.height = height;
 		int minimumHeight = mack.getMinimumHeight();
 		if (height < minimumHeight) {
 			height = minimumHeight;
 		}
+		this.height = height;
 		mack.setHeight(height);
 	}
 	
