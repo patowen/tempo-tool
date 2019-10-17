@@ -5,6 +5,7 @@ import java.io.File;
 
 import net.patowen.songanalyzer.undo.UserActionList;
 
+@SuppressWarnings("unused")
 public class GlobalStatus {
 	// All-encompassing audio file
 	private AudioStream audioStream;
