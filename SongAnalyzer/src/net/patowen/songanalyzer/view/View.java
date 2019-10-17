@@ -48,4 +48,12 @@ public abstract class View {
 			return applyMouseHover(new Point(mousePos.x - xPos, mousePos.y - yPos));
 		}
 	}
+	
+	public boolean isWithinView(Point pos) {
+		return pos != null
+				&& pos.x >= 0
+				&& pos.y >= 0
+				&& pos.x < width
+				&& pos.y < height;
+	}
 }

@@ -3,6 +3,7 @@ package net.patowen.songanalyzer.old;
 import javax.swing.JComponent;
 
 import net.patowen.songanalyzer.AudioStream;
+import net.patowen.songanalyzer.TrackBounds;
 
 public class TrackStatus {
 	private JComponent refreshComponent;

@@ -29,6 +29,7 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 		this.mack.setXPos(trackTabWidth + trackTabBorderWidth);
 		this.mack.setYPos(0);
 		this.height = mack.getDefaultHeight();
+		this.mack.setHeight(this.height);
 		
 		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new SuperMackInput.ActionResize(this), new InputTypeMouse(MouseEvent.BUTTON1, false, false, false), 1));
@@ -81,7 +82,7 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 				&& mousePos.x < width
 				&& mousePos.y >= 0
 				&& mousePos.y < height) {
-			mack.forwardInput(inputType, mousePos, value);
+			return mack.forwardInput(inputType, mousePos, value);
 		}
 		return null;
 	}

@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer.old;
+package net.patowen.songanalyzer;
 
 public class TrackBounds {
 	private double width;

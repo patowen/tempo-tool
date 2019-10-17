@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
 
-import net.patowen.songanalyzer.old.TrackBounds;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputType;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
@@ -30,9 +29,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		
 		bounds = new TrackBounds(0, 10);
 		
-		for (int i=0; i<3; i++) {
-			superMacks.add(new SuperMack(new MackSeek()));
-		}
+		superMacks.add(new SuperMack(new MackSeek(bounds)));
 	}
 	
 	@Override
@@ -42,6 +39,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		for (SuperMack superMack : superMacks) {
 			superMack.setWidth(width - outerBorderWidth * 2);
 		}
+		bounds.setWidth(width - outerBorderWidth * 2 - trackTabWidth - trackTabBorderWidth);
 	}
 	
 	@Override
@@ -49,7 +47,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		this.height = height;
 	}
 	
-	private void setSuperMackSizes() {
+	private void setSuperMackPositions() {
 		int yPos = outerBorderHeight;
 		for (SuperMack superMack : superMacks) {
 			superMack.setXPos(outerBorderWidth);
@@ -61,7 +59,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	
 	@Override
 	public void render(Graphics2D g) {
-		setSuperMackSizes();
+		setSuperMackPositions();
 		
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);

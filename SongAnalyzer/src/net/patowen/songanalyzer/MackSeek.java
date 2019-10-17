@@ -14,10 +14,14 @@ import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
 public class MackSeek extends Mack {
 	private InputDictionary inputDictionary;
 	
-	public MackSeek() {
+	private TrackBounds trackBounds;
+	
+	public MackSeek(TrackBounds trackBounds) {
 		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new Zoom(), new InputTypeScroll(false, false, false), 1));
 		inputDictionary.constructDictionary();
+		
+		this.trackBounds = trackBounds;
 	}
 	
 	@Override
@@ -59,10 +63,14 @@ public class MackSeek extends Mack {
 		return null;
 	}
 	
-	private static class Zoom implements InputActionStandard {
+	private class Zoom implements InputActionStandard {
 		@Override
 		public boolean onAction(Point pos, double value) {
-			// TODO Auto-generated method stub
+			if (isWithinView(pos)) {
+				double zoomFactor = Math.exp(value * 0.1);
+				trackBounds.zoom(trackBounds.pixelToSeconds(pos.x), zoomFactor);
+				return true;
+			}
 			return false;
 		}
 	}
