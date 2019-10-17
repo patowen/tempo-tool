@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
@@ -28,9 +27,12 @@ public class MackMarker extends Mack {
 	
 	private TreeSet<Double> marks;
 	
+	private int markSelectionRange = 3;
+	
 	public MackMarker(TrackBounds trackBounds, UserActionList userActionList) {
 		inputDictionary = new InputDictionary();
-		inputDictionary.addInputMapping(new InputMapping(new AddMark(), new InputTypeMouse(MouseEvent.BUTTON3, false, false, false), 1));
+		inputDictionary.addInputMapping(new InputMapping(new AddMarkAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, false, false), 1));
+		inputDictionary.addInputMapping(new InputMapping(new DeleteMarkAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, true, false), 1));
 		inputDictionary.constructDictionary();
 		
 		this.trackBounds = trackBounds;
@@ -66,20 +68,66 @@ public class MackMarker extends Mack {
 		return null;
 	}
 	
-	private class AddMark implements InputActionStandard {
+	private Double getClickedMark(int mouseX) {
+		double trackPos = trackBounds.pixelToSeconds(mouseX);
+		Double closestMark = getClosestMark(trackPos);
+		
+		if (Math.abs(mouseX - trackBounds.secondsToPixel(closestMark)) <= markSelectionRange) {
+			return closestMark;
+		} else {
+			return null;
+		}
+	}
+	
+	private Double getClosestMark(double trackPos) {
+		Double lower = marks.floor(trackPos);
+		Double upper = marks.ceiling(trackPos);
+		
+		if (lower == null && upper == null) {
+			return null;
+		}
+		
+		if (lower == null) {
+			return upper;
+		}
+		
+		if (upper == null) {
+			return lower;
+		}
+		
+		return upper - trackPos < trackPos - lower ? upper : lower;
+	}
+	
+	private class AddMarkAtMouse implements InputActionStandard {
 		@Override
 		public boolean onAction(Point pos, double value) {
 			if (isWithinView(pos)) {
 				double markPos = trackBounds.pixelToSeconds(pos.x);
-				userActionList.applyAction(new MarkCreationAction(Collections.singleton(markPos)));
-				return true;
+				if (!marks.contains(markPos)) {
+					userActionList.applyAction(new MarkCreationAction(Collections.singleton(markPos)));
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+	
+	private class DeleteMarkAtMouse implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			if (isWithinView(pos)) {
+				Double clickedMark = getClickedMark(pos.x);
+				if (clickedMark != null) {
+					userActionList.applyAction(new MarkDeletionAction(Collections.singleton(clickedMark)));
+					return true;
+				}
 			}
 			return false;
 		}
 	}
 	
 	private class MarkCreationAction implements UserAction {
-		private Collection<Double> addedMarks;
+		private final Collection<Double> addedMarks;
 		
 		public MarkCreationAction(Collection<Double> addedMarks) {
 			this.addedMarks = addedMarks;
@@ -93,6 +141,24 @@ public class MackMarker extends Mack {
 		@Override
 		public void undo() {
 			marks.removeAll(addedMarks);
+		}
+	}
+	
+	private class MarkDeletionAction implements UserAction {
+		private final Collection<Double> deletedMarks;
+		
+		public MarkDeletionAction(Collection<Double> deletedMarks) {
+			this.deletedMarks = deletedMarks;
+		}
+		
+		@Override
+		public void exec() {
+			marks.removeAll(deletedMarks);
+		}
+
+		@Override
+		public void undo() {
+			marks.addAll(deletedMarks);
 		}
 	}
 }
