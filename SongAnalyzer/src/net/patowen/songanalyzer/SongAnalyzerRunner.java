@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputController;
 
 public class SongAnalyzerRunner {
@@ -26,7 +27,7 @@ public class SongAnalyzerRunner {
 		
 		GlobalStatus status = new GlobalStatus(panel);
 		
-		deck = new Deck(status);
+		deck = new Deck(status, new UserActionList());
 		
 		new InputController(panel, deck);
 		

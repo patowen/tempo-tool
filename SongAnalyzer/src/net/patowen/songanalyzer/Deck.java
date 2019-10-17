@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
 
+import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputType;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
@@ -15,16 +16,19 @@ import net.patowen.songanalyzer.view.View;
 // The deck is main area of the application, a stack of macks (track layers) with a play bar.
 public class Deck extends View implements DimWidthControlled, DimHeightControlled {
 	private GlobalStatus status;
+	
+	private UserActionList userActionList;
+	
 	private ArrayList<SuperMack> superMacks;
-	private SuperMack activeSuperMack;
 	private TrackBounds bounds;
 	
 	private int outerBorderWidth = 1, outerBorderHeight = 1, interBorderHeight = 1;
 	
 	private int trackTabWidth = 8, trackTabBorderWidth = 1;
 	
-	public Deck(GlobalStatus status) {
+	public Deck(GlobalStatus status, UserActionList userActionList) {
 		this.status = status;
+		this.userActionList = userActionList;
 		superMacks = new ArrayList<>();
 		
 		bounds = new TrackBounds(0, 10);
@@ -39,6 +43,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		for (SuperMack superMack : superMacks) {
 			superMack.setWidth(width - outerBorderWidth * 2);
 		}
+		
 		bounds.setWidth(width - outerBorderWidth * 2 - trackTabWidth - trackTabBorderWidth);
 	}
 	
@@ -89,7 +94,8 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 			}
 			return null;
 		}
-		// TODO Auto-generated method stub
+		
+		// TODO Keyboard controls on active mack
 		return null;
 	}
 

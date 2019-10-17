@@ -3,7 +3,7 @@ package net.patowen.songanalyzer;
 import java.awt.Component;
 import java.io.File;
 
-import net.patowen.songanalyzer.old.UserActionList;
+import net.patowen.songanalyzer.undo.UserActionList;
 
 public class GlobalStatus {
 	// All-encompassing audio file

@@ -4,6 +4,7 @@ import javax.swing.JComponent;
 
 import net.patowen.songanalyzer.AudioStream;
 import net.patowen.songanalyzer.TrackBounds;
+import net.patowen.songanalyzer.undo.UserActionList;
 
 public class TrackStatus {
 	private JComponent refreshComponent;
