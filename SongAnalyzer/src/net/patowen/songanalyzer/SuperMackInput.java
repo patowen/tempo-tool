@@ -13,6 +13,9 @@ public class SuperMackInput {
 		
 		@Override
 		public boolean onAction(Point pos, double value) {
+			if (!superMack.isDragHandle(pos)) {
+				return false;
+			}
 			initialHeight = superMack.getHeight();
 			return true;
 		}

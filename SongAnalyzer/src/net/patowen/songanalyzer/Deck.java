@@ -10,13 +10,11 @@ import java.util.ArrayList;
 import net.patowen.songanalyzer.old.TrackBounds;
 
 // The deck is main area of the application, a stack of macks (track layers) with a play bar.
-public class Deck implements View, DimWidthControlled, DimHeightControlled {
+public class Deck extends View implements DimWidthControlled, DimHeightControlled {
 	private GlobalStatus status;
 	private ArrayList<SuperMack> superMacks;
 	private SuperMack activeSuperMack;
 	private TrackBounds bounds;
-	
-	private int width, height;
 	
 	private int outerBorderWidth = 1, outerBorderHeight = 1, interBorderHeight = 1;
 	
@@ -47,42 +45,29 @@ public class Deck implements View, DimWidthControlled, DimHeightControlled {
 		this.height = height;
 	}
 	
+	private void setSuperMackSizes() {
+		int yPos = outerBorderHeight;
+		for (SuperMack superMack : superMacks) {
+			superMack.setXPos(outerBorderWidth);
+			superMack.setYPos(yPos);
+			
+			yPos += superMack.getHeight() + interBorderHeight;
+		}
+	}
+	
 	@Override
 	public void render(Graphics2D g) {
+		setSuperMackSizes();
+		
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
 		g.setColor(Color.WHITE);
 		g.drawRect(0, 0, width-1, height-1);
 		
-		AffineTransform savedTransform = g.getTransform();
-		
-		g.translate(outerBorderWidth, outerBorderHeight);
-		int innerWidth = width - outerBorderWidth * 2;
-		int trackWidth = innerWidth - trackTabWidth - trackTabBorderWidth;
-//		bounds.setWidth(trackWidth);
 		for (SuperMack superMack : superMacks) {
-			int layerHeight = superMack.getHeight();
-			AffineTransform savedTransform2 = g.getTransform();
-			g.translate(trackTabWidth + trackTabBorderWidth, 0);
-			Shape savedClip = g.getClip();
-			g.clipRect(0, 0, trackWidth, layerHeight);
-			superMack.render(g); // trackWidth, layerHeight
-			g.setClip(savedClip);
-			g.setTransform(savedTransform2);
-			g.setColor(Color.WHITE);
-			g.setClip(null);
-			g.drawLine(trackTabWidth, 0, trackTabWidth, layerHeight);
-			g.drawLine(0, layerHeight, innerWidth, layerHeight);
-			
-			if (superMack == activeSuperMack) {
-				g.setColor(Color.GREEN);
-				g.fillRect(0, 0, trackTabWidth, layerHeight);
-			}
-			
-			g.translate(0, layerHeight + interBorderHeight);
+			superMack.forwardRender(g);
 		}
 		
-		g.setTransform(savedTransform);
 		g.setColor(Color.GREEN);
 		
 		int pos = bounds.secondsToPixel(status.getPlayPos()) + outerBorderWidth + trackTabWidth + trackTabBorderWidth;
@@ -91,13 +76,14 @@ public class Deck implements View, DimWidthControlled, DimHeightControlled {
 
 	@Override
 	public InputAction applyInputAction(InputType inputType, Point mousePos, double value) {
-		// TODO: Loop through all SuperMacks and apply the input action without checking first.
-		// Proposal: Have views themselves determine if the cursor is in bounds. Don't leave
-		// the responsibility to the parent view.
 		if (inputType.isMouseBased()) {
-			DeckInput.MouseRegion mouseRegion = getMouseRegion(mousePos.x, mousePos.y);
-			if (mouseRegion != null) {
-				return mouseRegion.handleInput(inputType, value);
+			if (mousePos.x >= 0 && mousePos.y >= 0 && mousePos.x < width && mousePos.y < height) {
+				for (SuperMack superMack : superMacks) {
+					InputAction inputAction = superMack.forwardInput(inputType, mousePos, value);
+					if (inputAction != null) {
+						return inputAction;
+					}
+				}
 			}
 			return null;
 		}
@@ -107,13 +93,11 @@ public class Deck implements View, DimWidthControlled, DimHeightControlled {
 
 	@Override
 	public MouseHoverFeedback applyMouseHover(Point mousePos) {
-		if (mousePos == null) {
-			return null;
-		}
-		
-		DeckInput.MouseRegion mouseRegion = getMouseRegion(mousePos.x, mousePos.y);
-		if (mouseRegion != null) {
-			return mouseRegion.applyMouseHover();
+		for (SuperMack superMack : superMacks) {
+			MouseHoverFeedback mouseHoverFeedback = superMack.forwardMouseHover(mousePos);
+			if (mouseHoverFeedback != null) {
+				return mouseHoverFeedback;
+			}
 		}
 		return null;
 	}

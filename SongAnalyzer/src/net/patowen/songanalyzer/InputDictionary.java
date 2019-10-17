@@ -29,6 +29,11 @@ public class InputDictionary {
 	
 	public InputAction applyInput(InputType inputType, Point pos, double value) {
 		List<InputMapping> candidateMappings = dictionary.get(inputType);
+		
+		if (candidateMappings == null) {
+			return null;
+		}
+		
 		for (InputMapping candidateMapping : candidateMappings) {
 			if (candidateMapping.applyAction(pos, value)) {
 				return candidateMapping.getInputAction();

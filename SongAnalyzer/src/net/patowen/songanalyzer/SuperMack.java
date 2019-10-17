@@ -1,14 +1,13 @@
 package net.patowen.songanalyzer;
 
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
-public class SuperMack implements View, DimWidthControlled, DimHeightFree {
+public class SuperMack extends View implements DimWidthControlled, DimHeightFree {
 	private Mack mack;
-	private int height;
-	
-	private int width;
 	
 	private int interBorderHeight = 1, interBorderSelectionRange = 3;
 	private int trackTabWidth = 8, trackTabBorderWidth = 1;
@@ -17,16 +16,21 @@ public class SuperMack implements View, DimWidthControlled, DimHeightFree {
 	
 	public SuperMack(Mack mack) {
 		this.mack = mack;
+		this.mack.setXPos(trackTabWidth + trackTabBorderWidth);
+		this.mack.setYPos(0);
 		this.height = mack.getDefaultHeight();
 		
+		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new SuperMackInput.ActionResize(this), new InputTypeMouse(MouseEvent.BUTTON1, false, false, false), 1));
 		inputDictionary.constructDictionary();
 	}
 	
 	public void render(Graphics2D g) {
-		// TODO: Put SuperMack rendering code here and add a transformation
-		// TODO: Consider altering the SuperMack to have more overlap with the deck in the outer boundary
-		mack.render(g);
+		g.setColor(Color.WHITE);
+		g.drawLine(trackTabWidth, 0, trackTabWidth, height);
+		g.drawLine(0, height, width, height);
+		
+		mack.forwardRender(g);
 	}
 	
 	public int getHeight() {
@@ -39,21 +43,17 @@ public class SuperMack implements View, DimWidthControlled, DimHeightFree {
 		if (height < minimumHeight) {
 			height = minimumHeight;
 		}
-		updateMackSize();
+		mack.setHeight(height);
 	}
 	
 	public void setWidth(int width) {
 		this.width = width;
-		updateMackSize();
-	}
-	
-	private void updateMackSize() {
 		mack.setWidth(width - trackTabWidth - trackTabBorderWidth);
-		mack.setHeight(height);
 	}
 	
 	public boolean isDragHandle(Point pos) {
-		return pos.x >= 0
+		return pos != null
+				&& pos.x >= 0
 				&& pos.x < trackTabWidth
 				&& pos.y >= height - interBorderSelectionRange
 				&& pos.y < height + interBorderHeight + interBorderSelectionRange;
@@ -71,14 +71,16 @@ public class SuperMack implements View, DimWidthControlled, DimHeightFree {
 				&& mousePos.x < width
 				&& mousePos.y >= 0
 				&& mousePos.y < height) {
-			mack.applyInputAction(inputType, new Point(mousePos.x - trackTabWidth - trackTabBorderWidth, mousePos.y), value);
+			mack.forwardInput(inputType, mousePos, value);
 		}
 		return null;
 	}
 
 	@Override
 	public MouseHoverFeedback applyMouseHover(Point mousePos) {
-		// TODO Auto-generated method stub
-		return null;
+		if (isDragHandle(mousePos)) {
+			return new MouseHoverFeedback(new Cursor(Cursor.S_RESIZE_CURSOR));
+		}
+		return mack.applyMouseHover(null);
 	}
 }

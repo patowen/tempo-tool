@@ -2,11 +2,8 @@ package net.patowen.songanalyzer;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.util.HashMap;
 
-public class MackSeek implements Mack {
-	private int width, height;
-	
+public class MackSeek extends Mack {
 	private InputDictionary inputDictionary;
 	
 	public MackSeek() {
