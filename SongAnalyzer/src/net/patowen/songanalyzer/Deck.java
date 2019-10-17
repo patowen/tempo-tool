@@ -6,6 +6,12 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 import net.patowen.songanalyzer.old.TrackBounds;
+import net.patowen.songanalyzer.userinput.InputAction;
+import net.patowen.songanalyzer.userinput.InputType;
+import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
+import net.patowen.songanalyzer.view.DimHeightControlled;
+import net.patowen.songanalyzer.view.DimWidthControlled;
+import net.patowen.songanalyzer.view.View;
 
 // The deck is main area of the application, a stack of macks (track layers) with a play bar.
 public class Deck extends View implements DimWidthControlled, DimHeightControlled {

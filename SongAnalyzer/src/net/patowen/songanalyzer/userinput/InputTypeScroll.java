@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer;
+package net.patowen.songanalyzer.userinput;
 
 public final class InputTypeScroll implements InputType {
 	private final boolean ctrl;

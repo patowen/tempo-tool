@@ -7,6 +7,8 @@ import java.awt.Graphics2D;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import net.patowen.songanalyzer.userinput.InputController;
+
 public class SongAnalyzerRunner {
 	private static Deck deck;
 	

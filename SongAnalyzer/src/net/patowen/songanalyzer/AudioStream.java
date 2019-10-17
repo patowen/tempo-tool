@@ -18,6 +18,7 @@ import javax.swing.Timer;
 
 import net.patowen.songanalyzer.old.Ticker;
 
+// Anyone interested in some spaghetti?
 public class AudioStream {
 	private int length;
 	private int numChannels;

@@ -2,6 +2,8 @@ package net.patowen.songanalyzer;
 
 import java.awt.Point;
 
+import net.patowen.songanalyzer.userinput.InputActionDrag;
+
 public class SuperMackInput {
 	public static final class ActionResize implements InputActionDrag {
 		private SuperMack superMack;

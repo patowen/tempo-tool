@@ -3,6 +3,14 @@ package net.patowen.songanalyzer;
 import java.awt.Graphics2D;
 import java.awt.Point;
 
+import net.patowen.songanalyzer.userinput.InputAction;
+import net.patowen.songanalyzer.userinput.InputActionStandard;
+import net.patowen.songanalyzer.userinput.InputDictionary;
+import net.patowen.songanalyzer.userinput.InputMapping;
+import net.patowen.songanalyzer.userinput.InputType;
+import net.patowen.songanalyzer.userinput.InputTypeScroll;
+import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
+
 public class MackSeek extends Mack {
 	private InputDictionary inputDictionary;
 	

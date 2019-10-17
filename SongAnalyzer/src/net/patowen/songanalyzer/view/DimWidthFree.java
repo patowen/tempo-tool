@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer;
+package net.patowen.songanalyzer.view;
 
 public interface DimWidthFree {
 	int getWidth();

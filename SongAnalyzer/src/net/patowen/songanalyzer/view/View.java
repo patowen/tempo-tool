@@ -1,8 +1,12 @@
-package net.patowen.songanalyzer;
+package net.patowen.songanalyzer.view;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
+
+import net.patowen.songanalyzer.userinput.InputAction;
+import net.patowen.songanalyzer.userinput.InputType;
+import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
 
 public abstract class View {
 	protected int width, height;

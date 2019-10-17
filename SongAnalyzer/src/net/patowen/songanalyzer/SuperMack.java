@@ -6,6 +6,16 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
+import net.patowen.songanalyzer.userinput.InputAction;
+import net.patowen.songanalyzer.userinput.InputDictionary;
+import net.patowen.songanalyzer.userinput.InputMapping;
+import net.patowen.songanalyzer.userinput.InputType;
+import net.patowen.songanalyzer.userinput.InputTypeMouse;
+import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
+import net.patowen.songanalyzer.view.DimHeightFree;
+import net.patowen.songanalyzer.view.DimWidthControlled;
+import net.patowen.songanalyzer.view.View;
+
 public class SuperMack extends View implements DimWidthControlled, DimHeightFree {
 	private Mack mack;
 	

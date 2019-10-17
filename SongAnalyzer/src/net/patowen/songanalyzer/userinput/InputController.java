@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer;
+package net.patowen.songanalyzer.userinput;
 
 import java.awt.Component;
 import java.awt.Point;
@@ -9,6 +9,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+
+import net.patowen.songanalyzer.view.View;
 
 public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 	private Component component;
