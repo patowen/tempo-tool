@@ -5,6 +5,9 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.TreeSet;
 
 import net.patowen.songanalyzer.undo.UserAction;
@@ -67,21 +70,29 @@ public class MackMarker extends Mack {
 		@Override
 		public boolean onAction(Point pos, double value) {
 			if (isWithinView(pos)) {
-				userActionList.applyAction(new UserAction() {
-					@Override
-					public void exec() {
-						marks.add(trackBounds.pixelToSeconds(pos.x));
-					}
-
-					@Override
-					public void undo() {
-						marks.remove(trackBounds.pixelToSeconds(pos.x));
-					}
-				});
-				
+				double markPos = trackBounds.pixelToSeconds(pos.x);
+				userActionList.applyAction(new MarkCreationAction(Collections.singleton(markPos)));
 				return true;
 			}
 			return false;
+		}
+	}
+	
+	private class MarkCreationAction implements UserAction {
+		private Collection<Double> addedMarks;
+		
+		public MarkCreationAction(Collection<Double> addedMarks) {
+			this.addedMarks = addedMarks;
+		}
+		
+		@Override
+		public void exec() {
+			marks.addAll(addedMarks);
+		}
+
+		@Override
+		public void undo() {
+			marks.removeAll(addedMarks);
 		}
 	}
 }
