@@ -20,28 +20,27 @@ import net.patowen.songanalyzer.old.Ticker;
 
 // Anyone interested in some spaghetti?
 public class AudioStream {
-	private int length;
-	private int numChannels;
-	private int bytesPerSample;
-	private float samplingRate;
-	private ByteBuffer totalBuffer;
-	private ByteBuffer fragmentBuffer;
-	private int currentSample;
-	private double currentSubsample;
-	private boolean playing;
-	private double playSpeed;
+	private int length; // Length of the steam in samples. Samples are usually 1/44100 seconds no matter how many channels there are.
+	private int numChannels; // Usually 2 for stereo
+	private int bytesPerSample; // Number of bytes in the byte buffer for each sample
+	private float samplingRate; // Usually 44100
+	private ByteBuffer totalBuffer; // Contains uncompressed audio for the entire loaded sound file. Playing cannot begin until the entire sound file is loaded into memory.
+	private ByteBuffer fragmentBuffer; // Contains the audio that is about to be sent to the OS to play. Includes data from the totalBuffer, possibly slowed down, along with possible metronome ticks. Updated frequently.
+	private int currentSample; // Current position in the totalBuffer. When audio is paused, it is where it will start playing again. When audio is playing, it advances based on what has already been sent to the SourceDataLine, but it will be ahead of what has actually played and cannot be used directly for the play bar.
+	private double currentSubsample; // To allow sound to be played slowed down, fractional samples are allowed, and the fractional part is separated out.
+	private boolean playing; // This is the main indicator that communicates whether the audio is playing or paused.
+	private double playSpeed; // This is set externally to allow sound to be played slowed down.
 	
-	private int initialFramePosition;
-	private int initialSample;
+	private int initialFramePosition; // The frame position after a transition from pausing to playing, used to calculate the actual current sample while playing.
+	private int initialSample; // The value of currentSample after a transition from pausing to playing, used to calculate the actual current sample while playing.
 	
-	private SourceDataLine line;
+	private SourceDataLine line; // The actual line used that allows sound to physically come out of the speakers.
 	
-	private ActionListener audioStreamUpdater;
-	private Timer updateTimer;
+	private Timer updateTimer; // This timer is used to feed audio data in the UI thread to avoid needing to worry about multithreading.
 	
-	private Ticker ticker;
-	private boolean hasCurrentTick;
-	private int currentTickSample;
+	private Ticker ticker; // The source that decides when to play a tick sound
+	private boolean hasCurrentTick; // Whether a metronome tick sound is currently playing
+	private int currentTickSample; // The current progress along the waveform of the metronome tick sound
 	
 	private void playFragment() {
 		fragmentBuffer.clear();
@@ -124,7 +123,7 @@ public class AudioStream {
 		playing = false;
 		playSpeed = 1;
 		
-		audioStreamUpdater = new ActionListener() {
+		ActionListener audioStreamUpdater = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (playing) {
 					if (line.available() > line.getBufferSize() / 2) {
