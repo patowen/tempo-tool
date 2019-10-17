@@ -26,7 +26,7 @@ public class SongAnalyzerRunner {
 		
 		deck = new Deck(status);
 		
-		InputController inputController = new InputController(panel, deck);
+		new InputController(panel, deck);
 		
 		deck.setWidth(800);
 		deck.setHeight(600);

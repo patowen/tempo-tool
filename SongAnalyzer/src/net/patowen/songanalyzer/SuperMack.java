@@ -81,6 +81,6 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 		if (isDragHandle(mousePos)) {
 			return new MouseHoverFeedback(new Cursor(Cursor.S_RESIZE_CURSOR));
 		}
-		return mack.applyMouseHover(null);
+		return mack.forwardMouseHover(mousePos);
 	}
 }

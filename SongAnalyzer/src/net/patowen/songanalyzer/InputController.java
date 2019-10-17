@@ -43,7 +43,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 		if (activeInput != null) {
 			InputType inputType = new InputTypeMouse(e.getButton(), e.isControlDown(), e.isShiftDown(), e.isAltDown());
 			if (activeInput.inputType.fuzzyEquals(inputType)) {
-				Point startRelative = Utils.getRelativePoint(activeInput.start, e.getPoint());
+				Point startRelative = activeInput.getRelativePoint(e.getPoint());
 				activeInput.drag.onDrag(startRelative);
 				activeInput.drag.onEnd(startRelative);
 				component.repaint();
@@ -69,7 +69,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 	public void mouseDragged(MouseEvent e) {
 		mousePos = e.getPoint();
 		if (activeInput != null) {
-			activeInput.drag.onDrag(Utils.getRelativePoint(activeInput.start, e.getPoint()));
+			activeInput.drag.onDrag(activeInput.getRelativePoint(e.getPoint()));
 			component.repaint();
 		}
 		handleMouseHoverFeedback();
@@ -145,6 +145,13 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 			this.drag = drag;
 			this.start = start;
 			this.inputType = inputType;
+		}
+		
+		public Point getRelativePoint(Point point) {
+			if (point == null) {
+				return null;
+			}
+			return new Point(point.x - start.x, point.y - start.y);
 		}
 	}
 }

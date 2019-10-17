@@ -30,6 +30,7 @@ public class GlobalStatus {
 		return audioStream.getPos();
 	}
 	
+	// TODO: Remove?
 	public void repaint() {
 		component.repaint();
 	}
