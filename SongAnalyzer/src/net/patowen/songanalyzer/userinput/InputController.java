@@ -28,6 +28,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 		component.addMouseListener(this);
 		component.addMouseMotionListener(this);
 		component.addMouseWheelListener(this);
+		component.addKeyListener(this);
 		
 		this.rootNode = rootNode;
 		this.component = component;

@@ -24,6 +24,7 @@ public class SongAnalyzerRunner {
 			}
 		};
 		panel.setPreferredSize(new Dimension(800, 600));
+		panel.setFocusable(true);
 		
 		GlobalStatus status = new GlobalStatus(panel);
 		

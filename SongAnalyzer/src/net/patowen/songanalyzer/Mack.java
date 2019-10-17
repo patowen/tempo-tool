@@ -6,6 +6,22 @@ import net.patowen.songanalyzer.view.View;
 
 public abstract class Mack extends View implements DimWidthControlled, DimHeightControlled {
 	public abstract int getType();
-	public abstract int getMinimumHeight();
-	public abstract int getDefaultHeight();
+	
+	public int getMinimumHeight() {
+		return 32;
+	}
+	
+	public int getDefaultHeight() {
+		return 64;
+	}
+	
+	@Override
+	public void setWidth(int width) {
+		this.width = width;
+	}
+	
+	@Override
+	public void setHeight(int height) {
+		this.height = height;
+	}
 }

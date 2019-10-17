@@ -3,11 +3,16 @@ package net.patowen.songanalyzer;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
+import net.patowen.songanalyzer.userinput.InputActionStandard;
+import net.patowen.songanalyzer.userinput.InputDictionary;
+import net.patowen.songanalyzer.userinput.InputMapping;
 import net.patowen.songanalyzer.userinput.InputType;
+import net.patowen.songanalyzer.userinput.InputTypeKeyboard;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
 import net.patowen.songanalyzer.view.DimHeightControlled;
 import net.patowen.songanalyzer.view.DimWidthControlled;
@@ -15,6 +20,8 @@ import net.patowen.songanalyzer.view.View;
 
 // The deck is main area of the application, a stack of macks (track layers) with a play bar.
 public class Deck extends View implements DimWidthControlled, DimHeightControlled {
+	private InputDictionary fallbackInputDictionary;
+	
 	private GlobalStatus status;
 	
 	private UserActionList userActionList;
@@ -34,6 +41,17 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		bounds = new TrackBounds(0, 10);
 		
 		superMacks.add(new SuperMack(new MackSeek(bounds)));
+		superMacks.add(new SuperMack(new MackMarker(bounds, userActionList)));
+		
+		fallbackInputDictionary = new InputDictionary();
+		fallbackInputDictionary.addInputMapping(new InputMapping(new InputActionStandard() {
+			@Override
+			public boolean onAction(Point pos, double value) {
+				userActionList.undo();
+				return true;
+			}
+		}, new InputTypeKeyboard(KeyEvent.VK_Z, true, false, false), 1));
+		fallbackInputDictionary.constructDictionary();
 	}
 	
 	@Override
@@ -92,11 +110,11 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 					}
 				}
 			}
-			return null;
 		}
 		
 		// TODO Keyboard controls on active mack
-		return null;
+		
+		return fallbackInputDictionary.applyInput(inputType, mousePos, value);
 	}
 
 	@Override
