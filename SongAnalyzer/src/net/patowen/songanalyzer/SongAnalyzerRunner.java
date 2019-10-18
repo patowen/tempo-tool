@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -13,14 +15,24 @@ import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputController;
 
 public class SongAnalyzerRunner {
+	private JFrame frame;
+	private JPanel panel;
+	private Config config;
+	private UserActionList userActionList;
 	private Root root;
 	
+	@SuppressWarnings("serial")
 	public SongAnalyzerRunner() {
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame = new JFrame();
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				config.saveConfig();
+				frame.dispose();
+			}
+		});
 		
-		@SuppressWarnings("serial")
-		JPanel panel = new JPanel() {
+		panel = new JPanel() {
 			public void paint(Graphics g) {
 				root.render((Graphics2D) g);
 			}
@@ -36,7 +48,10 @@ public class SongAnalyzerRunner {
 			}
 		});
 		
-		root = new Root(new UserActionList());
+		config = new Config();
+		userActionList = new UserActionList();
+		
+		root = new Root(config, userActionList);
 		
 		new InputController(panel, root);
 		

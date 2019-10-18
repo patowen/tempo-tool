@@ -17,12 +17,17 @@ import net.patowen.songanalyzer.view.DimWidthControlled;
 import net.patowen.songanalyzer.view.View;
 
 public class Root extends View implements DimWidthControlled, DimHeightControlled {
+	private Config config;
 	private UserActionList userActionList;
 	private Deck deck;
 	private InputDictionary inputDictionary;
 	
-	public Root(UserActionList userActionList) {
+	public Root(Config config, UserActionList userActionList) {
+		this.config = config;
 		this.userActionList = userActionList;
+		if (!this.config.loadConfig()) {
+			System.err.println("Loading the configuration file failed");
+		}
 		deck = new Deck(userActionList);
 		
 		inputDictionary = new InputDictionary();
