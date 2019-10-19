@@ -19,6 +19,7 @@ public class SongAnalyzerRunner {
 	private JPanel panel;
 	private Config config;
 	private UserActionList userActionList;
+	private FileDialogManager fileDialogManager;
 	private Root root;
 	
 	@SuppressWarnings("serial")
@@ -50,8 +51,9 @@ public class SongAnalyzerRunner {
 		
 		config = new Config();
 		userActionList = new UserActionList();
+		fileDialogManager = new FileDialogManager(panel);
 		
-		root = new Root(config, userActionList);
+		root = new Root(config, userActionList, fileDialogManager);
 		
 		new InputController(panel, root);
 		

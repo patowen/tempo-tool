@@ -3,7 +3,16 @@ package net.patowen.songanalyzer;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 
+import net.patowen.songanalyzer.FileDialogManager.DialogKind;
 import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputActionStandard;
@@ -19,12 +28,16 @@ import net.patowen.songanalyzer.view.View;
 public class Root extends View implements DimWidthControlled, DimHeightControlled {
 	private Config config;
 	private UserActionList userActionList;
+	private FileDialogManager fileDialogManager;
 	private Deck deck;
 	private InputDictionary inputDictionary;
 	
-	public Root(Config config, UserActionList userActionList) {
+	private Path currentFile;
+	
+	public Root(Config config, UserActionList userActionList, FileDialogManager fileDialogManager) {
 		this.config = config;
 		this.userActionList = userActionList;
+		this.fileDialogManager = fileDialogManager;
 		if (!this.config.loadConfig()) {
 			System.err.println("Loading the configuration file failed");
 		}
@@ -35,7 +48,20 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		Redo redo = new Redo();
 		inputDictionary.addInputMapping(new InputMapping(redo, new InputTypeKeyboard(KeyEvent.VK_Z, true, true, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(redo, new InputTypeKeyboard(KeyEvent.VK_Y, true, false, false), 1));
+		
+		inputDictionary.addInputMapping(new InputMapping(new Save(), new InputTypeKeyboard(KeyEvent.VK_S, true, false, false), 1));
+		inputDictionary.addInputMapping(new InputMapping(new SaveWithForcedDialog(), new InputTypeKeyboard(KeyEvent.VK_S, true, true, false), 1));
+		inputDictionary.addInputMapping(new InputMapping(new Open(), new InputTypeKeyboard(KeyEvent.VK_O, true, false, false), 1));
+		
 		inputDictionary.constructDictionary();
+		
+		currentFile = config.getConfigEntryPath(Config.Keys.DEFAULT_FILE);
+		if (currentFile != null) {
+			if (!prechosenLoad(currentFile, true)) {
+				currentFile = null;
+				config.setConfigEntryPath(Config.Keys.DEFAULT_FILE, null);
+			}
+		}
 	}
 	
 	@Override
@@ -70,6 +96,85 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		deck.setHeight(height);
 	}
 	
+	public void save(DataOutputStream stream) throws IOException {
+		
+	}
+	
+	public void load(DataInputStream stream) throws IOException {
+		
+	}
+	
+	private void superSave(Path path) throws IOException {
+		save(new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(path))));
+	}
+	
+	private void superLoad(Path path) throws IOException {
+		load(new DataInputStream(new BufferedInputStream(Files.newInputStream(path))));
+	}
+	
+	private boolean prechosenSaveOrLoad(Path path, FileDialogManager.DialogKind dialogKind, boolean quiet) {
+		try {
+			switch (dialogKind) {
+			case SAVE:
+				superSave(path);
+				break;
+			case OPEN:
+				superLoad(path);
+				break;
+			default:
+				throw new IllegalArgumentException("dialogKind");
+			}
+			return true;
+		} catch (NoSuchFileException e) {
+			if (!quiet || dialogKind != DialogKind.OPEN) {
+				fileDialogManager.showErrorDialog(path, dialogKind);
+			}
+			return false;
+		} catch (IOException e) {
+			fileDialogManager.showErrorDialog(path, dialogKind);
+			return false;
+		}
+	}
+	
+	private Path dialogSaveOrLoad(FileDialogManager.DialogKind dialogKind) {
+		Path path = fileDialogManager.getUserChosenPath(
+				config.getConfigEntryPath(Config.Keys.DEFAULT_FOLDER),
+				"Song analyis files",
+				new String[] {"songanalysis"},
+				dialogKind);
+		
+		if (path == null) {
+			return null;
+		}
+		
+		boolean success = prechosenSaveOrLoad(path, dialogKind, false);
+		
+		if (!success) {
+			return null;
+		}
+
+		currentFile = path;
+		config.setConfigEntryPath(Config.Keys.DEFAULT_FILE, currentFile);
+		config.setConfigEntryPath(Config.Keys.DEFAULT_FOLDER, currentFile.getParent());
+		return path;
+	}
+	
+	private boolean prechosenSave(Path path) {
+		return prechosenSaveOrLoad(path, FileDialogManager.DialogKind.SAVE, false);
+	}
+	
+	private boolean prechosenLoad(Path path, boolean quiet) {
+		return prechosenSaveOrLoad(path, FileDialogManager.DialogKind.OPEN, quiet);
+	}
+	
+	private Path dialogSave() {
+		return dialogSaveOrLoad(FileDialogManager.DialogKind.SAVE);
+	}
+	
+	private Path dialogLoad() {
+		return dialogSaveOrLoad(FileDialogManager.DialogKind.OPEN);
+	}
+	
 	private class Undo implements InputActionStandard {
 		@Override
 		public boolean onAction(Point pos, double value) {
@@ -82,6 +187,34 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		@Override
 		public boolean onAction(Point pos, double value) {
 			userActionList.redo();
+			return true;
+		}
+	}
+	
+	private class Save implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			if (currentFile != null) {
+				prechosenSave(currentFile);
+			} else {
+				dialogSave();
+			}
+			return true;
+		}
+	}
+	
+	private class SaveWithForcedDialog implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			dialogSave();
+			return true;
+		}
+	}
+	
+	private class Open implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			dialogLoad();
 			return true;
 		}
 	}
