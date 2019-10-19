@@ -60,9 +60,12 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		currentFile = config.getConfigEntryPath(Config.Keys.DEFAULT_FILE);
 		if (currentFile != null) {
 			if (!prechosenLoad(currentFile, true)) {
+				reset();
 				currentFile = null;
 				config.setConfigEntryPath(Config.Keys.DEFAULT_FILE, null);
 			}
+		} else {
+			reset();
 		}
 	}
 	

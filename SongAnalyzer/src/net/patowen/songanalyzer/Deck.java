@@ -37,8 +37,6 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		
 		fallbackInputDictionary = new InputDictionary();
 		fallbackInputDictionary.constructDictionary();
-		
-		reset();
 	}
 	
 	@Override
@@ -127,6 +125,8 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		for (int i=0; i<numSuperMacks; i++) {
 			superMacks.add(SuperMack.load(stream, trackBounds, userActionList));
 		}
+		
+		this.setWidth(width);
 	}
 
 	@Override
