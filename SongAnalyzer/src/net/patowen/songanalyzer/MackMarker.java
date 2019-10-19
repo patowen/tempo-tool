@@ -5,10 +5,14 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
 
+import net.patowen.songanalyzer.exception.FileFormatException;
 import net.patowen.songanalyzer.undo.UserAction;
 import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
@@ -20,6 +24,8 @@ import net.patowen.songanalyzer.userinput.InputTypeMouse;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
 
 public class MackMarker extends Mack {
+	public static final int type = 1;
+	
 	private InputDictionary inputDictionary;
 	
 	private TrackBounds trackBounds;
@@ -42,7 +48,7 @@ public class MackMarker extends Mack {
 	
 	@Override
 	public int getType() {
-		return 1;
+		return type;
 	}
 	
 	@Override
@@ -159,6 +165,22 @@ public class MackMarker extends Mack {
 		@Override
 		public void undo() {
 			marks.addAll(deletedMarks);
+		}
+	}
+
+	@Override
+	public void save(DataOutputStream stream) throws IOException {
+		stream.writeInt(marks.size());
+		for (double mark : marks) {
+			stream.writeDouble(mark);
+		}
+	}
+
+	@Override
+	public void load(DataInputStream stream) throws IOException, FileFormatException {
+		int numMarks = stream.readInt();
+		for (int i=0; i<numMarks; i++) {
+			marks.add(stream.readDouble());
 		}
 	}
 }

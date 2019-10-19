@@ -5,7 +5,13 @@ import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
+import net.patowen.songanalyzer.exception.FileFormatException;
+import net.patowen.songanalyzer.exception.IllegalMackTypeException;
+import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputDictionary;
 import net.patowen.songanalyzer.userinput.InputMapping;
@@ -24,16 +30,31 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 	
 	private InputDictionary inputDictionary;
 	
-	public SuperMack(Mack mack) {
+	private SuperMack(Mack mack) {
 		this.mack = mack;
 		this.mack.setXPos(trackTabWidth + trackTabBorderWidth);
 		this.mack.setYPos(0);
-		this.height = mack.getDefaultHeight();
-		this.mack.setHeight(this.height);
 		
 		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new SuperMackInput.ActionResize(this), new InputTypeMouse(MouseEvent.BUTTON1, false, false, false), 1));
 		inputDictionary.constructDictionary();
+	}
+	
+	private static Mack createMack(int type, TrackBounds trackBounds, UserActionList userActionList) {
+		switch (type) {
+		case MackSeek.type:
+			return new MackSeek(trackBounds);
+		case MackMarker.type:
+			return new MackMarker(trackBounds, userActionList);
+		default:
+			throw new IllegalMackTypeException();
+		}
+	}
+	
+	public static SuperMack create(int type, Integer height, TrackBounds trackBounds, UserActionList userActionList) {
+		SuperMack superMack = new SuperMack(createMack(type, trackBounds, userActionList));
+		superMack.trySetHeight(height == null ? superMack.mack.getDefaultHeight() : height);
+		return superMack;
 	}
 	
 	public void render(Graphics2D g) {
@@ -93,5 +114,23 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 			return new MouseHoverFeedback(new Cursor(Cursor.S_RESIZE_CURSOR));
 		}
 		return mack.forwardMouseHover(mousePos);
+	}
+	
+	public void save(DataOutputStream stream) throws IOException {
+		stream.writeInt(height);
+		stream.writeInt(mack.getType());
+		mack.save(stream);
+	}
+	
+	public static SuperMack load(DataInputStream stream, TrackBounds trackBounds, UserActionList userActionList) throws IOException, FileFormatException {
+		int height = stream.readInt();
+		int type = stream.readInt();
+		try {
+			SuperMack superMack = create(type, height, trackBounds, userActionList);
+			superMack.mack.load(stream);
+			return superMack;
+		} catch (IllegalMackTypeException e) {
+			throw new FileFormatException("Unknown mack type " + type);
+		}
 	}
 }

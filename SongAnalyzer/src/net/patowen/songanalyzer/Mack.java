@@ -1,5 +1,10 @@
 package net.patowen.songanalyzer;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+import net.patowen.songanalyzer.exception.FileFormatException;
 import net.patowen.songanalyzer.view.DimHeightControlled;
 import net.patowen.songanalyzer.view.DimWidthControlled;
 import net.patowen.songanalyzer.view.View;
@@ -24,4 +29,8 @@ public abstract class Mack extends View implements DimWidthControlled, DimHeight
 	public void setHeight(int height) {
 		this.height = height;
 	}
+	
+	public abstract void save(DataOutputStream stream) throws IOException;
+	
+	public abstract void load(DataInputStream stream) throws IOException, FileFormatException;
 }

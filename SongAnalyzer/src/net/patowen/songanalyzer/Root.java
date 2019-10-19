@@ -7,12 +7,14 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 
 import net.patowen.songanalyzer.FileDialogManager.DialogKind;
+import net.patowen.songanalyzer.exception.FileFormatException;
 import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputActionStandard;
@@ -96,20 +98,34 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		deck.setHeight(height);
 	}
 	
-	public void save(DataOutputStream stream) throws IOException {
-		
+	public void reset() {
+		deck.reset();
 	}
 	
-	public void load(DataInputStream stream) throws IOException {
-		
+	public void save(DataOutputStream stream) throws IOException {
+		stream.writeInt(0);
+		deck.save(stream);
+	}
+	
+	public void load(DataInputStream stream) throws IOException, FileFormatException {
+		if (stream.readInt() != 0) {
+			throw new FileFormatException("Unsupported song analysis file version");
+		}
+		deck.load(stream);
 	}
 	
 	private void superSave(Path path) throws IOException {
-		save(new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(path))));
+		try (DataOutputStream stream = new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(path)))) {
+			save(stream);
+		}
 	}
 	
-	private void superLoad(Path path) throws IOException {
-		load(new DataInputStream(new BufferedInputStream(Files.newInputStream(path))));
+	private void superLoad(Path path) throws IOException, FileFormatException {
+		try (DataInputStream stream = new DataInputStream(new BufferedInputStream(Files.newInputStream(path)))) {
+			load(stream);
+		} catch (EOFException e) {
+			throw new FileFormatException("File contents ended earlier than expected");
+		}
 	}
 	
 	private boolean prechosenSaveOrLoad(Path path, FileDialogManager.DialogKind dialogKind, boolean quiet) {
@@ -125,6 +141,9 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 				throw new IllegalArgumentException("dialogKind");
 			}
 			return true;
+		} catch (FileFormatException e) {
+			fileDialogManager.showFileFormatErrorDialog(path, e.getMessage());
+			return false;
 		} catch (NoSuchFileException e) {
 			if (!quiet || dialogKind != DialogKind.OPEN) {
 				fileDialogManager.showErrorDialog(path, dialogKind);

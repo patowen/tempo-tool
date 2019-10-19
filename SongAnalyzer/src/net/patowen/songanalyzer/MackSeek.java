@@ -2,7 +2,11 @@ package net.patowen.songanalyzer;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
+import net.patowen.songanalyzer.exception.FileFormatException;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputActionStandard;
 import net.patowen.songanalyzer.userinput.InputDictionary;
@@ -12,6 +16,8 @@ import net.patowen.songanalyzer.userinput.InputTypeScroll;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
 
 public class MackSeek extends Mack {
+	public static final int type = 0;
+	
 	private InputDictionary inputDictionary;
 	
 	private TrackBounds trackBounds;
@@ -26,7 +32,7 @@ public class MackSeek extends Mack {
 	
 	@Override
 	public int getType() {
-		return 0;
+		return type;
 	}
 	
 	@Override
@@ -53,5 +59,13 @@ public class MackSeek extends Mack {
 			}
 			return false;
 		}
+	}
+
+	@Override
+	public void save(DataOutputStream stream) throws IOException {
+	}
+
+	@Override
+	public void load(DataInputStream stream) throws IOException, FileFormatException {
 	}
 }

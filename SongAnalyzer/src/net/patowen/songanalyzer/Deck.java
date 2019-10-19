@@ -3,8 +3,12 @@ package net.patowen.songanalyzer;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import net.patowen.songanalyzer.exception.FileFormatException;
 import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputDictionary;
@@ -21,7 +25,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	private UserActionList userActionList;
 	
 	private ArrayList<SuperMack> superMacks;
-	private TrackBounds bounds;
+	private TrackBounds trackBounds;
 	
 	private int outerBorderWidth = 1, outerBorderHeight = 1, interBorderHeight = 1;
 	
@@ -31,13 +35,10 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		this.userActionList = userActionList;
 		superMacks = new ArrayList<>();
 		
-		bounds = new TrackBounds(0, 10);
-		
-		superMacks.add(new SuperMack(new MackSeek(bounds)));
-		superMacks.add(new SuperMack(new MackMarker(bounds, this.userActionList)));
-		
 		fallbackInputDictionary = new InputDictionary();
 		fallbackInputDictionary.constructDictionary();
+		
+		reset();
 	}
 	
 	@Override
@@ -48,7 +49,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 			superMack.setWidth(width - outerBorderWidth * 2);
 		}
 		
-		bounds.setWidth(width - outerBorderWidth * 2 - trackTabWidth - trackTabBorderWidth);
+		trackBounds.setWidth(width - outerBorderWidth * 2 - trackTabWidth - trackTabBorderWidth);
 	}
 	
 	@Override
@@ -81,7 +82,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		
 		g.setColor(Color.GREEN);
 		
-		int pos = bounds.secondsToPixel(0) + outerBorderWidth + trackTabWidth + trackTabBorderWidth;
+		int pos = trackBounds.secondsToPixel(0) + outerBorderWidth + trackTabWidth + trackTabBorderWidth;
 		g.drawLine(pos, 0, pos, height);
 	}
 
@@ -101,6 +102,31 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		// TODO Keyboard controls on active mack
 		
 		return fallbackInputDictionary.applyInput(inputType, mousePos, value);
+	}
+	
+	public void reset() {
+		superMacks.clear();
+		trackBounds = new TrackBounds(0, 10);
+		
+		superMacks.add(SuperMack.create(MackSeek.type, null, trackBounds, this.userActionList));
+		superMacks.add(SuperMack.create(MackMarker.type, null, trackBounds, this.userActionList));
+	}
+	
+	public void save(DataOutputStream stream) throws IOException {
+		stream.writeInt(superMacks.size());
+		for (SuperMack superMack : superMacks) {
+			superMack.save(stream);
+		}
+	}
+	
+	public void load(DataInputStream stream) throws IOException, FileFormatException {
+		superMacks.clear();
+		trackBounds = new TrackBounds(0, 10);
+		
+		int numSuperMacks = stream.readInt();
+		for (int i=0; i<numSuperMacks; i++) {
+			superMacks.add(SuperMack.load(stream, trackBounds, userActionList));
+		}
 	}
 
 	@Override

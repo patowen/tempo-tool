@@ -87,4 +87,11 @@ public class FileDialogManager {
 			throw new IllegalArgumentException("dialogKind");
 		}
 	}
+	
+	public void showFileFormatErrorDialog(Path path, String message) {
+		JOptionPane.showMessageDialog(parent,
+				"Unexpected content in " + path.getFileName() + ": " + message,
+				"Unknown file format",
+				JOptionPane.ERROR_MESSAGE);
+	}
 }
