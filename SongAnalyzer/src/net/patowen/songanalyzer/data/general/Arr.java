@@ -4,8 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class Arr extends Obj {
 	public static final byte type = 1;
@@ -16,8 +16,8 @@ public class Arr extends Obj {
 		arr = new ArrayList<>();
 	}
 	
-	public Iterator<Obj> getIterator() {
-		return arr.iterator();
+	public List<Obj> get() {
+		return arr;
 	}
 	
 	public void add(Obj value) {
