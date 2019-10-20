@@ -19,7 +19,6 @@ import net.patowen.songanalyzer.old.Ticker;
 
 // Anyone interested in some spaghetti?
 public class AudioStream {
-	private int length; // Length of the steam in samples. Samples are usually 1/44100 seconds no matter how many channels there are.
 	private int numChannels; // Usually 2 for stereo
 	private int bytesPerSample; // Number of bytes in the byte buffer for each sample
 	private float samplingRate; // Usually 44100
@@ -44,6 +43,8 @@ public class AudioStream {
 	private void playFragment() {
 		fragmentBuffer.clear();
 		
+		int numSamples = getNumSamples();
+		
 		int samplesThisPass = line.available() / bytesPerSample;
 		
 		double currentPos = getCurrentSampleInSeconds();
@@ -59,7 +60,7 @@ public class AudioStream {
 			}
 			
 			for (int j=0; j < numChannels; j++) {
-				double totalAmp = getAmpInterpolated(currentSample, currentSubsample, j) * 0.4;
+				double totalAmp = getAmpInterpolated(numSamples, currentSample, currentSubsample, j) * 0.4;
 				if (hasCurrentTick) {
 					totalAmp += getTickAmp(currentTickSample) * 0.4;
 				}
@@ -104,7 +105,6 @@ public class AudioStream {
 		}
 		
 		bytesPerSample = 2 * numChannels;
-		length = totalBuffer.size() / bytesPerSample;
 		
 		AudioFormat format = new AudioFormat(samplingRate, 16, numChannels, true, true);
 		DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
@@ -138,15 +138,19 @@ public class AudioStream {
 		line.close();
 	}
 	
-	private double getAmpRaw(int index, int channel) {
-		if (index >= length || index < 0) return 0;
+	private int getNumSamples() {
+		return totalBuffer.size() / bytesPerSample;
+	}
+	
+	private double getAmpRaw(int numSamples, int index, int channel) {
+		if (index >= numSamples || index < 0) return 0;
 		int arrayPos = (index*numChannels+channel)*2;
 		return Byte.toUnsignedInt(totalBuffer.get(arrayPos)) + totalBuffer.get(arrayPos + 1) * 256;
 	}
 	
-	private double getAmpInterpolated(int index, double subIndex, int channel) {
-		double amp0 = getAmpRaw(index, channel);
-		double amp1 = getAmpRaw(index + 1, channel);
+	private double getAmpInterpolated(int numSamples, int index, double subIndex, int channel) {
+		double amp0 = getAmpRaw(numSamples, index, channel);
+		double amp1 = getAmpRaw(numSamples, index + 1, channel);
 		return amp0 + ((amp1 - amp0) * subIndex);
 	}
 	
@@ -159,7 +163,7 @@ public class AudioStream {
 	}
 	
 	public double getLength() {
-		return (double)length / (double)samplingRate;
+		return (double)getNumSamples() / (double)samplingRate;
 	}
 
 	public void setPos(double pos) {
