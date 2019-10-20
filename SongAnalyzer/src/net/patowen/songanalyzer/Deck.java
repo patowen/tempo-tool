@@ -69,8 +69,6 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	public void render(Graphics2D g) {
 		setSuperMackPositions();
 		
-		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, width, height);
 		g.setColor(Color.WHITE);
 		g.drawRect(0, 0, width-1, height-1);
 		

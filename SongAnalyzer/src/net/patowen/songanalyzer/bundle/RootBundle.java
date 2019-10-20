@@ -29,7 +29,7 @@ public class RootBundle {
 		return userActionList;
 	}
 	
-	public DialogManager getFileDialogManager() {
+	public DialogManager getDialogManager() {
 		return fileDialogManager;
 	}
 	

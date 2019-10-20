@@ -1,5 +1,6 @@
 package net.patowen.songanalyzer;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -37,18 +38,21 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 	private final Config config;
 	private final UserActionList userActionList;
 	private final DialogManager fileDialogManager;
-	private Deck deck;
-	private InputDictionary inputDictionary;
 	private final AudioPlayer audioPlayer;
 	
+	private Deck deck;
+	private Header header;
+	
 	private Path currentFile;
+	
+	private InputDictionary inputDictionary;
 	
 	public Root(Component component) {
 		bundle = new RootBundle(component);
 		
 		this.config = bundle.getConfig();
 		this.userActionList = bundle.getUserActionList();
-		this.fileDialogManager = bundle.getFileDialogManager();
+		this.fileDialogManager = bundle.getDialogManager();
 		this.audioPlayer = bundle.getAudioPlayer();
 		
 		if (!this.config.loadConfig()) {
@@ -56,6 +60,7 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		}
 		
 		deck = new Deck(bundle);
+		header = new Header(bundle);
 		
 		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new Undo(), new InputTypeKeyboard(KeyEvent.VK_Z, true, false, false), 1));
@@ -66,8 +71,6 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		inputDictionary.addInputMapping(new InputMapping(new Save(), new InputTypeKeyboard(KeyEvent.VK_S, true, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new SaveWithForcedDialog(), new InputTypeKeyboard(KeyEvent.VK_S, true, true, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new Open(), new InputTypeKeyboard(KeyEvent.VK_O, true, false, false), 1));
-		
-		inputDictionary.addInputMapping(new InputMapping(new OpenAudio(), new InputTypeKeyboard(KeyEvent.VK_BACK_QUOTE, true, false, false), 1));
 		
 		inputDictionary.addInputMapping(new InputMapping(new TogglePlay(), new InputTypeKeyboard(KeyEvent.VK_SPACE, false, false, false), 1));
 		
@@ -92,12 +95,23 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 	
 	@Override
 	public void render(Graphics2D g) {
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, width, height);
+		
+		deck.setYPos(header.getHeight());
+		
+		header.forwardRender(g);
 		deck.forwardRender(g);
 	}
 
 	@Override
 	public InputAction applyInputAction(InputType inputType, Point mousePos, double value) {
 		InputAction inputAction = inputDictionary.applyInput(inputType, mousePos, value);
+		if (inputAction != null) {
+			return inputAction;
+		}
+		
+		inputAction = header.forwardInput(inputType, mousePos, value);
 		if (inputAction != null) {
 			return inputAction;
 		}
@@ -119,7 +133,7 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 	@Override
 	public void setHeight(int height) {
 		this.height = height;
-		deck.setHeight(height);
+		deck.setHeight(height - header.getHeight());
 	}
 	
 	private void reset() {
@@ -256,14 +270,6 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		@Override
 		public boolean onAction(Point pos, double value) {
 			dialogLoad();
-			return true;
-		}
-	}
-	
-	private class OpenAudio implements InputActionStandard {
-		@Override
-		public boolean onAction(Point pos, double value) {
-			audioPlayer.chooseAudioFileFromUser(config, fileDialogManager);
 			return true;
 		}
 	}

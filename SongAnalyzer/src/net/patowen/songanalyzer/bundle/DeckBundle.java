@@ -25,7 +25,7 @@ public class DeckBundle {
 	}
 	
 	public DialogManager getFileDialogManager() {
-		return rootBundle.getFileDialogManager();
+		return rootBundle.getDialogManager();
 	}
 	
 	public AudioPlayer getAudioPlayer() {
