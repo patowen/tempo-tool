@@ -20,6 +20,7 @@ public class SongAnalyzerRunner {
 	private Config config;
 	private UserActionList userActionList;
 	private FileDialogManager fileDialogManager;
+	private AudioPlayer audioPlayer;
 	private Root root;
 	
 	@SuppressWarnings("serial")
@@ -29,6 +30,7 @@ public class SongAnalyzerRunner {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				config.saveConfig();
+				root.destroy();
 				frame.dispose();
 			}
 		});
@@ -52,8 +54,9 @@ public class SongAnalyzerRunner {
 		config = new Config();
 		userActionList = new UserActionList();
 		fileDialogManager = new FileDialogManager(panel);
+		audioPlayer = new AudioPlayer(panel);
 		
-		root = new Root(config, userActionList, fileDialogManager);
+		root = new Root(config, userActionList, fileDialogManager, audioPlayer);
 		
 		new InputController(panel, root);
 		

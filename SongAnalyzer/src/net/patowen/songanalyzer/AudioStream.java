@@ -140,6 +140,11 @@ public class AudioStream {
 		hasCurrentTick = false;
 	}
 	
+	public void destroy() {
+		updateTimer.stop();
+		line.close();
+	}
+	
 	private short getAmpRaw(int index, int channel) {
 		if (index >= length || index < 0) return 0;
 		return totalBuffer.getShort((index*numChannels+channel)*2);

@@ -38,10 +38,10 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 		inputDictionary.constructDictionary();
 	}
 	
-	private static Mack createMack(int type, TrackBounds trackBounds, UserActionList userActionList) {
+	private static Mack createMack(int type, TrackBounds trackBounds, UserActionList userActionList, AudioPlayer audioPlayer) {
 		switch (type) {
 		case MackSeek.type:
-			return new MackSeek(trackBounds);
+			return new MackSeek(trackBounds, audioPlayer);
 		case MackMarker.type:
 			return new MackMarker(trackBounds, userActionList);
 		default:
@@ -49,8 +49,8 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 		}
 	}
 	
-	public static SuperMack create(int type, Integer height, TrackBounds trackBounds, UserActionList userActionList) {
-		SuperMack superMack = new SuperMack(createMack(type, trackBounds, userActionList));
+	public static SuperMack create(int type, Integer height, TrackBounds trackBounds, UserActionList userActionList, AudioPlayer audioPlayer) {
+		SuperMack superMack = new SuperMack(createMack(type, trackBounds, userActionList, audioPlayer));
 		superMack.trySetHeight(height == null ? superMack.mack.getDefaultHeight() : height);
 		return superMack;
 	}
@@ -127,11 +127,11 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 		return dict;
 	}
 	
-	public static SuperMack load(Dict dict, TrackBounds trackBounds, UserActionList userActionList) throws FileFormatException {
+	public static SuperMack load(Dict dict, TrackBounds trackBounds, UserActionList userActionList, AudioPlayer audioPlayer) throws FileFormatException {
 		int height = dict.get(Keys.height).asInt();
 		int type = dict.get(Keys.type).asInt();
 		try {
-			SuperMack superMack = create(type, height, trackBounds, userActionList);
+			SuperMack superMack = create(type, height, trackBounds, userActionList, audioPlayer);
 			superMack.mack.load(dict);
 			return superMack;
 		} catch (IllegalMackTypeException e) {

@@ -23,6 +23,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	private InputDictionary fallbackInputDictionary;
 	
 	private UserActionList userActionList;
+	private AudioPlayer audioPlayer;
 	
 	private ArrayList<SuperMack> superMacks;
 	private TrackBounds trackBounds;
@@ -31,8 +32,9 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	
 	private int trackTabWidth = 8, trackTabBorderWidth = 1;
 	
-	public Deck(UserActionList userActionList) {
+	public Deck(UserActionList userActionList, AudioPlayer audioPlayer) {
 		this.userActionList = userActionList;
+		this.audioPlayer = audioPlayer;
 		superMacks = new ArrayList<>();
 		
 		fallbackInputDictionary = new InputDictionary();
@@ -80,8 +82,10 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		
 		g.setColor(Color.GREEN);
 		
-		int pos = trackBounds.secondsToPixel(0) + outerBorderWidth + trackTabWidth + trackTabBorderWidth;
-		g.drawLine(pos, 0, pos, height);
+		if (audioPlayer.hasAudioStream()) {
+			int pos = trackBounds.secondsToPixel(audioPlayer.getPos()) + outerBorderWidth + trackTabWidth + trackTabBorderWidth;
+			g.drawLine(pos, 0, pos, height);
+		}
 	}
 
 	@Override
@@ -106,8 +110,8 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		superMacks.clear();
 		trackBounds = new TrackBounds(0, 10);
 		
-		superMacks.add(SuperMack.create(MackSeek.type, null, trackBounds, this.userActionList));
-		superMacks.add(SuperMack.create(MackMarker.type, null, trackBounds, this.userActionList));
+		superMacks.add(SuperMack.create(MackSeek.type, null, trackBounds, userActionList, audioPlayer));
+		superMacks.add(SuperMack.create(MackMarker.type, null, trackBounds, userActionList, audioPlayer));
 	}
 	
 	private interface Keys {
@@ -130,7 +134,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		
 		Arr arr = dict.get(Keys.macks).asArr();
 		for (Obj obj : arr.get()) {
-			superMacks.add(SuperMack.load(obj.asDict(), trackBounds, userActionList));
+			superMacks.add(SuperMack.load(obj.asDict(), trackBounds, userActionList, audioPlayer));
 		}
 		
 		this.setWidth(width);

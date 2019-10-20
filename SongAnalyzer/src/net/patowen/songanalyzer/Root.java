@@ -35,17 +35,21 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 	private FileDialogManager fileDialogManager;
 	private Deck deck;
 	private InputDictionary inputDictionary;
+	private AudioPlayer audioPlayer;
 	
 	private Path currentFile;
 	
-	public Root(Config config, UserActionList userActionList, FileDialogManager fileDialogManager) {
+	public Root(Config config, UserActionList userActionList, FileDialogManager fileDialogManager, AudioPlayer audioPlayer) {
 		this.config = config;
 		this.userActionList = userActionList;
 		this.fileDialogManager = fileDialogManager;
+		this.audioPlayer = audioPlayer;
+		
 		if (!this.config.loadConfig()) {
 			System.err.println("Loading the configuration file failed");
 		}
-		deck = new Deck(userActionList);
+		
+		deck = new Deck(userActionList, audioPlayer);
 		
 		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new Undo(), new InputTypeKeyboard(KeyEvent.VK_Z, true, false, false), 1));
@@ -56,6 +60,10 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		inputDictionary.addInputMapping(new InputMapping(new Save(), new InputTypeKeyboard(KeyEvent.VK_S, true, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new SaveWithForcedDialog(), new InputTypeKeyboard(KeyEvent.VK_S, true, true, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new Open(), new InputTypeKeyboard(KeyEvent.VK_O, true, false, false), 1));
+		
+		inputDictionary.addInputMapping(new InputMapping(new OpenAudio(), new InputTypeKeyboard(KeyEvent.VK_BACK_QUOTE, true, false, false), 1));
+		
+		inputDictionary.addInputMapping(new InputMapping(new TogglePlay(), new InputTypeKeyboard(KeyEvent.VK_SPACE, false, false, false), 1));
 		
 		inputDictionary.constructDictionary();
 		
@@ -69,6 +77,10 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		} else {
 			reset();
 		}
+	}
+	
+	public void destroy() {
+		audioPlayer.destroy();
 	}
 	
 	@Override
@@ -237,6 +249,22 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		@Override
 		public boolean onAction(Point pos, double value) {
 			dialogLoad();
+			return true;
+		}
+	}
+	
+	private class OpenAudio implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			audioPlayer.chooseAudioFileFromUser(config, fileDialogManager);
+			return true;
+		}
+	}
+	
+	private class TogglePlay implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			audioPlayer.setPlaying(!audioPlayer.isPlaying());
 			return true;
 		}
 	}

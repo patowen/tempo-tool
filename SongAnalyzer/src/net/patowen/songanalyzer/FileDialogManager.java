@@ -94,4 +94,11 @@ public class FileDialogManager {
 				"Unknown file format",
 				JOptionPane.ERROR_MESSAGE);
 	}
+	
+	public void showCustomErrorDialog(Path path, String message) {
+		JOptionPane.showMessageDialog(parent,
+				message,
+				"Error",
+				JOptionPane.ERROR_MESSAGE);
+	}
 }

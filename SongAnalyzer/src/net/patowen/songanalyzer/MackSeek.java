@@ -19,13 +19,15 @@ public class MackSeek extends Mack {
 	private InputDictionary inputDictionary;
 	
 	private TrackBounds trackBounds;
+	private AudioPlayer audioPlayer;
 	
-	public MackSeek(TrackBounds trackBounds) {
+	public MackSeek(TrackBounds trackBounds, AudioPlayer audioPlayer) {
 		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new Zoom(), new InputTypeScroll(false, false, false), 1));
 		inputDictionary.constructDictionary();
 		
 		this.trackBounds = trackBounds;
+		this.audioPlayer = audioPlayer;
 	}
 	
 	@Override
