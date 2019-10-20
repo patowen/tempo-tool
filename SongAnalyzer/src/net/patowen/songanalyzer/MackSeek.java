@@ -1,7 +1,9 @@
 package net.patowen.songanalyzer;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Shape;
 
 import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
@@ -37,7 +39,17 @@ public class MackSeek extends Mack {
 	
 	@Override
 	public void render(Graphics2D g) {
-		
+		if (audioPlayer.hasAudioStream()) {
+			Shape prevClip = g.getClip();
+			g.clipRect(0, 0, width, height);
+			
+			g.setColor(new Color(128, 128, 128));
+			int xLeft = trackBounds.secondsToPixel(0);
+			int xRight = trackBounds.secondsToPixel(audioPlayer.getLength());
+			g.fillRect(xLeft, 8, xRight - xLeft + 1, height - 16);
+			
+			g.setClip(prevClip);
+		}
 	}
 	
 	@Override

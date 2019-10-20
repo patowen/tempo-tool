@@ -97,6 +97,13 @@ public class AudioPlayer {
 		}
 	}
 	
+	public double getLength() {
+		if (audioStream == null) {
+			return 0;
+		}
+		return audioStream.getLength();
+	}
+	
 	public boolean hasAudioStream() {
 		return audioStream != null;
 	}
