@@ -4,7 +4,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 
 import javax.sound.sampled.AudioFormat;
@@ -24,7 +23,7 @@ public class AudioStream {
 	private int numChannels; // Usually 2 for stereo
 	private int bytesPerSample; // Number of bytes in the byte buffer for each sample
 	private float samplingRate; // Usually 44100
-	private ByteBuffer totalBuffer; // Contains uncompressed audio for the entire loaded sound file. Playing cannot begin until the entire sound file is loaded into memory.
+	private ArrayList<Byte> totalBuffer; // Contains uncompressed audio for the entire loaded sound file. Playing cannot begin until the entire sound file is loaded into memory.
 	private ByteBuffer fragmentBuffer; // Contains the audio that is about to be sent to the OS to play. Includes data from the totalBuffer, possibly slowed down, along with possible metronome ticks. Updated frequently.
 	private int currentSample; // Current position in the totalBuffer. When audio is paused, it is where it will start playing again. When audio is playing, it advances based on what has already been sent to the SourceDataLine, but it will be ahead of what has actually played and cannot be used directly for the play bar.
 	private double currentSubsample; // To allow sound to be played slowed down, fractional samples are allowed, and the fractional part is separated out.
@@ -92,26 +91,20 @@ public class AudioStream {
 		numChannels = decodedFormat.getChannels();
 		samplingRate = decodedFormat.getSampleRate();
 		
-		ArrayList<Byte> dataList = new ArrayList<Byte>(65536);
+		totalBuffer = new ArrayList<Byte>(65536);
 		byte[] data = new byte[4096];
 		int framesRead = 0;
 		while (framesRead != -1) {
 			framesRead = din.read(data, 0, data.length);
 			if (framesRead != -1) {
 				for (int i=0; i<framesRead; i++) {
-					dataList.add(data[i]);
+					totalBuffer.add(data[i]);
 				}
 			}
 		}
 		
-		totalBuffer = ByteBuffer.allocate(dataList.size()).order(ByteOrder.LITTLE_ENDIAN);
-		for (int i=0; i<dataList.size(); i++) {
-			totalBuffer.put(dataList.get(i));
-		}
-		
-		totalBuffer.rewind();
 		bytesPerSample = 2 * numChannels;
-		length = dataList.size() / bytesPerSample;
+		length = totalBuffer.size() / bytesPerSample;
 		
 		AudioFormat format = new AudioFormat(samplingRate, 16, numChannels, true, true);
 		DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
@@ -145,14 +138,15 @@ public class AudioStream {
 		line.close();
 	}
 	
-	private short getAmpRaw(int index, int channel) {
+	private double getAmpRaw(int index, int channel) {
 		if (index >= length || index < 0) return 0;
-		return totalBuffer.getShort((index*numChannels+channel)*2);
+		int arrayPos = (index*numChannels+channel)*2;
+		return Byte.toUnsignedInt(totalBuffer.get(arrayPos)) + totalBuffer.get(arrayPos + 1) * 256;
 	}
 	
 	private double getAmpInterpolated(int index, double subIndex, int channel) {
-		short amp0 = getAmpRaw(index, channel);
-		short amp1 = getAmpRaw(index + 1, channel);
+		double amp0 = getAmpRaw(index, channel);
+		double amp1 = getAmpRaw(index + 1, channel);
 		return amp0 + ((amp1 - amp0) * subIndex);
 	}
 	
