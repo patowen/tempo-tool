@@ -5,14 +5,14 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
 
-import net.patowen.songanalyzer.data.general.FileFormatException;
+import net.patowen.songanalyzer.data.Arr;
+import net.patowen.songanalyzer.data.Dict;
+import net.patowen.songanalyzer.data.FileFormatException;
+import net.patowen.songanalyzer.data.Obj;
 import net.patowen.songanalyzer.undo.UserAction;
 import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
@@ -167,20 +167,25 @@ public class MackMarker extends Mack {
 			marks.addAll(deletedMarks);
 		}
 	}
-
+	
+	private interface Keys {
+		byte marks = 0;
+	}
+	
 	@Override
-	public void save(DataOutputStream stream) throws IOException {
-		stream.writeInt(marks.size());
+	public void save(Dict dict) {
+		Arr arr = new Arr();
 		for (double mark : marks) {
-			stream.writeDouble(mark);
+			arr.add(mark);
 		}
+		dict.set(Keys.marks, arr);
 	}
 
 	@Override
-	public void load(DataInputStream stream) throws IOException, FileFormatException {
-		int numMarks = stream.readInt();
-		for (int i=0; i<numMarks; i++) {
-			marks.add(stream.readDouble());
+	public void load(Dict dict) throws FileFormatException {
+		Arr arr = dict.get(Keys.marks).asArr();
+		for (Obj obj : arr.get()) {
+			marks.add(obj.asDouble());
 		}
 	}
 }

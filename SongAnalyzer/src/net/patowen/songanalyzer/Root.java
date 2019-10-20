@@ -14,7 +14,9 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 
 import net.patowen.songanalyzer.FileDialogManager.DialogKind;
-import net.patowen.songanalyzer.data.general.FileFormatException;
+import net.patowen.songanalyzer.data.Dict;
+import net.patowen.songanalyzer.data.FileFormatException;
+import net.patowen.songanalyzer.data.Obj;
 import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputActionStandard;
@@ -105,27 +107,25 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		deck.reset();
 	}
 	
-	public void save(DataOutputStream stream) throws IOException {
-		stream.writeInt(0);
-		deck.save(stream);
+	public Dict save() {
+		return deck.save();
 	}
 	
-	public void load(DataInputStream stream) throws IOException, FileFormatException {
-		if (stream.readInt() != 0) {
-			throw new FileFormatException("Unsupported song analysis file version");
-		}
-		deck.load(stream);
+	public void load(Dict dict) throws FileFormatException {
+		deck.load(dict);
 	}
 	
 	private void superSave(Path path) throws IOException {
+		Dict dict = save();
 		try (DataOutputStream stream = new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(path)))) {
-			save(stream);
+			dict.saveObj(stream);
 		}
 	}
 	
 	private void superLoad(Path path) throws IOException, FileFormatException {
 		try (DataInputStream stream = new DataInputStream(new BufferedInputStream(Files.newInputStream(path)))) {
-			load(stream);
+			Dict dict = Obj.loadObj(stream).asDict();
+			load(dict);
 		} catch (EOFException e) {
 			throw new FileFormatException("File contents ended earlier than expected");
 		}

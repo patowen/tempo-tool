@@ -3,12 +3,12 @@ package net.patowen.songanalyzer;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
-import net.patowen.songanalyzer.data.general.FileFormatException;
+import net.patowen.songanalyzer.data.Arr;
+import net.patowen.songanalyzer.data.Dict;
+import net.patowen.songanalyzer.data.FileFormatException;
+import net.patowen.songanalyzer.data.Obj;
 import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputDictionary;
@@ -110,20 +110,27 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		superMacks.add(SuperMack.create(MackMarker.type, null, trackBounds, this.userActionList));
 	}
 	
-	public void save(DataOutputStream stream) throws IOException {
-		stream.writeInt(superMacks.size());
-		for (SuperMack superMack : superMacks) {
-			superMack.save(stream);
-		}
+	private interface Keys {
+		byte macks = 0;
 	}
 	
-	public void load(DataInputStream stream) throws IOException, FileFormatException {
+	public Dict save() {
+		Dict dict = new Dict();
+		Arr arr = new Arr();
+		for (SuperMack superMack : superMacks) {
+			arr.add(superMack.save());
+		}
+		dict.set(Keys.macks, arr);
+		return dict;
+	}
+	
+	public void load(Dict dict) throws FileFormatException {
 		superMacks.clear();
 		trackBounds = new TrackBounds(0, 10);
 		
-		int numSuperMacks = stream.readInt();
-		for (int i=0; i<numSuperMacks; i++) {
-			superMacks.add(SuperMack.load(stream, trackBounds, userActionList));
+		Arr arr = dict.get(Keys.macks).asArr();
+		for (Obj obj : arr.get()) {
+			superMacks.add(SuperMack.load(obj.asDict(), trackBounds, userActionList));
 		}
 		
 		this.setWidth(width);

@@ -1,11 +1,10 @@
-package net.patowen.songanalyzer.data.general;
+package net.patowen.songanalyzer.data;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class Arr extends Obj {
 	public static final byte type = 1;

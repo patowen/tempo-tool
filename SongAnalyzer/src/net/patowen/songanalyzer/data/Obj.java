@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer.data.general;
+package net.patowen.songanalyzer.data;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -27,6 +27,14 @@ public abstract class Obj {
 		switch (type) {
 		case Dict.type:
 			return new Dict();
+		case Arr.type:
+			return new Arr();
+		case ObjString.type:
+			return new ObjString();
+		case ObjInt.type:
+			return new ObjInt();
+		case ObjDouble.type:
+			return new ObjDouble();
 		default:
 			throw new FileFormatException("Unknown Obj type " + type);
 		}

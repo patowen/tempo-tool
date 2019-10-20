@@ -2,11 +2,9 @@ package net.patowen.songanalyzer;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 
-import net.patowen.songanalyzer.data.general.FileFormatException;
+import net.patowen.songanalyzer.data.Dict;
+import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputActionStandard;
 import net.patowen.songanalyzer.userinput.InputDictionary;
@@ -62,10 +60,10 @@ public class MackSeek extends Mack {
 	}
 
 	@Override
-	public void save(DataOutputStream stream) throws IOException {
+	public void save(Dict dict) {
 	}
 
 	@Override
-	public void load(DataInputStream stream) throws IOException, FileFormatException {
+	public void load(Dict dict) throws FileFormatException {
 	}
 }

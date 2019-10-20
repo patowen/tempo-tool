@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer.data.general;
+package net.patowen.songanalyzer.data;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -51,7 +51,7 @@ public class Dict extends Obj {
 	protected void save(DataOutputStream stream) throws IOException {
 		stream.writeInt(dict.size());
 		for (int key : dict.keySet()) {
-			stream.writeByte(key);
+			stream.writeInt(key);
 			dict.get(key).saveObj(stream);
 		}
 	}

@@ -5,11 +5,9 @@ import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 
-import net.patowen.songanalyzer.data.general.FileFormatException;
+import net.patowen.songanalyzer.data.Dict;
+import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.exception.IllegalMackTypeException;
 import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
@@ -116,18 +114,25 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 		return mack.forwardMouseHover(mousePos);
 	}
 	
-	public void save(DataOutputStream stream) throws IOException {
-		stream.writeInt(height);
-		stream.writeInt(mack.getType());
-		mack.save(stream);
+	private interface Keys {
+		byte height = (byte) 128;
+		byte type = (byte) 129;
 	}
 	
-	public static SuperMack load(DataInputStream stream, TrackBounds trackBounds, UserActionList userActionList) throws IOException, FileFormatException {
-		int height = stream.readInt();
-		int type = stream.readInt();
+	public Dict save() {
+		Dict dict = new Dict();
+		dict.set(Keys.height, height);
+		dict.set(Keys.type, mack.getType());
+		mack.save(dict);
+		return dict;
+	}
+	
+	public static SuperMack load(Dict dict, TrackBounds trackBounds, UserActionList userActionList) throws FileFormatException {
+		int height = dict.get(Keys.height).asInt();
+		int type = dict.get(Keys.type).asInt();
 		try {
 			SuperMack superMack = create(type, height, trackBounds, userActionList);
-			superMack.mack.load(stream);
+			superMack.mack.load(dict);
 			return superMack;
 		} catch (IllegalMackTypeException e) {
 			throw new FileFormatException("Unknown mack type " + type);

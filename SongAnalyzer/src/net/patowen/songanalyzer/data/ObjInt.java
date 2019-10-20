@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer.data.general;
+package net.patowen.songanalyzer.data;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
