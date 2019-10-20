@@ -29,8 +29,8 @@ public class MackMarker extends Mack {
 	
 	private InputDictionary inputDictionary;
 	
-	private TrackBounds trackBounds;
-	private UserActionList userActionList;
+	private final TrackBounds trackBounds;
+	private final UserActionList userActionList;
 	
 	private TreeSet<Double> marks;
 	

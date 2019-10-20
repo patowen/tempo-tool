@@ -40,6 +40,8 @@ public class AudioStream {
 	private boolean hasCurrentTick; // Whether a metronome tick sound is currently playing
 	private int currentTickSample; // The current progress along the waveform of the metronome tick sound
 	
+	private SoundFileLoadingThread soundFileLoadingThread;
+	
 	private void playFragment() {
 		fragmentBuffer.clear();
 		
@@ -89,20 +91,12 @@ public class AudioStream {
 						baseFormat.getChannels(), baseFormat.getChannels()*2, baseFormat.getSampleRate(), false);
 		AudioInputStream din = AudioSystem.getAudioInputStream(decodedFormat, in);
 
+		totalBuffer = new ArrayList<Byte>(65536);
+		soundFileLoadingThread = new SoundFileLoadingThread(din, totalBuffer);
+		soundFileLoadingThread.start();
+
 		numChannels = decodedFormat.getChannels();
 		samplingRate = decodedFormat.getSampleRate();
-		
-		totalBuffer = new ArrayList<Byte>(65536);
-		byte[] data = new byte[4096];
-		int framesRead = 0;
-		while (framesRead != -1) {
-			framesRead = din.read(data, 0, data.length);
-			if (framesRead != -1) {
-				for (int i=0; i<framesRead; i++) {
-					totalBuffer.add(data[i]);
-				}
-			}
-		}
 		
 		bytesPerSample = 2 * numChannels;
 		
@@ -134,6 +128,7 @@ public class AudioStream {
 	}
 	
 	public void destroy() {
+		soundFileLoadingThread.interrupt();
 		updateTimer.stop();
 		line.close();
 	}

@@ -9,10 +9,10 @@ import net.patowen.songanalyzer.undo.UserActionList;
 
 // Stores data relevant to the whole application
 public class RootBundle {
-	private Config config;
-	private UserActionList userActionList;
-	private DialogManager fileDialogManager;
-	private AudioPlayer audioPlayer;
+	private final Config config;
+	private final UserActionList userActionList;
+	private final DialogManager fileDialogManager;
+	private final AudioPlayer audioPlayer;
 	
 	public RootBundle(Component component) {
 		config = new Config();

@@ -21,7 +21,7 @@ public class MackSeek extends Mack {
 	
 	private InputDictionary inputDictionary;
 	
-	private DeckBundle bundle;
+	private final DeckBundle bundle;
 	
 	public MackSeek(DeckBundle bundle) {
 		this.bundle = bundle;

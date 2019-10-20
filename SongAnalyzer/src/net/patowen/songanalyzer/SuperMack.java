@@ -21,7 +21,7 @@ import net.patowen.songanalyzer.view.DimWidthControlled;
 import net.patowen.songanalyzer.view.View;
 
 public class SuperMack extends View implements DimWidthControlled, DimHeightFree {
-	private Mack mack;
+	private final Mack mack;
 	
 	private int interBorderHeight = 1, interBorderSelectionRange = 3;
 	private int trackTabWidth = 8, trackTabBorderWidth = 1;

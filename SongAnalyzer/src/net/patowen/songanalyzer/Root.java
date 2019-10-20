@@ -32,14 +32,14 @@ import net.patowen.songanalyzer.view.DimWidthControlled;
 import net.patowen.songanalyzer.view.View;
 
 public class Root extends View implements DimWidthControlled, DimHeightControlled {
-	private RootBundle bundle;
+	private final RootBundle bundle;
 	
-	private Config config;
-	private UserActionList userActionList;
-	private DialogManager fileDialogManager;
+	private final Config config;
+	private final UserActionList userActionList;
+	private final DialogManager fileDialogManager;
 	private Deck deck;
 	private InputDictionary inputDictionary;
-	private AudioPlayer audioPlayer;
+	private final AudioPlayer audioPlayer;
 	
 	private Path currentFile;
 	

@@ -53,8 +53,6 @@ public class AudioPlayer {
 		
 		audioStream = new AudioStream(audioFile.toFile());
 		this.audioFile = audioFile;
-		System.gc();
-		System.out.println("Loaded");
 	}
 	
 	public Path getAudioFile() {

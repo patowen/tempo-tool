@@ -8,8 +8,8 @@ import net.patowen.songanalyzer.undo.UserActionList;
 
 // Stores data relevant to a deck
 public class DeckBundle {
-	private RootBundle rootBundle;
-	private TrackBounds trackBounds;
+	private final RootBundle rootBundle;
+	private final TrackBounds trackBounds;
 	
 	public DeckBundle(RootBundle rootBundle) {
 		this.rootBundle = rootBundle;

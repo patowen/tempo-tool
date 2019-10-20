@@ -23,7 +23,7 @@ import net.patowen.songanalyzer.view.View;
 public class Deck extends View implements DimWidthControlled, DimHeightControlled {
 	private InputDictionary fallbackInputDictionary;
 	
-	private DeckBundle bundle;
+	private final DeckBundle bundle;
 	
 	private ArrayList<SuperMack> superMacks;
 	
