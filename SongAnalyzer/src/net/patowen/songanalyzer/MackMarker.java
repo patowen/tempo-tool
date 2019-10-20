@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
 
-import net.patowen.songanalyzer.exception.FileFormatException;
+import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.undo.UserAction;
 import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;

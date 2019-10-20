@@ -14,7 +14,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 
 import net.patowen.songanalyzer.FileDialogManager.DialogKind;
-import net.patowen.songanalyzer.exception.FileFormatException;
+import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputActionStandard;

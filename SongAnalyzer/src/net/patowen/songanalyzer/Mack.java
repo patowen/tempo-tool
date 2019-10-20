@@ -4,7 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import net.patowen.songanalyzer.exception.FileFormatException;
+import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.view.DimHeightControlled;
 import net.patowen.songanalyzer.view.DimWidthControlled;
 import net.patowen.songanalyzer.view.View;
