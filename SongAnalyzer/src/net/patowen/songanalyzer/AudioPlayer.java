@@ -11,7 +11,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.Timer;
 
 import net.patowen.songanalyzer.Config.Keys;
-import net.patowen.songanalyzer.FileDialogManager.DialogKind;
+import net.patowen.songanalyzer.DialogManager.DialogKind;
 
 public class AudioPlayer {
 	private Component component;
@@ -108,7 +108,7 @@ public class AudioPlayer {
 		return audioStream != null;
 	}
 	
-	public void chooseAudioFileFromUser(Config config, FileDialogManager fileDialogManager) {
+	public void chooseAudioFileFromUser(Config config, DialogManager fileDialogManager) {
 		Path path = fileDialogManager.getUserChosenPath(
 				config.getConfigEntryPath(Keys.DEFAULT_SONG_FOLDER),
 				"Supported sound files",

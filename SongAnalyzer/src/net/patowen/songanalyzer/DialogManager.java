@@ -9,7 +9,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-public class FileDialogManager {
+public class DialogManager {
 	public enum DialogKind {
 		SAVE,
 		OPEN
@@ -17,7 +17,7 @@ public class FileDialogManager {
 	
 	private Component parent;
 	
-	public FileDialogManager(Component parent) {
+	public DialogManager(Component parent) {
 		this.parent = parent;
 	}
 	

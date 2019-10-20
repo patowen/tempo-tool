@@ -5,11 +5,12 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
 
+import net.patowen.songanalyzer.bundle.DeckBundle;
+import net.patowen.songanalyzer.bundle.RootBundle;
 import net.patowen.songanalyzer.data.Arr;
 import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.data.Obj;
-import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputDictionary;
 import net.patowen.songanalyzer.userinput.InputType;
@@ -22,19 +23,16 @@ import net.patowen.songanalyzer.view.View;
 public class Deck extends View implements DimWidthControlled, DimHeightControlled {
 	private InputDictionary fallbackInputDictionary;
 	
-	private UserActionList userActionList;
-	private AudioPlayer audioPlayer;
+	private DeckBundle bundle;
 	
 	private ArrayList<SuperMack> superMacks;
-	private TrackBounds trackBounds;
 	
 	private int outerBorderWidth = 1, outerBorderHeight = 1, interBorderHeight = 1;
 	
 	private int trackTabWidth = 8, trackTabBorderWidth = 1;
 	
-	public Deck(UserActionList userActionList, AudioPlayer audioPlayer) {
-		this.userActionList = userActionList;
-		this.audioPlayer = audioPlayer;
+	public Deck(RootBundle rootBundle) {
+		bundle = new DeckBundle(rootBundle);
 		superMacks = new ArrayList<>();
 		
 		fallbackInputDictionary = new InputDictionary();
@@ -49,7 +47,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 			superMack.setWidth(width - outerBorderWidth * 2);
 		}
 		
-		trackBounds.setWidth(width - outerBorderWidth * 2 - trackTabWidth - trackTabBorderWidth);
+		bundle.getTrackBounds().setWidth(width - outerBorderWidth * 2 - trackTabWidth - trackTabBorderWidth);
 	}
 	
 	@Override
@@ -82,8 +80,8 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		
 		g.setColor(Color.GREEN);
 		
-		if (audioPlayer.hasAudioStream()) {
-			int pos = trackBounds.secondsToPixel(audioPlayer.getPos()) + outerBorderWidth + trackTabWidth + trackTabBorderWidth;
+		if (bundle.getAudioPlayer().hasAudioStream()) {
+			int pos = bundle.getTrackBounds().secondsToPixel(bundle.getAudioPlayer().getPos()) + outerBorderWidth + trackTabWidth + trackTabBorderWidth;
 			g.drawLine(pos, 0, pos, height);
 		}
 	}
@@ -108,10 +106,10 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	
 	public void reset() {
 		superMacks.clear();
-		trackBounds = new TrackBounds(0, 10);
+		bundle.getTrackBounds().setBounds(0, 10);
 		
-		superMacks.add(SuperMack.create(MackSeek.type, null, trackBounds, userActionList, audioPlayer));
-		superMacks.add(SuperMack.create(MackMarker.type, null, trackBounds, userActionList, audioPlayer));
+		superMacks.add(SuperMack.create(MackSeek.type, null, bundle));
+		superMacks.add(SuperMack.create(MackMarker.type, null, bundle));
 	}
 	
 	private interface Keys {
@@ -130,11 +128,11 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	
 	public void load(Dict dict) throws FileFormatException {
 		superMacks.clear();
-		trackBounds = new TrackBounds(0, 10);
+		bundle.getTrackBounds().setBounds(0, 10);
 		
 		Arr arr = dict.get(Keys.macks).asArr();
 		for (Obj obj : arr.get()) {
-			superMacks.add(SuperMack.load(obj.asDict(), trackBounds, userActionList, audioPlayer));
+			superMacks.add(SuperMack.load(obj.asDict(), bundle));
 		}
 		
 		this.setWidth(width);

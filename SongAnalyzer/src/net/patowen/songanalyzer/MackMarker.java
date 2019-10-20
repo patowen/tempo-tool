@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
 
+import net.patowen.songanalyzer.bundle.DeckBundle;
 import net.patowen.songanalyzer.data.Arr;
 import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
@@ -35,14 +36,14 @@ public class MackMarker extends Mack {
 	
 	private int markSelectionRange = 3;
 	
-	public MackMarker(TrackBounds trackBounds, UserActionList userActionList) {
+	public MackMarker(DeckBundle bundle) {
 		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new AddMarkAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new DeleteMarkAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, true, false), 1));
 		inputDictionary.constructDictionary();
 		
-		this.trackBounds = trackBounds;
-		this.userActionList = userActionList;
+		this.trackBounds = bundle.getTrackBounds();
+		this.userActionList = bundle.getUserActionList();
 		this.marks = new TreeSet<>();
 	}
 	

@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
 
+import net.patowen.songanalyzer.bundle.DeckBundle;
 import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.userinput.InputAction;
@@ -20,16 +21,14 @@ public class MackSeek extends Mack {
 	
 	private InputDictionary inputDictionary;
 	
-	private TrackBounds trackBounds;
-	private AudioPlayer audioPlayer;
+	private DeckBundle bundle;
 	
-	public MackSeek(TrackBounds trackBounds, AudioPlayer audioPlayer) {
+	public MackSeek(DeckBundle bundle) {
+		this.bundle = bundle;
+		
 		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new Zoom(), new InputTypeScroll(false, false, false), 1));
 		inputDictionary.constructDictionary();
-		
-		this.trackBounds = trackBounds;
-		this.audioPlayer = audioPlayer;
 	}
 	
 	@Override
@@ -39,13 +38,13 @@ public class MackSeek extends Mack {
 	
 	@Override
 	public void render(Graphics2D g) {
-		if (audioPlayer.hasAudioStream()) {
+		if (bundle.getAudioPlayer().hasAudioStream()) {
 			Shape prevClip = g.getClip();
 			g.clipRect(0, 0, width, height);
 			
 			g.setColor(new Color(128, 128, 128));
-			int xLeft = trackBounds.secondsToPixel(0);
-			int xRight = trackBounds.secondsToPixel(audioPlayer.getLength());
+			int xLeft = bundle.getTrackBounds().secondsToPixel(0);
+			int xRight = bundle.getTrackBounds().secondsToPixel(bundle.getAudioPlayer().getLength());
 			g.fillRect(xLeft, 8, xRight - xLeft + 1, height - 16);
 			
 			g.setClip(prevClip);
@@ -66,7 +65,7 @@ public class MackSeek extends Mack {
 		public boolean onAction(Point pos, double value) {
 			if (isWithinView(pos)) {
 				double zoomFactor = Math.exp(value * 0.1);
-				trackBounds.zoom(trackBounds.pixelToSeconds(pos.x), zoomFactor);
+				bundle.getTrackBounds().zoom(bundle.getTrackBounds().pixelToSeconds(pos.x), zoomFactor);
 				return true;
 			}
 			return false;

@@ -1,5 +1,6 @@
 package net.patowen.songanalyzer;
 
+import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
@@ -13,7 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 
-import net.patowen.songanalyzer.FileDialogManager.DialogKind;
+import net.patowen.songanalyzer.DialogManager.DialogKind;
+import net.patowen.songanalyzer.bundle.RootBundle;
 import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.data.Obj;
@@ -30,26 +32,30 @@ import net.patowen.songanalyzer.view.DimWidthControlled;
 import net.patowen.songanalyzer.view.View;
 
 public class Root extends View implements DimWidthControlled, DimHeightControlled {
+	private RootBundle bundle;
+	
 	private Config config;
 	private UserActionList userActionList;
-	private FileDialogManager fileDialogManager;
+	private DialogManager fileDialogManager;
 	private Deck deck;
 	private InputDictionary inputDictionary;
 	private AudioPlayer audioPlayer;
 	
 	private Path currentFile;
 	
-	public Root(Config config, UserActionList userActionList, FileDialogManager fileDialogManager, AudioPlayer audioPlayer) {
-		this.config = config;
-		this.userActionList = userActionList;
-		this.fileDialogManager = fileDialogManager;
-		this.audioPlayer = audioPlayer;
+	public Root(Component component) {
+		bundle = new RootBundle(component);
+		
+		this.config = bundle.getConfig();
+		this.userActionList = bundle.getUserActionList();
+		this.fileDialogManager = bundle.getFileDialogManager();
+		this.audioPlayer = bundle.getAudioPlayer();
 		
 		if (!this.config.loadConfig()) {
 			System.err.println("Loading the configuration file failed");
 		}
 		
-		deck = new Deck(userActionList, audioPlayer);
+		deck = new Deck(bundle);
 		
 		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new Undo(), new InputTypeKeyboard(KeyEvent.VK_Z, true, false, false), 1));
@@ -80,6 +86,7 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 	}
 	
 	public void destroy() {
+		config.saveConfig();
 		audioPlayer.destroy();
 	}
 	
@@ -143,7 +150,7 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		}
 	}
 	
-	private boolean prechosenSaveOrLoad(Path path, FileDialogManager.DialogKind dialogKind, boolean quiet) {
+	private boolean prechosenSaveOrLoad(Path path, DialogManager.DialogKind dialogKind, boolean quiet) {
 		try {
 			switch (dialogKind) {
 			case SAVE:
@@ -170,7 +177,7 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		}
 	}
 	
-	private Path dialogSaveOrLoad(FileDialogManager.DialogKind dialogKind) {
+	private Path dialogSaveOrLoad(DialogManager.DialogKind dialogKind) {
 		Path path = fileDialogManager.getUserChosenPath(
 				config.getConfigEntryPath(Config.Keys.DEFAULT_FOLDER),
 				"Song analyis files",
@@ -194,19 +201,19 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 	}
 	
 	private boolean prechosenSave(Path path) {
-		return prechosenSaveOrLoad(path, FileDialogManager.DialogKind.SAVE, false);
+		return prechosenSaveOrLoad(path, DialogManager.DialogKind.SAVE, false);
 	}
 	
 	private boolean prechosenLoad(Path path, boolean quiet) {
-		return prechosenSaveOrLoad(path, FileDialogManager.DialogKind.OPEN, quiet);
+		return prechosenSaveOrLoad(path, DialogManager.DialogKind.OPEN, quiet);
 	}
 	
 	private Path dialogSave() {
-		return dialogSaveOrLoad(FileDialogManager.DialogKind.SAVE);
+		return dialogSaveOrLoad(DialogManager.DialogKind.SAVE);
 	}
 	
 	private Path dialogLoad() {
-		return dialogSaveOrLoad(FileDialogManager.DialogKind.OPEN);
+		return dialogSaveOrLoad(DialogManager.DialogKind.OPEN);
 	}
 	
 	private class Undo implements InputActionStandard {

@@ -11,16 +11,11 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputController;
 
 public class SongAnalyzerRunner {
 	private JFrame frame;
 	private JPanel panel;
-	private Config config;
-	private UserActionList userActionList;
-	private FileDialogManager fileDialogManager;
-	private AudioPlayer audioPlayer;
 	private Root root;
 	
 	@SuppressWarnings("serial")
@@ -29,7 +24,6 @@ public class SongAnalyzerRunner {
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				config.saveConfig();
 				root.destroy();
 				frame.dispose();
 			}
@@ -51,12 +45,7 @@ public class SongAnalyzerRunner {
 			}
 		});
 		
-		config = new Config();
-		userActionList = new UserActionList();
-		fileDialogManager = new FileDialogManager(panel);
-		audioPlayer = new AudioPlayer(panel);
-		
-		root = new Root(config, userActionList, fileDialogManager, audioPlayer);
+		root = new Root(panel);
 		
 		new InputController(panel, root);
 		

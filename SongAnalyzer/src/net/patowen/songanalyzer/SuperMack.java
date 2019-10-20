@@ -6,10 +6,10 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
+import net.patowen.songanalyzer.bundle.DeckBundle;
 import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.exception.IllegalMackTypeException;
-import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputDictionary;
 import net.patowen.songanalyzer.userinput.InputMapping;
@@ -38,19 +38,19 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 		inputDictionary.constructDictionary();
 	}
 	
-	private static Mack createMack(int type, TrackBounds trackBounds, UserActionList userActionList, AudioPlayer audioPlayer) {
+	private static Mack createMack(int type, DeckBundle bundle) {
 		switch (type) {
 		case MackSeek.type:
-			return new MackSeek(trackBounds, audioPlayer);
+			return new MackSeek(bundle);
 		case MackMarker.type:
-			return new MackMarker(trackBounds, userActionList);
+			return new MackMarker(bundle);
 		default:
 			throw new IllegalMackTypeException();
 		}
 	}
 	
-	public static SuperMack create(int type, Integer height, TrackBounds trackBounds, UserActionList userActionList, AudioPlayer audioPlayer) {
-		SuperMack superMack = new SuperMack(createMack(type, trackBounds, userActionList, audioPlayer));
+	public static SuperMack create(int type, Integer height, DeckBundle bundle) {
+		SuperMack superMack = new SuperMack(createMack(type, bundle));
 		superMack.trySetHeight(height == null ? superMack.mack.getDefaultHeight() : height);
 		return superMack;
 	}
@@ -127,11 +127,11 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 		return dict;
 	}
 	
-	public static SuperMack load(Dict dict, TrackBounds trackBounds, UserActionList userActionList, AudioPlayer audioPlayer) throws FileFormatException {
+	public static SuperMack load(Dict dict, DeckBundle bundle) throws FileFormatException {
 		int height = dict.get(Keys.height).asInt();
 		int type = dict.get(Keys.type).asInt();
 		try {
-			SuperMack superMack = create(type, height, trackBounds, userActionList, audioPlayer);
+			SuperMack superMack = create(type, height, bundle);
 			superMack.mack.load(dict);
 			return superMack;
 		} catch (IllegalMackTypeException e) {
