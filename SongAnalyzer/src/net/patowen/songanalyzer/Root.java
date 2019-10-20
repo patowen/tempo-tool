@@ -103,15 +103,15 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		deck.setHeight(height);
 	}
 	
-	public void reset() {
+	private void reset() {
 		deck.reset();
 	}
 	
-	public Dict save() {
+	private Dict save() {
 		return deck.save();
 	}
 	
-	public void load(Dict dict) throws FileFormatException {
+	private void load(Dict dict) throws FileFormatException {
 		deck.load(dict);
 	}
 	
