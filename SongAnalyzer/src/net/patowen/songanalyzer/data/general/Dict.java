@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer.data;
+package net.patowen.songanalyzer.data.general;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -35,6 +35,18 @@ public class Dict extends Obj {
 		dict.put(key, value);
 	}
 	
+	public void set(int key, String value) {
+		dict.put(key, new ObjString(value));
+	}
+	
+	public void set(int key, int value) {
+		dict.put(key, new ObjInt(value));
+	}
+	
+	public void set(int key, double value) {
+		dict.put(key, new ObjDouble(value));
+	}
+	
 	@Override
 	protected void save(DataOutputStream stream) throws IOException {
 		stream.writeInt(dict.size());
@@ -57,5 +69,10 @@ public class Dict extends Obj {
 	@Override
 	public byte getType() {
 		return type;
+	}
+	
+	@Override
+	public Dict asDict() throws FileFormatException {
+		return this;
 	}
 }

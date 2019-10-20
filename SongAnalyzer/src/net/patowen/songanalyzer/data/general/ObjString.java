@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer.data;
+package net.patowen.songanalyzer.data.general;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -9,6 +9,14 @@ public class ObjString extends Obj {
 	public static final byte type = 32;
 	
 	private String value;
+	
+	public ObjString() {
+		this(null);
+	}
+	
+	public ObjString(String value) {
+		this.value = value;
+	}
 	
 	public String getValue() {
 		return value;
@@ -36,5 +44,9 @@ public class ObjString extends Obj {
 	public byte getType() {
 		return type;
 	}
-
+	
+	@Override
+	public String asString() throws FileFormatException {
+		return value;
+	}
 }

@@ -9,7 +9,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import net.patowen.songanalyzer.data.FileFormatException;
+import net.patowen.songanalyzer.data.general.FileFormatException;
 import net.patowen.songanalyzer.exception.IllegalMackTypeException;
 import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;

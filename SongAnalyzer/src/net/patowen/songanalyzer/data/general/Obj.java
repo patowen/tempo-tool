@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer.data;
+package net.patowen.songanalyzer.data.general;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -30,5 +30,25 @@ public abstract class Obj {
 		default:
 			throw new FileFormatException("Unknown Obj type " + type);
 		}
+	}
+	
+	public Arr asArr() throws FileFormatException {
+		throw new FileFormatException("Arr expected, got " + getType());
+	}
+	
+	public Dict asDict() throws FileFormatException {
+		throw new FileFormatException("Dict expected, got " + getType());
+	}
+	
+	public String asString() throws FileFormatException {
+		throw new FileFormatException("ObjString expected, got " + getType());
+	}
+	
+	public int asInt() throws FileFormatException {
+		throw new FileFormatException("ObjInt expected, got " + getType());
+	}
+	
+	public double asDouble() throws FileFormatException {
+		throw new FileFormatException("ObjDouble expected, got " + getType());
 	}
 }

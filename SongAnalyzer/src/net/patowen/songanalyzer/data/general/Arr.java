@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer.data;
+package net.patowen.songanalyzer.data.general;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -24,6 +24,18 @@ public class Arr extends Obj {
 		arr.add(value);
 	}
 	
+	public void add(String value) {
+		arr.add(new ObjString(value));
+	}
+	
+	public void add(int value) {
+		arr.add(new ObjInt(value));
+	}
+	
+	public void add(double value) {
+		arr.add(new ObjDouble(value));
+	}
+	
 	@Override
 	protected void save(DataOutputStream stream) throws IOException {
 		stream.writeInt(arr.size());
@@ -44,5 +56,10 @@ public class Arr extends Obj {
 	@Override
 	public byte getType() {
 		return type;
+	}
+	
+	@Override
+	public Arr asArr() throws FileFormatException {
+		return this;
 	}
 }
