@@ -1,46 +1,34 @@
 package net.patowen.songanalyzer;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.nio.file.Path;
 
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.swing.Timer;
 
 import net.patowen.songanalyzer.Config.Keys;
 import net.patowen.songanalyzer.DialogManager.DialogKind;
 
 public class AudioPlayer {
-	private Component component;
+	private final AnimationSource animationSource;
+	
 	private Path audioFile;
 	private AudioStream audioStream;
 	private double speed;
 	
-	private int timerDelayMilliseconds;
-	private Timer playbarTimer;
-	
-	public AudioPlayer(Component component) {
-		this.component = component;
+	public AudioPlayer(AnimationController animationController) {
+		this.animationSource = animationController.createAnimationSource();
+		
 		audioStream = null;
 		audioFile = null;
 		speed = 1;
-		timerDelayMilliseconds = 30;
-		playbarTimer = new Timer(timerDelayMilliseconds, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				AudioPlayer.this.component.repaint();
-			}
-		});
 	}
 	
 	public void destroy() {
 		if (audioStream != null) {
 			audioStream.destroy();
 		}
-		playbarTimer.stop();
+		animationSource.stop();
 	}
 	
 	private void setAudioFile(Path audioFile) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
@@ -67,10 +55,10 @@ public class AudioPlayer {
 		if (audioStream != null) {
 			if (playing) {
 				audioStream.play(speed);
-				playbarTimer.restart();
+				animationSource.start();
 			} else {
 				audioStream.pause();
-				playbarTimer.stop();
+				animationSource.stop();
 			}
 		}
 	}
@@ -89,7 +77,7 @@ public class AudioPlayer {
 		}
 		
 		if (audioStream.isPlaying()) {
-			return audioStream.getPos() + timerDelayMilliseconds * 0.5 * 0.001;
+			return audioStream.getPos() + AnimationController.timerDelayMilliseconds * 0.5 * 0.001;
 		} else {
 			return audioStream.getPos();
 		}

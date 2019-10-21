@@ -38,6 +38,7 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 	private final Config config;
 	private final UserActionList userActionList;
 	private final DialogManager fileDialogManager;
+	private final AnimationController animationController;
 	private final AudioPlayer audioPlayer;
 	
 	private Deck deck;
@@ -53,6 +54,7 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		this.config = bundle.getConfig();
 		this.userActionList = bundle.getUserActionList();
 		this.fileDialogManager = bundle.getDialogManager();
+		this.animationController = bundle.getAnimationController();
 		this.audioPlayer = bundle.getAudioPlayer();
 		
 		if (!this.config.loadConfig()) {
@@ -90,6 +92,7 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 	
 	public void destroy() {
 		config.saveConfig();
+		animationController.destroy();
 		audioPlayer.destroy();
 	}
 	

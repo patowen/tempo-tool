@@ -1,5 +1,6 @@
 package net.patowen.songanalyzer.bundle;
 
+import net.patowen.songanalyzer.AnimationController;
 import net.patowen.songanalyzer.AudioPlayer;
 import net.patowen.songanalyzer.Config;
 import net.patowen.songanalyzer.DialogManager;
@@ -26,6 +27,10 @@ public class DeckBundle {
 	
 	public DialogManager getFileDialogManager() {
 		return rootBundle.getDialogManager();
+	}
+	
+	public AnimationController getAnimationController() {
+		return rootBundle.getAnimationController();
 	}
 	
 	public AudioPlayer getAudioPlayer() {
