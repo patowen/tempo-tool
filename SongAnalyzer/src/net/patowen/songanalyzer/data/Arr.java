@@ -35,6 +35,10 @@ public class Arr extends Obj {
 		arr.add(new ObjDouble(value));
 	}
 	
+	public void add(boolean value) {
+		arr.add(new ObjBool(value));
+	}
+	
 	@Override
 	protected void save(DataOutputStream stream) throws IOException {
 		stream.writeInt(arr.size());

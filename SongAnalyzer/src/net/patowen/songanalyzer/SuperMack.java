@@ -115,8 +115,8 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 	}
 	
 	private interface Keys {
-		byte height = (byte) 128;
-		byte type = (byte) 129;
+		int height = 128;
+		int type = 129;
 	}
 	
 	public Dict save() {

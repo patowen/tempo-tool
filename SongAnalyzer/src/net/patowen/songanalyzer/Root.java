@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import net.patowen.songanalyzer.DialogManager.DialogKind;
 import net.patowen.songanalyzer.bundle.RootBundle;
@@ -145,12 +146,32 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		deck.reset();
 	}
 	
+	private interface Keys {
+		int deck = 0;
+		int hasAudioFile = 1;
+		int audioFile = 2;
+	}
+	
 	private Dict save() {
-		return deck.save();
+		Dict dict = new Dict();
+		dict.set(Keys.deck, deck.save());
+		
+		Path audioFile = audioPlayer.getAudioFile();
+		dict.set(Keys.hasAudioFile, audioFile != null);
+		if (audioFile != null) {
+			dict.set(Keys.audioFile, audioFile.toString());
+		}
+		
+		return dict;
 	}
 	
 	private void load(Dict dict) throws FileFormatException {
-		deck.load(dict);
+		deck.load(dict.get(Keys.deck).asDict());
+		
+		if (dict.get(Keys.hasAudioFile).asBool()) {
+			Path path = Paths.get(dict.get(Keys.audioFile).asString());
+			audioPlayer.loadAudioFileFromSave(path, fileDialogManager);
+		}
 	}
 	
 	private void superSave(Path path) throws IOException {

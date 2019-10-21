@@ -170,7 +170,7 @@ public class MackMarker extends Mack {
 	}
 	
 	private interface Keys {
-		byte marks = 0;
+		int marks = 0;
 	}
 	
 	@Override

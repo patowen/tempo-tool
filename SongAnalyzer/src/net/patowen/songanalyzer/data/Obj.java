@@ -35,6 +35,8 @@ public abstract class Obj {
 			return new ObjInt();
 		case ObjDouble.type:
 			return new ObjDouble();
+		case ObjBool.type:
+			return new ObjBool();
 		default:
 			throw new FileFormatException("Unknown Obj type " + type);
 		}
@@ -58,5 +60,9 @@ public abstract class Obj {
 	
 	public double asDouble() throws FileFormatException {
 		throw new FileFormatException("ObjDouble expected, got " + getType());
+	}
+	
+	public boolean asBool() throws FileFormatException {
+		throw new FileFormatException("ObjBool expected, got " + getType());
 	}
 }

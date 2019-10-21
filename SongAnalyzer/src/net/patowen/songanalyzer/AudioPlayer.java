@@ -129,4 +129,16 @@ public class AudioPlayer {
 			fileDialogManager.showCustomErrorDialog(path, "Cannot get the necessary resources to play audio. Perhaps too many applications are using audio.");
 		}
 	}
+	
+	public void loadAudioFileFromSave(Path path, DialogManager dialogManager) {
+		try {
+			setAudioFile(path);
+		} catch (IOException e) {
+			dialogManager.showCustomErrorDialog(path, "Could not open the audio file attached to the current save. Does it still exist?");
+		} catch (UnsupportedAudioFileException e) {
+			dialogManager.showFileFormatErrorDialog(path, "The audio file attached to the current save is not a recognized audio file.");
+		} catch (LineUnavailableException e) {
+			dialogManager.showCustomErrorDialog(path, "Cannot get the necessary resources to play audio. Perhaps too many applications are using audio.");
+		}
+	}
 }

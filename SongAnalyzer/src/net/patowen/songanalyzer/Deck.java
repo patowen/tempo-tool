@@ -111,7 +111,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	}
 	
 	private interface Keys {
-		byte macks = 0;
+		int macks = 0;
 	}
 	
 	public Dict save() {

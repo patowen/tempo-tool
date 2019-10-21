@@ -47,6 +47,10 @@ public class Dict extends Obj {
 		dict.put(key, new ObjDouble(value));
 	}
 	
+	public void set(int key, boolean value) {
+		dict.put(key, new ObjBool(value));
+	}
+	
 	@Override
 	protected void save(DataOutputStream stream) throws IOException {
 		stream.writeInt(dict.size());
