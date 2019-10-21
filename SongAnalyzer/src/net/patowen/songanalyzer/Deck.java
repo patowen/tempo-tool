@@ -104,7 +104,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	
 	public void reset() {
 		superMacks.clear();
-		bundle.getTrackBounds().setBounds(0, 10);
+		bundle.getTrackBounds().setBounds(0, 60);
 		
 		superMacks.add(SuperMack.create(MackSeek.type, null, bundle));
 		superMacks.add(SuperMack.create(MackMarker.type, null, bundle));
@@ -126,7 +126,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	
 	public void load(Dict dict) throws FileFormatException {
 		superMacks.clear();
-		bundle.getTrackBounds().setBounds(0, 10);
+		bundle.getTrackBounds().setBounds(0, 60);
 		
 		Arr arr = dict.get(Keys.macks).asArr();
 		for (Obj obj : arr.get()) {

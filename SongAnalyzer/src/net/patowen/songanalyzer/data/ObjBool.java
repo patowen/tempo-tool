@@ -3,7 +3,6 @@ package net.patowen.songanalyzer.data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.UTFDataFormatException;
 
 public class ObjBool extends Obj {
 	public static final byte type = 35;

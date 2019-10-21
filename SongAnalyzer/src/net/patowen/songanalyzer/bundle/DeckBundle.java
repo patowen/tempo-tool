@@ -14,7 +14,7 @@ public class DeckBundle {
 	
 	public DeckBundle(RootBundle rootBundle) {
 		this.rootBundle = rootBundle;
-		trackBounds = new TrackBounds(0, 10);
+		trackBounds = new TrackBounds(0, 60);
 	}
 	
 	public Config getConfig() {
