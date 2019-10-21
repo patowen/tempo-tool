@@ -8,16 +8,19 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import net.patowen.songanalyzer.Config.Keys;
 import net.patowen.songanalyzer.DialogManager.DialogKind;
+import net.patowen.songanalyzer.SoundFileLoadingThread.Status;
 
 public class AudioPlayer {
-	private final AnimationSource animationSource;
+	private final AnimationSource playingAnimation;
+	private final AnimationSource bufferingAnimation;
 	
 	private Path audioFile;
 	private AudioStream audioStream;
 	private double speed;
 	
 	public AudioPlayer(AnimationController animationController) {
-		this.animationSource = animationController.createAnimationSource();
+		playingAnimation = animationController.createAnimationSource();
+		bufferingAnimation = animationController.createAnimationSource();
 		
 		audioStream = null;
 		audioFile = null;
@@ -28,7 +31,16 @@ public class AudioPlayer {
 		if (audioStream != null) {
 			audioStream.destroy();
 		}
-		animationSource.stop();
+		playingAnimation.stop();
+		bufferingAnimation.stop();
+	}
+	
+	public void pollBufferingStatus() {
+		if (audioStream != null) {
+			if (audioStream.getLoadingStatus() != Status.PENDING) {
+				bufferingAnimation.stop();
+			}
+		}
 	}
 	
 	private void setAudioFile(Path audioFile) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
@@ -41,6 +53,7 @@ public class AudioPlayer {
 		
 		audioStream = new AudioStream(audioFile.toFile());
 		this.audioFile = audioFile;
+		bufferingAnimation.start();
 	}
 	
 	public Path getAudioFile() {
@@ -55,10 +68,10 @@ public class AudioPlayer {
 		if (audioStream != null) {
 			if (playing) {
 				audioStream.play(speed);
-				animationSource.start();
+				playingAnimation.start();
 			} else {
 				audioStream.pause();
-				animationSource.stop();
+				playingAnimation.stop();
 			}
 		}
 	}

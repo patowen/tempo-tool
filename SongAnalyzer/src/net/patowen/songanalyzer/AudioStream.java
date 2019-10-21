@@ -133,6 +133,10 @@ public class AudioStream {
 		line.close();
 	}
 	
+	public SoundFileLoadingThread.Status getLoadingStatus() {
+		return soundFileLoadingThread.getStatus();
+	}
+	
 	private int getNumSamples() {
 		return totalBuffer.size() / bytesPerSample;
 	}

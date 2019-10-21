@@ -105,6 +105,8 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		
 		header.forwardRender(g);
 		deck.forwardRender(g);
+		
+		audioPlayer.pollBufferingStatus();
 	}
 
 	@Override
