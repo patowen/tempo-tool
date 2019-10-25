@@ -24,6 +24,7 @@ public class SongAnalyzerRunner {
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
+				// TODO: Are you sure you want to close?
 				root.destroy();
 				frame.dispose();
 			}

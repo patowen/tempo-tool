@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
+import java.awt.event.MouseEvent;
 
 import net.patowen.songanalyzer.bundle.DeckBundle;
 import net.patowen.songanalyzer.data.Dict;
@@ -13,7 +14,7 @@ import net.patowen.songanalyzer.userinput.InputActionStandard;
 import net.patowen.songanalyzer.userinput.InputDictionary;
 import net.patowen.songanalyzer.userinput.InputMapping;
 import net.patowen.songanalyzer.userinput.InputType;
-import net.patowen.songanalyzer.userinput.InputTypeScroll;
+import net.patowen.songanalyzer.userinput.InputTypeMouse;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
 
 public class MackSeek extends Mack {
@@ -27,7 +28,7 @@ public class MackSeek extends Mack {
 		this.bundle = bundle;
 		
 		inputDictionary = new InputDictionary();
-		inputDictionary.addInputMapping(new InputMapping(new Zoom(), new InputTypeScroll(false, false, false), 1));
+		inputDictionary.addInputMapping(new InputMapping(new Seek(), new InputTypeMouse(MouseEvent.BUTTON1, false, false, false), 1));
 		inputDictionary.constructDictionary();
 	}
 	
@@ -59,18 +60,6 @@ public class MackSeek extends Mack {
 	public MouseHoverFeedback applyMouseHover(Point mousePos) {
 		return null;
 	}
-	
-	private class Zoom implements InputActionStandard {
-		@Override
-		public boolean onAction(Point pos, double value) {
-			if (isWithinView(pos)) {
-				double zoomFactor = Math.exp(value * 0.1);
-				bundle.getTrackBounds().zoom(bundle.getTrackBounds().pixelToSeconds(pos.x), zoomFactor);
-				return true;
-			}
-			return false;
-		}
-	}
 
 	@Override
 	public void save(Dict dict) {
@@ -78,5 +67,16 @@ public class MackSeek extends Mack {
 
 	@Override
 	public void load(Dict dict) throws FileFormatException {
+	}
+	
+	private class Seek implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			if (isWithinView(pos)) {
+				bundle.getAudioPlayer().setPos(bundle.getTrackBounds().pixelToSeconds(pos.x));
+				return true;
+			}
+			return false;
+		}
 	}
 }

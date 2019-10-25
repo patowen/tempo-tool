@@ -12,8 +12,11 @@ import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.data.Obj;
 import net.patowen.songanalyzer.userinput.InputAction;
+import net.patowen.songanalyzer.userinput.InputActionStandard;
 import net.patowen.songanalyzer.userinput.InputDictionary;
+import net.patowen.songanalyzer.userinput.InputMapping;
 import net.patowen.songanalyzer.userinput.InputType;
+import net.patowen.songanalyzer.userinput.InputTypeScroll;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
 import net.patowen.songanalyzer.view.DimHeightControlled;
 import net.patowen.songanalyzer.view.DimWidthControlled;
@@ -36,6 +39,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		superMacks = new ArrayList<>();
 		
 		fallbackInputDictionary = new InputDictionary();
+		fallbackInputDictionary.addInputMapping(new InputMapping(new Zoom(), new InputTypeScroll(false, false, false), 1));
 		fallbackInputDictionary.constructDictionary();
 	}
 	
@@ -145,5 +149,17 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 			}
 		}
 		return null;
+	}
+	
+	private class Zoom implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			if (isWithinView(pos)) {
+				double zoomFactor = Math.exp(value * 0.1);
+				bundle.getTrackBounds().zoom(bundle.getTrackBounds().pixelToSeconds(pos.x), zoomFactor);
+				return true;
+			}
+			return false;
+		}
 	}
 }
