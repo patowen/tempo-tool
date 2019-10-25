@@ -40,9 +40,4 @@ public class Header extends View implements DimWidthControlled, DimHeightFree {
 	public int getHeight() {
 		return height;
 	}
-
-	@Override
-	public void setWidth(int width) {
-		this.width = width;
-	}
 }

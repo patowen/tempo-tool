@@ -59,7 +59,8 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 		g.setColor(Color.WHITE);
 		g.drawLine(trackTabWidth, 0, trackTabWidth, height);
 		g.drawLine(0, height, width, height);
-		
+
+		mack.setWidth(width - trackTabWidth - trackTabBorderWidth);
 		mack.forwardRender(g);
 	}
 	
@@ -74,11 +75,6 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 		}
 		this.height = height;
 		mack.setHeight(height);
-	}
-	
-	public void setWidth(int width) {
-		this.width = width;
-		mack.setWidth(width - trackTabWidth - trackTabBorderWidth);
 	}
 	
 	public boolean isDragHandle(Point pos) {

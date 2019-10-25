@@ -43,27 +43,12 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		fallbackInputDictionary.constructDictionary();
 	}
 	
-	@Override
-	public void setWidth(int width) {
-		this.width = width;
-		
-		for (SuperMack superMack : superMacks) {
-			superMack.setWidth(width - outerBorderWidth * 2);
-		}
-		
-		bundle.getTrackBounds().setWidth(width - outerBorderWidth * 2 - trackTabWidth - trackTabBorderWidth);
-	}
-	
-	@Override
-	public void setHeight(int height) {
-		this.height = height;
-	}
-	
 	private void setSuperMackPositions() {
 		int yPos = outerBorderHeight;
 		for (SuperMack superMack : superMacks) {
 			superMack.setXPos(outerBorderWidth);
 			superMack.setYPos(yPos);
+			superMack.setWidth(width - outerBorderWidth * 2);
 			
 			yPos += superMack.getHeight() + interBorderHeight;
 		}
@@ -72,6 +57,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	@Override
 	public void render(Graphics2D g) {
 		setSuperMackPositions();
+		bundle.getTrackBounds().setWidth(width - outerBorderWidth * 2 - trackTabWidth - trackTabBorderWidth);
 		
 		g.setColor(Color.WHITE);
 		g.drawRect(0, 0, width-1, height-1);

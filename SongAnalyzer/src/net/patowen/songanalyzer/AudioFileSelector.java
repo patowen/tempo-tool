@@ -68,11 +68,6 @@ public class AudioFileSelector extends View implements DimWidthFree, DimHeightCo
 	}
 	
 	@Override
-	public void setHeight(int height) {
-		this.height = height;
-	}
-	
-	@Override
 	public int getWidth() {
 		return width;
 	}

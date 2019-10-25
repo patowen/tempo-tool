@@ -102,6 +102,9 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
 		
+		deck.setWidth(width);
+		deck.setHeight(height - header.getHeight());
+		
 		deck.setYPos(header.getHeight());
 		
 		header.forwardRender(g);
@@ -128,18 +131,6 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 	@Override
 	public MouseHoverFeedback applyMouseHover(Point mousePos) {
 		return deck.forwardMouseHover(mousePos);
-	}
-
-	@Override
-	public void setWidth(int width) {
-		this.width = width;
-		deck.setWidth(width);
-	}
-
-	@Override
-	public void setHeight(int height) {
-		this.height = height;
-		deck.setHeight(height - header.getHeight());
 	}
 	
 	private void reset() {

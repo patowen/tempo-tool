@@ -17,16 +17,6 @@ public abstract class Mack extends View implements DimWidthControlled, DimHeight
 		return 64;
 	}
 	
-	@Override
-	public void setWidth(int width) {
-		this.width = width;
-	}
-	
-	@Override
-	public void setHeight(int height) {
-		this.height = height;
-	}
-	
 	public abstract void save(Dict dict);
 	
 	public abstract void load(Dict dict) throws FileFormatException;

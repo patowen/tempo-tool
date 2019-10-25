@@ -26,6 +26,14 @@ public abstract class View {
 		this.yPos = yPos;
 	}
 	
+	public final void setWidth(int width) {
+		this.width = width;
+	}
+	
+	public final void setHeight(int height) {
+		this.height = height;
+	}
+	
 	public void forwardRender(Graphics2D g) {
 		AffineTransform transform = g.getTransform();
 		g.translate(xPos, yPos);
