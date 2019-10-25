@@ -38,7 +38,7 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 	
 	private final Config config;
 	private final UserActionList userActionList;
-	private final DialogManager fileDialogManager;
+	private final DialogManager dialogManager;
 	private final AnimationController animationController;
 	private final AudioPlayer audioPlayer;
 	
@@ -52,11 +52,11 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 	public Root(Component component) {
 		bundle = new RootBundle(component);
 		
-		this.config = bundle.getConfig();
-		this.userActionList = bundle.getUserActionList();
-		this.fileDialogManager = bundle.getDialogManager();
-		this.animationController = bundle.getAnimationController();
-		this.audioPlayer = bundle.getAudioPlayer();
+		this.config = bundle.config;
+		this.userActionList = bundle.userActionList;
+		this.dialogManager = bundle.dialogManager;
+		this.animationController = bundle.animationController;
+		this.audioPlayer = bundle.audioPlayer;
 		
 		if (!this.config.loadConfig()) {
 			System.err.println("Loading the configuration file failed");
@@ -161,7 +161,7 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		
 		if (dict.get(Keys.hasAudioFile).asBool()) {
 			Path path = Paths.get(dict.get(Keys.audioFile).asString());
-			audioPlayer.loadAudioFileFromSave(path, fileDialogManager);
+			audioPlayer.loadAudioFileFromSave(path, dialogManager);
 		}
 	}
 	
@@ -195,21 +195,21 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 			}
 			return true;
 		} catch (FileFormatException e) {
-			fileDialogManager.showFileFormatErrorDialog(path, e.getMessage());
+			dialogManager.showFileFormatErrorDialog(path, e.getMessage());
 			return false;
 		} catch (NoSuchFileException e) {
 			if (!quiet || dialogKind != DialogKind.OPEN) {
-				fileDialogManager.showErrorDialog(path, dialogKind);
+				dialogManager.showErrorDialog(path, dialogKind);
 			}
 			return false;
 		} catch (IOException e) {
-			fileDialogManager.showErrorDialog(path, dialogKind);
+			dialogManager.showErrorDialog(path, dialogKind);
 			return false;
 		}
 	}
 	
 	private Path dialogSaveOrLoad(DialogManager.DialogKind dialogKind) {
-		Path path = fileDialogManager.getUserChosenPath(
+		Path path = dialogManager.getUserChosenPath(
 				config.getConfigEntryPath(Config.Keys.DEFAULT_FOLDER),
 				"Song analyis files",
 				new String[] {"songanalysis"},

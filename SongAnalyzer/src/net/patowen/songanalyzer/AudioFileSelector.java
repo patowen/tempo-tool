@@ -29,9 +29,9 @@ public class AudioFileSelector extends View implements DimWidthFree, DimHeightCo
 	public AudioFileSelector(RootBundle bundle) {
 		width = 200;
 		
-		config = bundle.getConfig();
-		dialogManager = bundle.getDialogManager();
-		audioPlayer = bundle.getAudioPlayer();
+		config = bundle.config;
+		dialogManager = bundle.dialogManager;
+		audioPlayer = bundle.audioPlayer;
 		
 		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new OpenAudio(), new InputTypeMouse(MouseEvent.BUTTON1, false, false, false), 1));

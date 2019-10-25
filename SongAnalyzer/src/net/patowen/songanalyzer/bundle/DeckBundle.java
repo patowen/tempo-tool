@@ -9,35 +9,22 @@ import net.patowen.songanalyzer.undo.UserActionList;
 
 // Stores data relevant to a deck
 public class DeckBundle {
-	private final RootBundle rootBundle;
-	private final TrackBounds trackBounds;
+	// From RootBundle
+	public final Config config;
+	public final UserActionList userActionList;
+	public final DialogManager fileDialogManager;
+	public final AnimationController animationController;
+	public final AudioPlayer audioPlayer;
+	
+	public final TrackBounds trackBounds;
 	
 	public DeckBundle(RootBundle rootBundle) {
-		this.rootBundle = rootBundle;
+		config = rootBundle.config;
+		userActionList = rootBundle.userActionList;
+		fileDialogManager = rootBundle.dialogManager;
+		animationController = rootBundle.animationController;
+		audioPlayer = rootBundle.audioPlayer;
+		
 		trackBounds = new TrackBounds(0, 60);
-	}
-	
-	public Config getConfig() {
-		return rootBundle.getConfig();
-	}
-	
-	public UserActionList getUserActionList() {
-		return rootBundle.getUserActionList();
-	}
-	
-	public DialogManager getFileDialogManager() {
-		return rootBundle.getDialogManager();
-	}
-	
-	public AnimationController getAnimationController() {
-		return rootBundle.getAnimationController();
-	}
-	
-	public AudioPlayer getAudioPlayer() {
-		return rootBundle.getAudioPlayer();
-	}
-	
-	public TrackBounds getTrackBounds() {
-		return trackBounds;
 	}
 }

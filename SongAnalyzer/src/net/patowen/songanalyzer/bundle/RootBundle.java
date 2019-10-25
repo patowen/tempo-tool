@@ -10,37 +10,17 @@ import net.patowen.songanalyzer.undo.UserActionList;
 
 // Stores data relevant to the whole application
 public class RootBundle {
-	private final Config config;
-	private final UserActionList userActionList;
-	private final DialogManager fileDialogManager;
-	private final AnimationController animationController;
-	private final AudioPlayer audioPlayer;
+	public final Config config;
+	public final UserActionList userActionList;
+	public final DialogManager dialogManager;
+	public final AnimationController animationController;
+	public final AudioPlayer audioPlayer;
 	
 	public RootBundle(Component component) {
 		config = new Config();
 		userActionList = new UserActionList();
-		fileDialogManager = new DialogManager(component);
+		dialogManager = new DialogManager(component);
 		animationController = new AnimationController(component);
 		audioPlayer = new AudioPlayer(animationController);
-	}
-	
-	public Config getConfig() {
-		return config;
-	}
-	
-	public UserActionList getUserActionList() {
-		return userActionList;
-	}
-	
-	public DialogManager getDialogManager() {
-		return fileDialogManager;
-	}
-	
-	public AnimationController getAnimationController() {
-		return animationController;
-	}
-	
-	public AudioPlayer getAudioPlayer() {
-		return audioPlayer;
 	}
 }

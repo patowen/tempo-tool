@@ -39,13 +39,13 @@ public class MackSeek extends Mack {
 	
 	@Override
 	public void render(Graphics2D g) {
-		if (bundle.getAudioPlayer().hasAudioStream()) {
+		if (bundle.audioPlayer.hasAudioStream()) {
 			Shape prevClip = g.getClip();
 			g.clipRect(0, 0, width, height);
 			
 			g.setColor(new Color(128, 128, 128));
-			int xLeft = bundle.getTrackBounds().secondsToPixel(0);
-			int xRight = bundle.getTrackBounds().secondsToPixel(bundle.getAudioPlayer().getLength());
+			int xLeft = bundle.trackBounds.secondsToPixel(0);
+			int xRight = bundle.trackBounds.secondsToPixel(bundle.audioPlayer.getLength());
 			g.fillRect(xLeft, 8, xRight - xLeft + 1, height - 16);
 			
 			g.setClip(prevClip);
@@ -73,7 +73,7 @@ public class MackSeek extends Mack {
 		@Override
 		public boolean onAction(Point pos, double value) {
 			if (isWithinView(pos)) {
-				bundle.getAudioPlayer().setPos(bundle.getTrackBounds().pixelToSeconds(pos.x));
+				bundle.audioPlayer.setPos(bundle.trackBounds.pixelToSeconds(pos.x));
 				return true;
 			}
 			return false;

@@ -42,8 +42,8 @@ public class MackMarker extends Mack {
 		inputDictionary.addInputMapping(new InputMapping(new DeleteMarkAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, true, false), 1));
 		inputDictionary.constructDictionary();
 		
-		this.trackBounds = bundle.getTrackBounds();
-		this.userActionList = bundle.getUserActionList();
+		this.trackBounds = bundle.trackBounds;
+		this.userActionList = bundle.userActionList;
 		this.marks = new TreeSet<>();
 	}
 	

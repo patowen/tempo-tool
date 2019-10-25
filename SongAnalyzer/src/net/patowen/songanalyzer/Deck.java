@@ -57,7 +57,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	@Override
 	public void render(Graphics2D g) {
 		setSuperMackPositions();
-		bundle.getTrackBounds().setWidth(width - outerBorderWidth * 2 - trackTabWidth - trackTabBorderWidth);
+		bundle.trackBounds.setWidth(width - outerBorderWidth * 2 - trackTabWidth - trackTabBorderWidth);
 		
 		g.setColor(Color.WHITE);
 		g.drawRect(0, 0, width-1, height-1);
@@ -68,8 +68,8 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		
 		g.setColor(Color.GREEN);
 		
-		if (bundle.getAudioPlayer().hasAudioStream()) {
-			int pos = bundle.getTrackBounds().secondsToPixel(bundle.getAudioPlayer().getPos()) + outerBorderWidth + trackTabWidth + trackTabBorderWidth;
+		if (bundle.audioPlayer.hasAudioStream()) {
+			int pos = bundle.trackBounds.secondsToPixel(bundle.audioPlayer.getPos()) + outerBorderWidth + trackTabWidth + trackTabBorderWidth;
 			g.drawLine(pos, 0, pos, height);
 		}
 	}
@@ -94,7 +94,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	
 	public void reset() {
 		superMacks.clear();
-		bundle.getTrackBounds().setBounds(0, 60);
+		bundle.trackBounds.setBounds(0, 60);
 		
 		superMacks.add(SuperMack.create(MackSeek.type, null, bundle));
 		superMacks.add(SuperMack.create(MackMarker.type, null, bundle));
@@ -116,7 +116,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	
 	public void load(Dict dict) throws FileFormatException {
 		superMacks.clear();
-		bundle.getTrackBounds().setBounds(0, 60);
+		bundle.trackBounds.setBounds(0, 60);
 		
 		Arr arr = dict.get(Keys.macks).asArr();
 		for (Obj obj : arr.get()) {
@@ -142,7 +142,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		public boolean onAction(Point pos, double value) {
 			if (isWithinView(pos)) {
 				double zoomFactor = Math.exp(value * 0.1);
-				bundle.getTrackBounds().zoom(bundle.getTrackBounds().pixelToSeconds(pos.x), zoomFactor);
+				bundle.trackBounds.zoom(bundle.trackBounds.pixelToSeconds(pos.x), zoomFactor);
 				return true;
 			}
 			return false;
