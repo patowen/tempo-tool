@@ -4,11 +4,11 @@ public class GridRow {
 	private int yPos;
 	private int height;
 	
-	public void setXPos(int yPos) {
+	public void setYPos(int yPos) {
 		this.yPos = yPos;
 	}
 	
-	public void setWidth(int height) {
+	public void setHeight(int height) {
 		this.height = height;
 	}
 	
