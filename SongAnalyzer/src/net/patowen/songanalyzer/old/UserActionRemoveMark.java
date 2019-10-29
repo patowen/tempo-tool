@@ -11,10 +11,12 @@ public class UserActionRemoveMark implements UserAction {
 		this.mark = mark;
 	}
 	
+	@Override
 	public void exec() {
 		layer.removeMark(mark);
 	}
 	
+	@Override
 	public void undo() {
 		layer.addMark(mark);
 	}

@@ -28,18 +28,22 @@ public class SeekLayer extends TrackLayer {
 		status.refresh();
 	}
 	
+	@Override
 	public int getMinimumHeight() {
 		return 32;
 	}
 	
+	@Override
 	public int getPreferredHeight() {
 		return 64;
 	}
 	
+	@Override
 	public void save(DataOutputStream stream) throws IOException {
 		
 	}
 	
+	@Override
 	public void load(DataInputStream stream) throws IOException {
 		
 	}

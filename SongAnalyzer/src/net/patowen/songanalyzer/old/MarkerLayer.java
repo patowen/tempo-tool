@@ -20,10 +20,12 @@ public class MarkerLayer extends TrackLayer {
 		marks = new TreeSet<>();
 		
 		tickerSource = new TickerSource() {
+			@Override
 			public Double getNextTickInclusive(double pos) {
 				return marks.ceiling(pos);
 			}
 			
+			@Override
 			public Double getNextTickExclusive(double pos) {
 				return marks.higher(pos);
 			}
@@ -96,14 +98,17 @@ public class MarkerLayer extends TrackLayer {
 		}
 	}
 	
+	@Override
 	public int getMinimumHeight() {
 		return 32;
 	}
 	
+	@Override
 	public int getPreferredHeight() {
 		return 64;
 	}
 	
+	@Override
 	public void save(DataOutputStream stream) throws IOException {
 		stream.writeInt(marks.size());
 		for (double mark : marks) {
@@ -111,6 +116,7 @@ public class MarkerLayer extends TrackLayer {
 		}
 	}
 	
+	@Override
 	public void load(DataInputStream stream) throws IOException {
 		int numMarks = stream.readInt();
 		for (int i=0; i<numMarks; i++) {

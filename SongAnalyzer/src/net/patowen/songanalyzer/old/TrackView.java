@@ -61,6 +61,7 @@ public class TrackView {
 	
 	public TrackView(AudioStream stream) {
 		playBarUpdateTimer = new Timer(0, new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (!status.audioStream.isPlaying()) {
 					playBarUpdateTimer.stop();
@@ -99,6 +100,7 @@ public class TrackView {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		trackPanel = new JPanel() {
+			@Override
 			public void paintComponent(Graphics g) {
 				renderPanel((Graphics2D)g);
 			}
@@ -106,32 +108,38 @@ public class TrackView {
 		trackPanel.setPreferredSize(new Dimension(800, 600));
 		trackPanel.setFocusable(true);
 		trackPanel.addKeyListener(new KeyAdapter() {
+			@Override
 			public void keyPressed(KeyEvent e) {
 				TrackView.this.keyPressed(e);
 			}
 		});
 		
 		trackPanel.addMouseListener(new MouseAdapter() {
+			@Override
 			public void mousePressed(MouseEvent e) {
 				TrackView.this.mousePressed(e);
 			}
 			
+			@Override
 			public void mouseReleased(MouseEvent e) {
 				TrackView.this.mouseReleased(e);
 			}
 		});
 		
 		trackPanel.addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
 			public void mouseMoved(MouseEvent e) {
 				TrackView.this.mouseMoved(e);
 			}
 			
+			@Override
 			public void mouseDragged(MouseEvent e) {
 				TrackView.this.mouseDragged(e);
 			}
 		});
 		
 		trackPanel.addMouseWheelListener(new MouseWheelListener() {
+			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				TrackView.this.mouseWheelMoved(e);
 			}

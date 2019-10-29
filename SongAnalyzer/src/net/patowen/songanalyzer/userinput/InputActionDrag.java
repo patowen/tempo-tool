@@ -9,6 +9,7 @@ public interface InputActionDrag extends InputAction {
 	
 	void onEnd(Point startRelative);
 	
+	@Override
 	default boolean cancelsDrag() {
 		return true;
 	}
