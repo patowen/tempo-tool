@@ -1,21 +1,10 @@
 package net.patowen.songanalyzer.grid;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
 public class Grid {
 	private int width;
 	private int height;
-	
-	private final List<GridColumn> startColumns;
-	private GridColumn centerColumn;
-	private final List<GridColumn> endColumns;
-	private GridColumn spanningColumn;
-	
-	private final List<GridRow> startRows;
-	private GridRow centerRow;
-	private final List<GridRow> endRows;
-	private GridRow spanningRow;
 	
 	private int outerBorderWidth;
 	private int interBorderWidth;
@@ -23,72 +12,51 @@ public class Grid {
 	private int interBorderHeight;
 	
 	public Grid() {
-		startColumns = new ArrayList<>();
-		endColumns = new ArrayList<>();
-		startRows = new ArrayList<>();
-		endRows = new ArrayList<>();
-		
 		outerBorderWidth = 1;
 		interBorderWidth = 1;
 		outerBorderHeight = 1;
 		interBorderHeight = 1;
 	}
 	
-	public GridColumn addStartColumn(int width) {
-		GridColumn gridColumn = new GridColumn();
-		gridColumn.setWidth(width);
-		startColumns.add(gridColumn);
-		return gridColumn;
+	public Iterable<GridColumn> getStartColumns() {
+		return Collections.emptyList();
 	}
 	
-	public GridColumn addCenterColumn() {
-		centerColumn = new GridColumn();
-		return centerColumn;
+	public GridColumn getCenterColumn() {
+		return null;
 	}
 	
-	public GridColumn addEndColumn(int width) {
-		GridColumn gridColumn = new GridColumn();
-		gridColumn.setWidth(width);
-		endColumns.add(gridColumn);
-		return gridColumn;
+	public Iterable<GridColumn> getEndColumns() {
+		return Collections.emptyList();
 	}
 	
-	public GridColumn addSpanningColumn() {
-		spanningColumn = new GridColumn();
-		return spanningColumn;
+	public GridColumn getSpanningColumn() {
+		return null;
 	}
 	
-	public GridRow addStartRow(int height) {
-		GridRow gridRow = new GridRow();
-		gridRow.setHeight(height);
-		startRows.add(gridRow);
-		return gridRow;
+	public Iterable<GridRow> getStartRows() {
+		return Collections.emptyList();
 	}
 	
-	public GridRow addCenterRow() {
-		centerRow = new GridRow();
-		return centerRow;
+	public GridRow getCenterRow() {
+		return null;
 	}
 	
-	public GridRow addEndRow() {
-		GridRow gridRow = new GridRow();
-		gridRow.setHeight(height);
-		endRows.add(gridRow);
-		return gridRow;
+	public Iterable<GridRow> getEndRows() {
+		return Collections.emptyList();
 	}
 	
-	public GridRow addSpanningRow() {
-		spanningRow = new GridRow();
-		return spanningRow;
+	public GridRow getSpanningRow() {
+		return null;
 	}
 	
-	public void setWidth(int width) {
+	public final void setWidth(int width) {
 		this.width = width;
 		
 		adjustColumns();
 	}
 	
-	public void setHeight(int height) {
+	public final void setHeight(int height) {
 		this.height = height;
 		
 		adjustRows();
@@ -98,21 +66,23 @@ public class Grid {
 		int startColumnXPos = outerBorderWidth;
 		int endColumnXPos = width - outerBorderWidth;
 		
+		GridColumn spanningColumn = getSpanningColumn();
 		if (spanningColumn != null) {
 			spanningColumn.setXPos(startColumnXPos);
 			spanningColumn.setWidth(endColumnXPos - startColumnXPos);
 		}
 		
-		for (GridColumn gridColumn : startColumns) {
+		for (GridColumn gridColumn : getStartColumns()) {
 			gridColumn.setXPos(startColumnXPos);
 			startColumnXPos += gridColumn.getWidth() + interBorderWidth;
 		}
 		
-		for (GridColumn gridColumn : endColumns) {
+		for (GridColumn gridColumn : getEndColumns()) {
 			endColumnXPos -= gridColumn.getWidth() + interBorderWidth;
 			gridColumn.setXPos(endColumnXPos);
 		}
 		
+		GridColumn centerColumn = getCenterColumn();
 		if (centerColumn != null) {
 			centerColumn.setXPos(startColumnXPos);
 			centerColumn.setWidth(endColumnXPos - startColumnXPos);
@@ -123,21 +93,23 @@ public class Grid {
 		int startRowYPos = outerBorderHeight;
 		int endRowYPos = height - outerBorderHeight;
 		
+		GridRow spanningRow = getSpanningRow();
 		if (spanningRow != null) {
 			spanningRow.setYPos(startRowYPos);
 			spanningRow.setHeight(endRowYPos - startRowYPos);
 		}
 		
-		for (GridRow gridRow : startRows) {
+		for (GridRow gridRow : getStartRows()) {
 			gridRow.setYPos(startRowYPos);
 			startRowYPos += gridRow.getHeight() + interBorderHeight;
 		}
 		
-		for (GridRow gridRow : endRows) {
+		for (GridRow gridRow : getEndRows()) {
 			endRowYPos -= gridRow.getHeight() + interBorderHeight;
 			gridRow.setYPos(endRowYPos);
 		}
 		
+		GridRow centerRow = getCenterRow();
 		if (centerRow != null) {
 			centerRow.setYPos(startRowYPos);
 			centerRow.setHeight(endRowYPos - startRowYPos);
