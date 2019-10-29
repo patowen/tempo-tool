@@ -35,17 +35,11 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	
 	private final DeckBundle bundle;
 	
-	private ArrayList<SuperMack> superMacks;
 	private final DeckGrid deckGrid;
 	private final List<DeckRow> deckRows;
 	
-	private int outerBorderWidth = 1, outerBorderHeight = 1, interBorderHeight = 1;
-	
-	private int trackTabWidth = 8, trackTabBorderWidth = 1;
-	
 	public Deck(RootBundle rootBundle) {
 		bundle = new DeckBundle(rootBundle);
-		superMacks = new ArrayList<>();
 		
 		deckRows = new ArrayList<>();
 		deckGrid = new DeckGrid(deckRows);
@@ -56,15 +50,6 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	}
 	
 	private void setSuperMackPositions() {
-		int yPos = outerBorderHeight;
-		for (SuperMack superMack : superMacks) {
-			superMack.setXPos(outerBorderWidth);
-			superMack.setYPos(yPos);
-			superMack.setWidth(width - outerBorderWidth * 2);
-			
-			yPos += superMack.getHeight() + interBorderHeight;
-		}
-		
 		deckGrid.setWidth(width);
 		deckGrid.setHeight(height);
 		deckGrid.resizeMacks();
@@ -73,15 +58,10 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	@Override
 	public void render(Graphics2D g) {
 		setSuperMackPositions();
-		bundle.trackBounds.setWidth(width - outerBorderWidth * 2 - trackTabWidth - trackTabBorderWidth);
+		bundle.trackBounds.setWidth(deckGrid.trackColumn.getWidth());
 		
 		g.setColor(Color.WHITE);
 		deckGrid.renderGridlines(g);
-		g.drawRect(0, 0, width-1, height-1);
-		
-		for (SuperMack superMack : superMacks) {
-			superMack.forwardRender(g);
-		}
 		
 		for (DeckRow deckRow : deckRows) {
 			deckRow.mack.forwardRender(g);
@@ -90,7 +70,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		g.setColor(Color.GREEN);
 		
 		if (bundle.audioPlayer.hasAudioStream()) {
-			int pos = bundle.trackBounds.secondsToPixel(bundle.audioPlayer.getPos()) + outerBorderWidth + trackTabWidth + trackTabBorderWidth;
+			int pos = bundle.trackBounds.secondsToPixel(bundle.audioPlayer.getPos()) + deckGrid.trackColumn.getXPos();
 			g.drawLine(pos, 0, pos, height);
 		}
 	}
@@ -99,8 +79,8 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	public InputAction applyInputAction(InputType inputType, Point mousePos, double value) {
 		if (inputType.isMouseBased()) {
 			if (mousePos.x >= 0 && mousePos.y >= 0 && mousePos.x < width && mousePos.y < height) {
-				for (SuperMack superMack : superMacks) {
-					InputAction inputAction = superMack.forwardInput(inputType, mousePos, value);
+				for (DeckRow deckRow : deckRows) {
+					InputAction inputAction = deckRow.mack.forwardInput(inputType, mousePos, value);
 					if (inputAction != null) {
 						return inputAction;
 					}
@@ -114,12 +94,8 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	}
 	
 	public void reset() {
-		superMacks.clear();
 		deckRows.clear();
 		bundle.trackBounds.setBounds(0, 60);
-		
-		superMacks.add(SuperMack.create(MackSeek.type, null, bundle));
-		superMacks.add(SuperMack.create(MackMarker.type, null, bundle));
 		
 		deckRows.add(new DeckRow(MackSeek.type, bundle));
 		deckRows.add(new DeckRow(MackMarker.type, bundle));
@@ -137,9 +113,6 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	public Dict save() {
 		Dict dict = new Dict();
 		Arr arr = new Arr();
-		for (SuperMack superMack : superMacks) {
-			arr.add(superMack.save());
-		}
 		for (DeckRow deckRow : deckRows) {
 			Dict mackDict = new Dict();
 			mackDict.set(MackKeys.height, height);
@@ -151,7 +124,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	}
 	
 	public void load(Dict dict) throws FileFormatException {
-		superMacks.clear();
+		deckRows.clear();
 		bundle.trackBounds.setBounds(0, 60);
 		
 		Arr arr = dict.get(Keys.macks).asArr();
@@ -165,17 +138,13 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 			} catch (IllegalMackTypeException e) {
 				throw new FileFormatException("Unknown mack type " + e.getType());
 			}
-			
-			superMacks.add(SuperMack.load(obj.asDict(), bundle));
 		}
-		
-		this.setWidth(width);
 	}
 
 	@Override
 	public MouseHoverFeedback applyMouseHover(Point mousePos) {
-		for (SuperMack superMack : superMacks) {
-			MouseHoverFeedback mouseHoverFeedback = superMack.forwardMouseHover(mousePos);
+		for (DeckRow deckRow : deckRows) {
+			MouseHoverFeedback mouseHoverFeedback = deckRow.mack.forwardMouseHover(mousePos);
 			if (mouseHoverFeedback != null) {
 				return mouseHoverFeedback;
 			}
@@ -198,10 +167,11 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	private static class DeckGrid extends Grid {
 		GridColumn tabColumn = new GridColumn();
 		GridColumn trackColumn = new GridColumn();
-		final List<DeckRow> deckRows = new ArrayList<DeckRow>();
+		final List<DeckRow> deckRows;
 		
 		DeckGrid(List<DeckRow> deckRows) {
 			tabColumn.setWidth(8);
+			this.deckRows = deckRows;
 		}
 		
 		@Override
