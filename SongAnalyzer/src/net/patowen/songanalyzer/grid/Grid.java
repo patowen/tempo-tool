@@ -7,16 +7,16 @@ public class Grid {
 	private int width;
 	private int height;
 	
-	private int outerBorderWidth;
-	private int interBorderWidth;
-	private int outerBorderHeight;
-	private int interBorderHeight;
+	private final int outerBorderWidth;
+	private final int outerBorderHeight;
+	private final int interBorderWidth;
+	private final int interBorderHeight;
 	
-	public Grid() {
-		outerBorderWidth = 1;
-		interBorderWidth = 1;
-		outerBorderHeight = 1;
-		interBorderHeight = 1;
+	public Grid(int outerBorderWidth, int outerBorderHeight, int interBorderWidth, int interBorderHeight) {
+		this.outerBorderWidth = outerBorderWidth;
+		this.outerBorderHeight = outerBorderHeight;
+		this.interBorderWidth = interBorderWidth;
+		this.interBorderHeight = interBorderHeight;
 	}
 	
 	public Iterable<GridColumn> getStartColumns() {

@@ -170,6 +170,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		final List<DeckRow> deckRows;
 		
 		DeckGrid(List<DeckRow> deckRows) {
+			super(1, 1, 1, 1);
 			tabColumn.setWidth(8);
 			this.deckRows = deckRows;
 		}
