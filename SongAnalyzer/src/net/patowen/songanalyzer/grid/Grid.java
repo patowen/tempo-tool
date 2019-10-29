@@ -1,5 +1,6 @@
 package net.patowen.songanalyzer.grid;
 
+import java.awt.Graphics2D;
 import java.util.Collections;
 
 public class Grid {
@@ -60,6 +61,43 @@ public class Grid {
 		this.height = height;
 		
 		adjustRows();
+	}
+	
+	public final void renderGridlines(Graphics2D g) {
+		// TODO: Handle border sizes other than 0 or 1
+		if (outerBorderWidth > 0) {
+			g.drawLine(0, 0, 0, height-1);
+			g.drawLine(width-1, 0, width-1, height-1);
+		}
+		
+		if (outerBorderHeight > 0) {
+			g.drawLine(0, 0, width-1, 0);
+			g.drawLine(0, height-1, width-1, height-1);
+		}
+		
+		if (interBorderWidth > 0) {
+			for (GridColumn gridColumn : getStartColumns()) {
+				int x = gridColumn.getXPos() + gridColumn.getWidth();
+				g.drawLine(x, 0, x, height-1);
+			}
+			
+			for (GridColumn gridColumn : getEndColumns()) {
+				int x = gridColumn.getXPos() - 1;
+				g.drawLine(x, 0, x, height-1);
+			}
+		}
+		
+		if (interBorderHeight > 0) {
+			for (GridRow gridRow : getStartRows()) {
+				int y = gridRow.getYPos() + gridRow.getHeight();
+				g.drawLine(0, y, width-1, y);
+			}
+			
+			for (GridRow gridRow : getEndRows()) {
+				int y = gridRow.getYPos() - 1;
+				g.drawLine(0, y, width-1, y);
+			}
+		}
 	}
 	
 	private void adjustColumns() {

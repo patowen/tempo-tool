@@ -45,7 +45,7 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 		case MackMarker.type:
 			return new MackMarker(bundle);
 		default:
-			throw new IllegalMackTypeException();
+			throw new IllegalMackTypeException(type);
 		}
 	}
 	
