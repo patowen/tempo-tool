@@ -125,6 +125,7 @@ public class Config {
 			this.value = defaultValue;
 		}
 		
+		@Override
 		public boolean parseValue(String valueStr) {
 			int len = valueStr.length();
 			if (len < 2) {
@@ -137,6 +138,7 @@ public class Config {
 			return true;
 		}
 		
+		@Override
 		public String serializeValue() {
 			if (value == null) {
 				return null;

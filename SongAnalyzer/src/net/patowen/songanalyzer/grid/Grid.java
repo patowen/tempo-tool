@@ -1,7 +1,11 @@
 package net.patowen.songanalyzer.grid;
 
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.util.Collections;
+
+import net.patowen.songanalyzer.SuperMack;
+import net.patowen.songanalyzer.userinput.InputActionDrag;
 
 public class Grid {
 	private int width;
@@ -151,6 +155,72 @@ public class Grid {
 		if (centerRow != null) {
 			centerRow.setYPos(startRowYPos);
 			centerRow.setHeight(endRowYPos - startRowYPos);
+		}
+	}
+	
+	private static final class ActionResize implements InputActionDrag {
+		private SuperMack superMack; // TODO: Use ResizingGridPart
+		private int initialHeight;
+		
+		public ActionResize(SuperMack superMack) {
+			this.superMack = superMack;
+		}
+		
+		@Override
+		public boolean onAction(Point pos, double value) {
+			if (!superMack.isDragHandle(pos)) {
+				return false;
+			}
+			initialHeight = superMack.getHeight();
+			return true;
+		}
+		
+		@Override
+		public void onDrag(Point startRelative) {
+			superMack.trySetHeight(initialHeight + startRelative.y);
+		}
+		
+		@Override
+		public void onCancel() {
+			superMack.trySetHeight(initialHeight);
+		}
+		
+		@Override
+		public void onEnd(Point startRelative) {}
+	}
+	
+	private static interface ResizingGridPart {
+		void onDrag(Point startRelative);
+		void onCancel();
+	}
+	
+	private static final class ResizingColumn implements ResizingGridPart {
+		private GridColumn gridColumn;
+		private int initialWidth;
+		
+		@Override
+		public void onDrag(Point startRelative) {
+			gridColumn.setWidth(initialWidth + startRelative.x);
+		}
+		
+		@Override
+		public void onCancel() {
+			gridColumn.setWidth(initialWidth);
+		}
+	}
+	
+	private static final class ResizingRow implements ResizingGridPart {
+		private GridRow gridRow;
+		private int initialHeight;
+		
+		@Override
+		public void onDrag(Point startRelative) {
+			gridRow.setHeight(initialHeight + startRelative.y);
+		}
+		
+		@Override
+		public void onCancel() {
+			gridRow.setHeight(initialHeight);
 		}
 	}
 }

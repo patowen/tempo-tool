@@ -111,6 +111,7 @@ public class AudioStream {
 		playSpeed = 1;
 		
 		ActionListener audioStreamUpdater = new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (playing) {
 					if (line.available() > line.getBufferSize() / 2) {

@@ -55,6 +55,7 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 		return superMack;
 	}
 	
+	@Override
 	public void render(Graphics2D g) {
 		g.setColor(Color.WHITE);
 		g.drawLine(trackTabWidth, 0, trackTabWidth, height);
@@ -64,6 +65,7 @@ public class SuperMack extends View implements DimWidthControlled, DimHeightFree
 		mack.forwardRender(g);
 	}
 	
+	@Override
 	public int getHeight() {
 		return height;
 	}

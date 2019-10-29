@@ -57,6 +57,7 @@ public class MackSeek extends Mack {
 		return inputDictionary.applyInput(inputType, mousePos, value);
 	}
 	
+	@Override
 	public MouseHoverFeedback applyMouseHover(Point mousePos) {
 		return null;
 	}

@@ -31,6 +31,7 @@ public class SongAnalyzerRunner {
 		});
 		
 		panel = new JPanel() {
+			@Override
 			public void paint(Graphics g) {
 				root.render((Graphics2D) g);
 			}
