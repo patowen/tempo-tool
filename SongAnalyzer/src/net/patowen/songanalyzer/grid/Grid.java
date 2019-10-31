@@ -11,17 +11,7 @@ public class Grid {
 	private int width;
 	private int height;
 	
-	private final int outerBorderWidth;
-	private final int outerBorderHeight;
-	private final int interBorderWidth;
-	private final int interBorderHeight;
-	
-	public Grid(int outerBorderWidth, int outerBorderHeight, int interBorderWidth, int interBorderHeight) {
-		this.outerBorderWidth = outerBorderWidth;
-		this.outerBorderHeight = outerBorderHeight;
-		this.interBorderWidth = interBorderWidth;
-		this.interBorderHeight = interBorderHeight;
-	}
+	private GridParams params = new GridParams();
 	
 	public Iterable<GridColumn> getStartColumns() {
 		return Collections.emptyList();
@@ -69,158 +59,136 @@ public class Grid {
 	
 	public final void renderGridlines(Graphics2D g) {
 		// TODO: Handle border sizes other than 0 or 1
-		if (outerBorderWidth > 0) {
+		if (params.outerBorderWidth > 0) {
 			g.drawLine(0, 0, 0, height-1);
 			g.drawLine(width-1, 0, width-1, height-1);
 		}
 		
-		if (outerBorderHeight > 0) {
+		if (params.outerBorderHeight > 0) {
 			g.drawLine(0, 0, width-1, 0);
 			g.drawLine(0, height-1, width-1, height-1);
 		}
 		
-		if (interBorderWidth > 0) {
+		if (params.interBorderWidth > 0) {
 			for (GridColumn gridColumn : getStartColumns()) {
-				int x = gridColumn.getXPos() + gridColumn.getWidth();
+				int x = gridColumn.getPos() + gridColumn.getSize();
 				g.drawLine(x, 0, x, height-1);
 			}
 			
 			for (GridColumn gridColumn : getEndColumns()) {
-				int x = gridColumn.getXPos() - 1;
+				int x = gridColumn.getPos() - 1;
 				g.drawLine(x, 0, x, height-1);
 			}
 		}
 		
-		if (interBorderHeight > 0) {
+		if (params.interBorderHeight > 0) {
 			for (GridRow gridRow : getStartRows()) {
-				int y = gridRow.getYPos() + gridRow.getHeight();
+				int y = gridRow.getPos() + gridRow.getSize();
 				g.drawLine(0, y, width-1, y);
 			}
 			
 			for (GridRow gridRow : getEndRows()) {
-				int y = gridRow.getYPos() - 1;
+				int y = gridRow.getPos() - 1;
 				g.drawLine(0, y, width-1, y);
 			}
 		}
 	}
 	
 	private void adjustColumns() {
-		int startColumnXPos = outerBorderWidth;
-		int endColumnXPos = width - outerBorderWidth;
+		int startColumnXPos = params.outerBorderWidth;
+		int endColumnXPos = width - params.outerBorderWidth;
 		
 		GridColumn spanningColumn = getSpanningColumn();
 		if (spanningColumn != null) {
-			spanningColumn.setXPos(startColumnXPos);
-			spanningColumn.setWidth(endColumnXPos - startColumnXPos);
+			spanningColumn.setSlot(GridSlot.spanning);
+			spanningColumn.setPos(startColumnXPos);
+			spanningColumn.setSize(endColumnXPos - startColumnXPos);
 		}
 		
 		for (GridColumn gridColumn : getStartColumns()) {
-			gridColumn.setXPos(startColumnXPos);
-			startColumnXPos += gridColumn.getWidth() + interBorderWidth;
+			gridColumn.setSlot(GridSlot.start);
+			gridColumn.setInterBorderSize(params.interBorderWidth);
+			gridColumn.setPos(startColumnXPos);
+			startColumnXPos += gridColumn.getSize() + gridColumn.getInterBorderSize();
 		}
 		
 		for (GridColumn gridColumn : getEndColumns()) {
-			endColumnXPos -= gridColumn.getWidth() + interBorderWidth;
-			gridColumn.setXPos(endColumnXPos);
+			gridColumn.setSlot(GridSlot.end);
+			gridColumn.setInterBorderSize(params.interBorderWidth);
+			endColumnXPos -= gridColumn.getSize() + gridColumn.getInterBorderSize();
+			gridColumn.setPos(endColumnXPos);
 		}
 		
 		GridColumn centerColumn = getCenterColumn();
 		if (centerColumn != null) {
-			centerColumn.setXPos(startColumnXPos);
-			centerColumn.setWidth(endColumnXPos - startColumnXPos);
+			centerColumn.setSlot(GridSlot.center);
+			centerColumn.setPos(startColumnXPos);
+			centerColumn.setSize(endColumnXPos - startColumnXPos);
 		}
 	}
 	
 	private void adjustRows() {
-		int startRowYPos = outerBorderHeight;
-		int endRowYPos = height - outerBorderHeight;
+		int startRowYPos = params.outerBorderHeight;
+		int endRowYPos = height - params.outerBorderHeight;
 		
 		GridRow spanningRow = getSpanningRow();
 		if (spanningRow != null) {
-			spanningRow.setYPos(startRowYPos);
-			spanningRow.setHeight(endRowYPos - startRowYPos);
+			spanningRow.setSlot(GridSlot.spanning);
+			spanningRow.setPos(startRowYPos);
+			spanningRow.setSize(endRowYPos - startRowYPos);
 		}
 		
 		for (GridRow gridRow : getStartRows()) {
-			gridRow.setYPos(startRowYPos);
-			startRowYPos += gridRow.getHeight() + interBorderHeight;
+			gridRow.setSlot(GridSlot.start);
+			gridRow.setInterBorderSize(params.interBorderHeight);
+			gridRow.setPos(startRowYPos);
+			startRowYPos += gridRow.getSize() + gridRow.getInterBorderSize();
 		}
 		
 		for (GridRow gridRow : getEndRows()) {
-			endRowYPos -= gridRow.getHeight() + interBorderHeight;
-			gridRow.setYPos(endRowYPos);
+			gridRow.setSlot(GridSlot.end);
+			gridRow.setInterBorderSize(params.interBorderHeight);
+			endRowYPos -= gridRow.getSize() + gridRow.getInterBorderSize();
+			gridRow.setPos(endRowYPos);
 		}
 		
 		GridRow centerRow = getCenterRow();
 		if (centerRow != null) {
-			centerRow.setYPos(startRowYPos);
-			centerRow.setHeight(endRowYPos - startRowYPos);
+			centerRow.setSlot(GridSlot.center);
+			centerRow.setPos(startRowYPos);
+			centerRow.setSize(endRowYPos - startRowYPos);
 		}
 	}
 	
-	private static final class ActionResize implements InputActionDrag {
-		private SuperMack superMack; // TODO: Use ResizingGridPart
+	private GridElement getElementToResize(Point pointerCoords) {
+		return null;
+	}
+	
+	private final class ActionResize implements InputActionDrag {
+		private GridElement gridElement; // TODO: Use ResizingGridPart
 		private int initialHeight;
-		
-		public ActionResize(SuperMack superMack) {
-			this.superMack = superMack;
-		}
 		
 		@Override
 		public boolean onAction(Point pos, double value) {
-			if (!superMack.isDragHandle(pos)) {
+			gridElement = getElementToResize(pos);
+			if (gridElement == null) {
 				return false;
 			}
-			initialHeight = superMack.getHeight();
+			initialHeight = gridElement.getSize();
 			return true;
 		}
 		
 		@Override
 		public void onDrag(Point startRelative) {
-			superMack.trySetHeight(initialHeight + startRelative.y);
+			gridElement.setSize(initialHeight + gridElement.getPointerPos(startRelative));
 		}
 		
 		@Override
 		public void onCancel() {
-			superMack.trySetHeight(initialHeight);
+			gridElement.setSize(initialHeight);
 		}
 		
 		@Override
 		public void onEnd(Point startRelative) {}
-	}
-	
-	private static interface ResizingGridPart {
-		void onDrag(Point startRelative);
-		void onCancel();
-	}
-	
-	private static final class ResizingColumn implements ResizingGridPart {
-		private GridColumn gridColumn;
-		private int initialWidth;
-		
-		@Override
-		public void onDrag(Point startRelative) {
-			gridColumn.setWidth(initialWidth + startRelative.x);
-		}
-		
-		@Override
-		public void onCancel() {
-			gridColumn.setWidth(initialWidth);
-		}
-	}
-	
-	private static final class ResizingRow implements ResizingGridPart {
-		private GridRow gridRow;
-		private int initialHeight;
-		
-		@Override
-		public void onDrag(Point startRelative) {
-			gridRow.setHeight(initialHeight + startRelative.y);
-		}
-		
-		@Override
-		public void onCancel() {
-			gridRow.setHeight(initialHeight);
-		}
 	}
 }

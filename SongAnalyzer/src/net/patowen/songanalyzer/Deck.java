@@ -58,7 +58,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	@Override
 	public void render(Graphics2D g) {
 		setSuperMackPositions();
-		bundle.trackBounds.setWidth(deckGrid.trackColumn.getWidth());
+		bundle.trackBounds.setWidth(deckGrid.trackColumn.getSize());
 		
 		g.setColor(Color.WHITE);
 		deckGrid.renderGridlines(g);
@@ -70,7 +70,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		g.setColor(Color.GREEN);
 		
 		if (bundle.audioPlayer.hasAudioStream()) {
-			int pos = bundle.trackBounds.secondsToPixel(bundle.audioPlayer.getPos()) + deckGrid.trackColumn.getXPos();
+			int pos = bundle.trackBounds.secondsToPixel(bundle.audioPlayer.getPos()) + deckGrid.trackColumn.getPos();
 			g.drawLine(pos, 0, pos, height);
 		}
 	}
@@ -132,7 +132,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 			Dict mackDict = obj.asDict();
 			try {
 				DeckRow deckRow = new DeckRow(mackDict.get(MackKeys.type).asInt(), bundle);
-				deckRow.gridRow.setHeight(mackDict.get(MackKeys.height).asInt());
+				deckRow.gridRow.setSize(mackDict.get(MackKeys.height).asInt());
 				deckRow.mack.load(mackDict);
 				deckRows.add(deckRow);
 			} catch (IllegalMackTypeException e) {
@@ -170,8 +170,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		final List<DeckRow> deckRows;
 		
 		DeckGrid(List<DeckRow> deckRows) {
-			super(1, 1, 1, 1);
-			tabColumn.setWidth(8);
+			tabColumn.setSize(8);
 			this.deckRows = deckRows;
 		}
 		
@@ -192,10 +191,10 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		
 		public void resizeMacks() {
 			for (DeckRow deckRow : deckRows) {
-				deckRow.mack.setXPos(trackColumn.getXPos());
-				deckRow.mack.setYPos(deckRow.gridRow.getYPos());
-				deckRow.mack.setWidth(trackColumn.getWidth());
-				deckRow.mack.setHeight(deckRow.gridRow.getHeight());
+				deckRow.mack.setXPos(trackColumn.getPos());
+				deckRow.mack.setYPos(deckRow.gridRow.getPos());
+				deckRow.mack.setWidth(trackColumn.getSize());
+				deckRow.mack.setHeight(deckRow.gridRow.getSize());
 			}
 		}
 	}
@@ -216,7 +215,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 				throw new IllegalMackTypeException(type);
 			}
 			
-			gridRow.setHeight(mack.getDefaultHeight());
+			gridRow.setSize(mack.getDefaultHeight());
 		}
 	}
 }
