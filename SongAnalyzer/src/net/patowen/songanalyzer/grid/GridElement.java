@@ -8,6 +8,7 @@ public abstract class GridElement {
 	private boolean resizable;
 	private GridSlot slot;
 	private int interBorderSize;
+	private int resizeRange;
 	
 	void setPos(int pos) {
 		this.pos = pos;
@@ -49,7 +50,27 @@ public abstract class GridElement {
 		return interBorderSize;
 	}
 	
+	void setResizeRange(int resizeRange) {
+		this.resizeRange = resizeRange;
+	}
+	
+	int getResizeRange() {
+		return resizeRange;
+	}
+	
 	int getResizeDistance(Point pointerCoords) {
+		if (!resizable) {
+			return Integer.MAX_VALUE;
+		}
+		
+		int resizeDistance = getResizeDistanceInternal(pointerCoords);
+		if (resizeDistance > resizeRange) {
+			return Integer.MAX_VALUE;
+		}
+		return resizeDistance;
+	}
+	
+	private int getResizeDistanceInternal(Point pointerCoords) {
 		int pointerPos = getPointerPos(pointerCoords);
 		
 		switch (getSlot()) {

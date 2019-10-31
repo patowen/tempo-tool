@@ -4,7 +4,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.Collections;
 
-import net.patowen.songanalyzer.SuperMack;
 import net.patowen.songanalyzer.userinput.InputActionDrag;
 
 public class Grid {
@@ -161,7 +160,44 @@ public class Grid {
 	}
 	
 	private GridElement getElementToResize(Point pointerCoords) {
-		return null;
+		GridElementToResize currentBest = new GridElementToResize(pointerCoords, null, Integer.MAX_VALUE);
+		for (GridColumn gridElement : getStartColumns()) {
+			currentBest.setIfBetter(gridElement);
+		}
+		for (GridColumn gridElement : getEndColumns()) {
+			currentBest.setIfBetter(gridElement);
+		}
+		for (GridRow gridElement : getStartRows()) {
+			currentBest.setIfBetter(gridElement);
+		}
+		for (GridRow gridElement : getEndRows()) {
+			currentBest.setIfBetter(gridElement);
+		}
+		return currentBest.gridElement;
+	}
+	
+	private final class GridElementToResize {
+		public Point pointerCoords;
+		public GridElement gridElement;
+		public int distance;
+		
+		public GridElementToResize(Point pointerCoords, GridElement gridElement, int distance) {
+			this.pointerCoords = pointerCoords;
+			this.gridElement = gridElement;
+			this.distance = distance;
+		}
+		
+		public void setIfBetter(GridElement newElement) {
+			if (newElement == null) {
+				return;
+			}
+			
+			int newDistance = newElement.getResizeDistance(pointerCoords);
+			if (newDistance < distance) {
+				gridElement = newElement;
+				distance = newDistance;
+			}
+		}
 	}
 	
 	private final class ActionResize implements InputActionDrag {
