@@ -131,9 +131,10 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 		Arr arr = new Arr();
 		for (DeckRow deckRow : deckRows) {
 			Dict mackDict = new Dict();
-			mackDict.set(MackKeys.height, height);
+			mackDict.set(MackKeys.height, deckRow.getSize());
 			mackDict.set(MackKeys.type, deckRow.mack.getType());
 			deckRow.mack.save(mackDict);
+			arr.add(mackDict);
 		}
 		dict.set(Keys.macks, arr);
 		return dict;
