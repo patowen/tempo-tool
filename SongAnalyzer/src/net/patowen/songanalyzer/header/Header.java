@@ -33,6 +33,10 @@ public class Header extends View {
 		columnList.add(audioFileSelectorColumn);
 		grid.setStartColumns(columnList);
 	}
+	
+	public int getPreferredHeight() {
+		return 32;
+	}
 
 	@Override
 	public void render(Graphics2D g) {

@@ -80,7 +80,7 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		grid.setStartRows(Collections.singletonList(headerRow));
 		grid.setCenterRow(deckRow);
 		grid.setCenterColumn(gridColumn);
-		headerRow.setSize(32);
+		headerRow.setSize(header.getPreferredHeight());
 		
 		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new Undo(), new InputTypeKeyboard(KeyEvent.VK_Z, true, false, false), 1));
