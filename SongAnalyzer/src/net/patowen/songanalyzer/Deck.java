@@ -43,6 +43,8 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 	public Deck(RootBundle rootBundle) {
 		bundle = new DeckBundle(rootBundle);
 		
+		tabColumn.setSize(8);
+		
 		grid.setStartColumns(Collections.singletonList(tabColumn));
 		grid.setCenterColumn(trackColumn);
 		grid.setStartRows(deckRows);
@@ -86,6 +88,11 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 
 	@Override
 	public InputAction applyInputAction(InputType inputType, Point mousePos, double value) {
+		InputAction gridInputAction = grid.applyInputAction(inputType, mousePos, value);
+		if (gridInputAction != null) {
+			return gridInputAction;
+		}
+		
 		if (inputType.isMouseBased()) {
 			if (mousePos.x >= 0 && mousePos.y >= 0 && mousePos.x < width && mousePos.y < height) {
 				for (DeckRow deckRow : deckRows) {
@@ -152,6 +159,11 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 
 	@Override
 	public MouseHoverFeedback applyMouseHover(Point mousePos) {
+		MouseHoverFeedback gridFeedback = grid.applyMouseHover(mousePos);
+		if (gridFeedback != null) {
+			return gridFeedback;
+		}
+		
 		for (DeckRow deckRow : deckRows) {
 			MouseHoverFeedback mouseHoverFeedback = deckRow.mack.forwardMouseHover(mousePos);
 			if (mouseHoverFeedback != null) {

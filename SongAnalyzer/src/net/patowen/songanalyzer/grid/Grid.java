@@ -1,17 +1,27 @@
 package net.patowen.songanalyzer.grid;
 
+import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.List;
 
+import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputActionDrag;
+import net.patowen.songanalyzer.userinput.InputDictionary;
+import net.patowen.songanalyzer.userinput.InputMapping;
+import net.patowen.songanalyzer.userinput.InputType;
+import net.patowen.songanalyzer.userinput.InputTypeMouse;
+import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
 
 public final class Grid {
 	private int width;
 	private int height;
 	
 	private GridParams params = new GridParams();
+	
+	private final InputDictionary inputDictionary = new InputDictionary();
 	
 	private List<? extends GridColumn> startColumns = Collections.emptyList();
 	private GridColumn centerColumn = null;
@@ -22,6 +32,11 @@ public final class Grid {
 	private GridRow centerRow = null;
 	private List<? extends GridRow> endRows = Collections.emptyList();
 	private GridRow spanningRow = null;
+	
+	public Grid() {
+		inputDictionary.addInputMapping(new InputMapping(new ActionResize(), new InputTypeMouse(MouseEvent.BUTTON1, false, false, false), 1));
+		inputDictionary.constructDictionary();
+	}
 	
 	public void setStartColumns(List<GridColumn> startColumns) {
 		this.startColumns = startColumns;
@@ -104,6 +119,28 @@ public final class Grid {
 		}
 	}
 	
+	public InputAction applyInputAction(InputType inputType, Point mousePos, double value) {
+		return inputDictionary.applyInput(inputType, mousePos, value);
+	}
+	
+	public MouseHoverFeedback applyMouseHover(Point mousePos) {
+		GridElement gridElement = getElementToResize(mousePos);
+		
+		if (gridElement == null) {
+			return null;
+		}
+		
+		if (gridElement instanceof GridColumn) {
+			return new MouseHoverFeedback(new Cursor(Cursor.E_RESIZE_CURSOR));
+		}
+		
+		if (gridElement instanceof GridRow) {
+			return new MouseHoverFeedback(new Cursor(Cursor.S_RESIZE_CURSOR));
+		}
+		
+		return null;
+	}
+	
 	private void adjustColumns() {
 		int startColumnXPos = params.outerBorderWidth;
 		int endColumnXPos = width - params.outerBorderWidth;
@@ -117,6 +154,7 @@ public final class Grid {
 		for (GridColumn gridColumn : startColumns) {
 			gridColumn.setSlot(GridSlot.start);
 			gridColumn.setInterBorderSize(params.interBorderWidth);
+			gridColumn.setResizeRange(params.resizeXRange);
 			gridColumn.setPos(startColumnXPos);
 			startColumnXPos += gridColumn.getSize() + gridColumn.getInterBorderSize();
 		}
@@ -124,6 +162,7 @@ public final class Grid {
 		for (GridColumn gridColumn : endColumns) {
 			gridColumn.setSlot(GridSlot.end);
 			gridColumn.setInterBorderSize(params.interBorderWidth);
+			gridColumn.setResizeRange(params.resizeXRange);
 			endColumnXPos -= gridColumn.getSize() + gridColumn.getInterBorderSize();
 			gridColumn.setPos(endColumnXPos);
 		}
@@ -148,6 +187,7 @@ public final class Grid {
 		for (GridRow gridRow : startRows) {
 			gridRow.setSlot(GridSlot.start);
 			gridRow.setInterBorderSize(params.interBorderHeight);
+			gridRow.setResizeRange(params.resizeYRange);
 			gridRow.setPos(startRowYPos);
 			startRowYPos += gridRow.getSize() + gridRow.getInterBorderSize();
 		}
@@ -155,6 +195,7 @@ public final class Grid {
 		for (GridRow gridRow : endRows) {
 			gridRow.setSlot(GridSlot.end);
 			gridRow.setInterBorderSize(params.interBorderHeight);
+			gridRow.setResizeRange(params.resizeYRange);
 			endRowYPos -= gridRow.getSize() + gridRow.getInterBorderSize();
 			gridRow.setPos(endRowYPos);
 		}
@@ -167,6 +208,10 @@ public final class Grid {
 	}
 	
 	private GridElement getElementToResize(Point pointerCoords) {
+		if (pointerCoords == null) {
+			return null;
+		}
+		
 		GridElementToResize currentBest = new GridElementToResize(pointerCoords, null, Integer.MAX_VALUE);
 		for (GridColumn gridElement : startColumns) {
 			currentBest.setIfBetter(gridElement);
