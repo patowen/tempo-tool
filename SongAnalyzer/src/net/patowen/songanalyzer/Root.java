@@ -35,11 +35,9 @@ import net.patowen.songanalyzer.userinput.InputMapping;
 import net.patowen.songanalyzer.userinput.InputType;
 import net.patowen.songanalyzer.userinput.InputTypeKeyboard;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
-import net.patowen.songanalyzer.view.DimHeightControlled;
-import net.patowen.songanalyzer.view.DimWidthControlled;
 import net.patowen.songanalyzer.view.View;
 
-public class Root extends View implements DimWidthControlled, DimHeightControlled {
+public class Root extends View {
 	private final RootBundle bundle;
 	
 	private final Config config;

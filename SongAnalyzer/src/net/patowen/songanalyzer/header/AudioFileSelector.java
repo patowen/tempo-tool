@@ -18,11 +18,9 @@ import net.patowen.songanalyzer.userinput.InputMapping;
 import net.patowen.songanalyzer.userinput.InputType;
 import net.patowen.songanalyzer.userinput.InputTypeMouse;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
-import net.patowen.songanalyzer.view.DimHeightControlled;
-import net.patowen.songanalyzer.view.DimWidthFree;
 import net.patowen.songanalyzer.view.View;
 
-public class AudioFileSelector extends View implements DimWidthFree, DimHeightControlled {
+public class AudioFileSelector extends View {
 	private final Config config;
 	private final DialogManager dialogManager;
 	private final AudioPlayer audioPlayer;
@@ -69,11 +67,6 @@ public class AudioFileSelector extends View implements DimWidthFree, DimHeightCo
 	@Override
 	public MouseHoverFeedback applyMouseHover(Point mousePos) {
 		return null;
-	}
-	
-	@Override
-	public int getWidth() {
-		return width;
 	}
 	
 	private class OpenAudio implements InputActionStandard {
