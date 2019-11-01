@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer;
+package net.patowen.songanalyzer.header;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

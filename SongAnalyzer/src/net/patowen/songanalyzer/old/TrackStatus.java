@@ -3,7 +3,7 @@ package net.patowen.songanalyzer.old;
 import javax.swing.JComponent;
 
 import net.patowen.songanalyzer.AudioStream;
-import net.patowen.songanalyzer.TrackBounds;
+import net.patowen.songanalyzer.deck.TrackBounds;
 import net.patowen.songanalyzer.undo.UserActionList;
 
 public class TrackStatus {

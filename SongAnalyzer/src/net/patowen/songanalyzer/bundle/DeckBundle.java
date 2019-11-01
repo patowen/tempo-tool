@@ -4,7 +4,7 @@ import net.patowen.songanalyzer.AnimationController;
 import net.patowen.songanalyzer.AudioPlayer;
 import net.patowen.songanalyzer.Config;
 import net.patowen.songanalyzer.DialogManager;
-import net.patowen.songanalyzer.TrackBounds;
+import net.patowen.songanalyzer.deck.TrackBounds;
 import net.patowen.songanalyzer.undo.UserActionList;
 
 // Stores data relevant to a deck

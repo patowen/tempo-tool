@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer;
+package net.patowen.songanalyzer.deck;
 
 import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;

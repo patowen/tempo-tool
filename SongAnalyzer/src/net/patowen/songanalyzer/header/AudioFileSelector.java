@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer;
+package net.patowen.songanalyzer.header;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -7,6 +7,9 @@ import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.nio.file.Path;
 
+import net.patowen.songanalyzer.AudioPlayer;
+import net.patowen.songanalyzer.Config;
+import net.patowen.songanalyzer.DialogManager;
 import net.patowen.songanalyzer.bundle.RootBundle;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputActionStandard;
