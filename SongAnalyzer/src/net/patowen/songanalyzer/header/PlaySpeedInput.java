@@ -42,10 +42,7 @@ public class PlaySpeedInput extends HeaderView {
 	private void populatePlaySpeeds(int maxNumeratorOrDenominator) {
 		for (int denominator = 1; denominator <= maxNumeratorOrDenominator; denominator++) {
 			for (int numerator = 1; numerator <= maxNumeratorOrDenominator; numerator++) {
-				RationalNumber playSpeedToAdd = new RationalNumber(numerator, denominator);
-				if (!playSpeeds.contains(playSpeedToAdd)) {
-					playSpeeds.add(new RationalNumber(numerator, denominator));
-				}
+				playSpeeds.add(new RationalNumber(numerator, denominator));
 			}
 		}
 	}
