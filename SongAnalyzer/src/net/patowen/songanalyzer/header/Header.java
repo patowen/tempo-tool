@@ -4,12 +4,11 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.patowen.songanalyzer.bundle.RootBundle;
 import net.patowen.songanalyzer.grid.Grid;
-import net.patowen.songanalyzer.grid.GridColumn;
 import net.patowen.songanalyzer.grid.GridRow;
-import net.patowen.songanalyzer.grid.GridSizer;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputType;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
@@ -18,22 +17,15 @@ import net.patowen.songanalyzer.view.View;
 public class Header extends View {
 	private final Grid grid;
 	private final GridRow gridRow;
-	private final GridColumn audioFileSelectorColumn = new GridColumn();
-	
-	private AudioFileSelector audioFileSelector;
+	private final List<HeaderColumn> headerColumns = new ArrayList<>();
 	
 	public Header(RootBundle bundle) {
 		grid = new Grid();
 		gridRow = new GridRow();
 		grid.setCenterRow(gridRow);
 		
-		audioFileSelector = new AudioFileSelector(bundle);
-		audioFileSelector.setSizer(new GridSizer(audioFileSelectorColumn, gridRow));
-		audioFileSelectorColumn.trySetSize(audioFileSelector.getPreferredWidth());
-		
-		ArrayList<GridColumn> columnList = new ArrayList<>();
-		columnList.add(audioFileSelectorColumn);
-		grid.setStartColumns(columnList);
+		headerColumns.add(new HeaderColumn(gridRow, new AudioFileSelector(bundle)));
+		grid.setStartColumns(headerColumns);
 	}
 	
 	public int getPreferredHeight() {
@@ -48,16 +40,30 @@ public class Header extends View {
 		g.setColor(Color.WHITE);
 		grid.renderGridlines(g);
 		
-		audioFileSelector.forwardRender(g);
+		for (HeaderColumn headerColumn : headerColumns) {
+			headerColumn.headerView.forwardRender(g);
+		}
 	}
 
 	@Override
 	public InputAction applyInputAction(InputType inputType, Point mousePos, double value) {
-		return audioFileSelector.forwardInput(inputType, mousePos, value);
+		for (HeaderColumn headerColumn : headerColumns) {
+			InputAction inputAction = headerColumn.headerView.forwardInput(inputType, mousePos, value);
+			if (inputAction != null) {
+				return inputAction;
+			}
+		}
+		return null;
 	}
 
 	@Override
 	public MouseHoverFeedback applyMouseHover(Point mousePos) {
-		return audioFileSelector.applyMouseHover(mousePos);
+		for (HeaderColumn headerColumn : headerColumns) {
+			MouseHoverFeedback mouseHoverFeedback = headerColumn.headerView.applyMouseHover(mousePos);
+			if (mouseHoverFeedback != null) {
+				return mouseHoverFeedback;
+			}
+		}
+		return null;
 	}
 }

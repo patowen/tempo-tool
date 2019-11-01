@@ -43,7 +43,7 @@ public final class Grid {
 		params.outerBorderHeight = 1;
 	}
 	
-	public void setStartColumns(List<GridColumn> startColumns) {
+	public void setStartColumns(List<? extends GridColumn> startColumns) {
 		this.startColumns = startColumns;
 	}
 	
@@ -51,7 +51,7 @@ public final class Grid {
 		this.centerColumn = centerColumn;
 	}
 	
-	public void setEndColumns(List<GridColumn> endColumns) {
+	public void setEndColumns(List<? extends GridColumn> endColumns) {
 		this.endColumns = endColumns;
 	}
 	
@@ -67,7 +67,7 @@ public final class Grid {
 		this.centerRow = centerRow;
 	}
 	
-	public void setEndRows(List<GridRow> endRows) {
+	public void setEndRows(List<? extends GridRow> endRows) {
 		this.endRows = endRows;
 	}
 	

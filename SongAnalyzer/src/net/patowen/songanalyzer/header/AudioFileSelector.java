@@ -18,9 +18,8 @@ import net.patowen.songanalyzer.userinput.InputMapping;
 import net.patowen.songanalyzer.userinput.InputType;
 import net.patowen.songanalyzer.userinput.InputTypeMouse;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
-import net.patowen.songanalyzer.view.View;
 
-public class AudioFileSelector extends View {
+public class AudioFileSelector extends HeaderView {
 	private final Config config;
 	private final DialogManager dialogManager;
 	private final AudioPlayer audioPlayer;
@@ -37,6 +36,7 @@ public class AudioFileSelector extends View {
 		inputDictionary.constructDictionary();
 	}
 	
+	@Override
 	public int getPreferredWidth() {
 		return 200;
 	}
