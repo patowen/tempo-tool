@@ -1,28 +1,51 @@
 package net.patowen.songanalyzer;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.util.ArrayList;
 
 import net.patowen.songanalyzer.bundle.RootBundle;
+import net.patowen.songanalyzer.grid.Grid;
+import net.patowen.songanalyzer.grid.GridColumn;
+import net.patowen.songanalyzer.grid.GridRow;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputType;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
-import net.patowen.songanalyzer.view.DimHeightFree;
-import net.patowen.songanalyzer.view.DimWidthControlled;
 import net.patowen.songanalyzer.view.View;
 
-public class Header extends View implements DimWidthControlled, DimHeightFree {
+public class Header extends View {
+	private final Grid grid;
+	private final GridRow gridRow;
+	private final GridColumn audioFileSelectorColumn = new GridColumn();
+	
 	private AudioFileSelector audioFileSelector;
 	
 	public Header(RootBundle bundle) {
-		height = 32;
+		grid = new Grid();
+		gridRow = new GridRow();
+		grid.setCenterRow(gridRow);
 		
 		audioFileSelector = new AudioFileSelector(bundle);
-		audioFileSelector.setHeight(height);
+		audioFileSelectorColumn.setSize(audioFileSelector.getPreferredWidth());
+		
+		ArrayList<GridColumn> columnList = new ArrayList<>();
+		columnList.add(audioFileSelectorColumn);
+		grid.setStartColumns(columnList);
 	}
 
 	@Override
 	public void render(Graphics2D g) {
+		grid.setWidth(width);
+		grid.setHeight(height);
+		
+		g.setColor(Color.WHITE);
+		grid.renderGridlines(g);
+		
+		audioFileSelector.setXPos(audioFileSelectorColumn.getPos());
+		audioFileSelector.setYPos(gridRow.getPos());
+		audioFileSelector.setWidth(audioFileSelectorColumn.getSize());
+		audioFileSelector.setHeight(gridRow.getSize());
 		audioFileSelector.forwardRender(g);
 	}
 
@@ -34,10 +57,5 @@ public class Header extends View implements DimWidthControlled, DimHeightFree {
 	@Override
 	public MouseHoverFeedback applyMouseHover(Point mousePos) {
 		return audioFileSelector.applyMouseHover(mousePos);
-	}
-
-	@Override
-	public int getHeight() {
-		return height;
 	}
 }

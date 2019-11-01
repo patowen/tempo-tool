@@ -1,10 +1,10 @@
 package net.patowen.songanalyzer.grid;
 
 public class GridParams {
-	public final int outerBorderWidth = 1;
-	public final int outerBorderHeight = 1;
-	public final int interBorderWidth = 1;
-	public final int interBorderHeight = 1;
-	public final int resizeXRange = 5;
-	public final int resizeYRange = 5;
+	public int outerBorderWidth = 0;
+	public int outerBorderHeight = 0;
+	public int interBorderWidth = 1;
+	public int interBorderHeight = 1;
+	public int resizeXRange = 5;
+	public int resizeYRange = 5;
 }

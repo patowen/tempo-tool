@@ -15,12 +15,16 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 
 import net.patowen.songanalyzer.DialogManager.DialogKind;
 import net.patowen.songanalyzer.bundle.RootBundle;
 import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.data.Obj;
+import net.patowen.songanalyzer.grid.Grid;
+import net.patowen.songanalyzer.grid.GridColumn;
+import net.patowen.songanalyzer.grid.GridRow;
 import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputActionStandard;
@@ -41,9 +45,14 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 	private final DialogManager dialogManager;
 	private final AnimationController animationController;
 	private final AudioPlayer audioPlayer;
-	
-	private Deck deck;
+
 	private Header header;
+	private Deck deck;
+	
+	private final Grid grid = new Grid();
+	private final GridRow headerRow = new GridRow();
+	private final GridRow deckRow = new GridRow();
+	private final GridColumn gridColumn = new GridColumn();
 	
 	private Path currentFile;
 	
@@ -64,6 +73,12 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		
 		deck = new Deck(bundle);
 		header = new Header(bundle);
+		
+		grid.setAsOuterGrid();
+		grid.setStartRows(Collections.singletonList(headerRow));
+		grid.setCenterRow(deckRow);
+		grid.setCenterColumn(gridColumn);
+		headerRow.setSize(32);
 		
 		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new Undo(), new InputTypeKeyboard(KeyEvent.VK_Z, true, false, false), 1));
@@ -102,10 +117,20 @@ public class Root extends View implements DimWidthControlled, DimHeightControlle
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
 		
-		deck.setWidth(width);
-		deck.setHeight(height - header.getHeight());
+		grid.setWidth(width);
+		grid.setHeight(height);
+		g.setColor(Color.WHITE);
+		grid.renderGridlines(g);
 		
-		deck.setYPos(header.getHeight());
+		header.setWidth(gridColumn.getSize());
+		header.setHeight(headerRow.getSize());
+		header.setXPos(gridColumn.getPos());
+		header.setYPos(headerRow.getPos());
+		
+		deck.setWidth(gridColumn.getSize());
+		deck.setHeight(deckRow.getSize());
+		deck.setXPos(gridColumn.getPos());
+		deck.setYPos(deckRow.getPos());
 		
 		header.forwardRender(g);
 		deck.forwardRender(g);

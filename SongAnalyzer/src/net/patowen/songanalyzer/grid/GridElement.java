@@ -5,7 +5,7 @@ import java.awt.Point;
 public abstract class GridElement {
 	private int pos;
 	private int size;
-	private boolean resizable = true;
+	private boolean resizable = false;
 	private GridSlot slot;
 	private int interBorderSize;
 	private int resizeRange;

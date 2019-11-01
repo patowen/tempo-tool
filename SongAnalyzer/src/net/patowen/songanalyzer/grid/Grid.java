@@ -38,6 +38,11 @@ public final class Grid {
 		inputDictionary.constructDictionary();
 	}
 	
+	public void setAsOuterGrid() {
+		params.outerBorderWidth = 1;
+		params.outerBorderHeight = 1;
+	}
+	
 	public void setStartColumns(List<GridColumn> startColumns) {
 		this.startColumns = startColumns;
 	}

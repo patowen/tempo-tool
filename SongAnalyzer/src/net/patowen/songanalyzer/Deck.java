@@ -201,6 +201,7 @@ public class Deck extends View implements DimWidthControlled, DimHeightControlle
 			}
 			
 			setSize(mack.getDefaultHeight());
+			setResizable(true);
 		}
 	}
 }

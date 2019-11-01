@@ -27,8 +27,6 @@ public class AudioFileSelector extends View implements DimWidthFree, DimHeightCo
 	private InputDictionary inputDictionary;
 	
 	public AudioFileSelector(RootBundle bundle) {
-		width = 200;
-		
 		config = bundle.config;
 		dialogManager = bundle.dialogManager;
 		audioPlayer = bundle.audioPlayer;
@@ -38,13 +36,16 @@ public class AudioFileSelector extends View implements DimWidthFree, DimHeightCo
 		inputDictionary.constructDictionary();
 	}
 	
+	public int getPreferredWidth() {
+		return 200;
+	}
+	
 	@Override
 	public void render(Graphics2D g) {
 		Shape prevClip = g.getClip();
 		g.clipRect(0, 0, width, height);
 		
 		g.setColor(Color.WHITE);
-		g.drawRect(0, 0, width-1, height-1);
 		Path audioFile = audioPlayer.getAudioFile();
 		String text;
 		if (audioFile == null) {
