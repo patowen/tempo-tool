@@ -42,10 +42,9 @@ public class PlaySpeedInput extends HeaderView {
 	private void populatePlaySpeeds(int maxNumeratorOrDenominator) {
 		for (int denominator = 1; denominator <= maxNumeratorOrDenominator; denominator++) {
 			for (int numerator = 1; numerator <= maxNumeratorOrDenominator; numerator++) {
-				if (numerator % denominator != 0 || denominator == 1) {
+				RationalNumber playSpeedToAdd = new RationalNumber(numerator, denominator);
+				if (!playSpeeds.contains(playSpeedToAdd)) {
 					playSpeeds.add(new RationalNumber(numerator, denominator));
-				} else {
-					System.out.println(numerator + "/" + denominator + ": " + (numerator % denominator));
 				}
 			}
 		}
@@ -108,6 +107,16 @@ public class PlaySpeedInput extends HeaderView {
 		@Override
 		public int compareTo(RationalNumber other) {
 			return Integer.compare(this.numerator * other.denominator, other.numerator * this.denominator);
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (!(o instanceof RationalNumber)) {
+				return false;
+			}
+			RationalNumber other = (RationalNumber) o;
+			
+			return this.compareTo(other) == 0;
 		}
 	}
 	
