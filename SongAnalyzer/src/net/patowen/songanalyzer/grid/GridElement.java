@@ -5,6 +5,7 @@ import java.awt.Point;
 public abstract class GridElement {
 	private int pos;
 	private int size;
+	private int minimumSize = 0;
 	private boolean resizable = false;
 	private GridSlot slot;
 	private int interBorderSize;
@@ -18,12 +19,19 @@ public abstract class GridElement {
 		return pos;
 	}
 	
-	public void setSize(int size) {
+	public void trySetSize(int size) {
 		this.size = size;
+		if (this.size < minimumSize) {
+			this.size = minimumSize;
+		}
 	}
 	
 	public int getSize() {
 		return size;
+	}
+	
+	public void setMinimumSize(int minimumSize) {
+		this.minimumSize = minimumSize;
 	}
 	
 	public void setResizable(boolean resizable) {

@@ -29,7 +29,7 @@ public class Header extends View {
 		
 		audioFileSelector = new AudioFileSelector(bundle);
 		audioFileSelector.setSizer(new GridSizer(audioFileSelectorColumn, gridRow));
-		audioFileSelectorColumn.setSize(audioFileSelector.getPreferredWidth());
+		audioFileSelectorColumn.trySetSize(audioFileSelector.getPreferredWidth());
 		
 		ArrayList<GridColumn> columnList = new ArrayList<>();
 		columnList.add(audioFileSelectorColumn);

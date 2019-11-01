@@ -42,7 +42,7 @@ public class Deck extends View {
 	public Deck(RootBundle rootBundle) {
 		bundle = new DeckBundle(rootBundle);
 		
-		tabColumn.setSize(8);
+		tabColumn.trySetSize(8);
 		
 		grid.setStartColumns(Collections.singletonList(tabColumn));
 		grid.setCenterColumn(trackColumn);
@@ -138,7 +138,7 @@ public class Deck extends View {
 			Dict mackDict = obj.asDict();
 			try {
 				DeckRow deckRow = new DeckRow(trackColumn, mackDict.get(MackKeys.type).asInt(), bundle);
-				deckRow.setSize(mackDict.get(MackKeys.height).asInt());
+				deckRow.trySetSize(mackDict.get(MackKeys.height).asInt());
 				deckRow.mack.load(mackDict);
 				deckRows.add(deckRow);
 			} catch (IllegalMackTypeException e) {
@@ -191,7 +191,8 @@ public class Deck extends View {
 			}
 			
 			mack.setSizer(new GridSizer(trackColumn, this));
-			setSize(mack.getDefaultHeight());
+			trySetSize(mack.getDefaultHeight());
+			setMinimumSize(mack.getMinimumHeight());
 			setResizable(true);
 		}
 	}

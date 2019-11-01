@@ -146,6 +146,7 @@ public final class Grid {
 		return null;
 	}
 	
+	// TODO: Adjust grid element positions if preferred center or spanning row/column size cannot be satisfied
 	private void adjustColumns() {
 		int startColumnXPos = params.outerBorderWidth;
 		int endColumnXPos = width - params.outerBorderWidth;
@@ -153,7 +154,7 @@ public final class Grid {
 		if (spanningColumn != null) {
 			spanningColumn.setSlot(GridSlot.spanning);
 			spanningColumn.setPos(startColumnXPos);
-			spanningColumn.setSize(endColumnXPos - startColumnXPos);
+			spanningColumn.trySetSize(endColumnXPos - startColumnXPos);
 		}
 		
 		for (GridColumn gridColumn : startColumns) {
@@ -175,7 +176,7 @@ public final class Grid {
 		if (centerColumn != null) {
 			centerColumn.setSlot(GridSlot.center);
 			centerColumn.setPos(startColumnXPos);
-			centerColumn.setSize(endColumnXPos - startColumnXPos);
+			centerColumn.trySetSize(endColumnXPos - startColumnXPos);
 		}
 	}
 	
@@ -186,7 +187,7 @@ public final class Grid {
 		if (spanningRow != null) {
 			spanningRow.setSlot(GridSlot.spanning);
 			spanningRow.setPos(startRowYPos);
-			spanningRow.setSize(endRowYPos - startRowYPos);
+			spanningRow.trySetSize(endRowYPos - startRowYPos);
 		}
 		
 		for (GridRow gridRow : startRows) {
@@ -208,7 +209,7 @@ public final class Grid {
 		if (centerRow != null) {
 			centerRow.setSlot(GridSlot.center);
 			centerRow.setPos(startRowYPos);
-			centerRow.setSize(endRowYPos - startRowYPos);
+			centerRow.trySetSize(endRowYPos - startRowYPos);
 		}
 	}
 	
@@ -273,12 +274,12 @@ public final class Grid {
 		
 		@Override
 		public void onDrag(Point startRelative) {
-			gridElement.setSize(initialHeight + gridElement.getPointerPos(startRelative));
+			gridElement.trySetSize(initialHeight + gridElement.getPointerPos(startRelative));
 		}
 		
 		@Override
 		public void onCancel() {
-			gridElement.setSize(initialHeight);
+			gridElement.trySetSize(initialHeight);
 		}
 		
 		@Override
