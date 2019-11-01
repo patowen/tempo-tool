@@ -3,45 +3,56 @@ package net.patowen.songanalyzer.grid;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.Collections;
+import java.util.List;
 
 import net.patowen.songanalyzer.userinput.InputActionDrag;
 
-public class Grid {
+public final class Grid {
 	private int width;
 	private int height;
 	
 	private GridParams params = new GridParams();
 	
-	public Iterable<GridColumn> getStartColumns() {
-		return Collections.emptyList();
+	private List<? extends GridColumn> startColumns = Collections.emptyList();
+	private GridColumn centerColumn = null;
+	private List<? extends GridColumn> endColumns = Collections.emptyList();
+	private GridColumn spanningColumn = null;
+	
+	private List<? extends GridRow> startRows = Collections.emptyList();
+	private GridRow centerRow = null;
+	private List<? extends GridRow> endRows = Collections.emptyList();
+	private GridRow spanningRow = null;
+	
+	public void setStartColumns(List<GridColumn> startColumns) {
+		this.startColumns = startColumns;
 	}
 	
-	public GridColumn getCenterColumn() {
-		return null;
+	public void setCenterColumn(GridColumn centerColumn) {
+		this.centerColumn = centerColumn;
 	}
 	
-	public Iterable<GridColumn> getEndColumns() {
-		return Collections.emptyList();
+	public void setEndColumns(List<GridColumn> endColumns) {
+		this.endColumns = endColumns;
 	}
 	
-	public GridColumn getSpanningColumn() {
-		return null;
+	public void setSpanningColumn(GridColumn spanningColumn) {
+		this.spanningColumn = spanningColumn;
 	}
 	
-	public Iterable<GridRow> getStartRows() {
-		return Collections.emptyList();
+	public void setStartRows(List<? extends GridRow> startRows) {
+		this.startRows = startRows;
 	}
 	
-	public GridRow getCenterRow() {
-		return null;
+	public void setCenterRow(GridRow centerRow) {
+		this.centerRow = centerRow;
 	}
 	
-	public Iterable<GridRow> getEndRows() {
-		return Collections.emptyList();
+	public void setEndRows(List<GridRow> endRows) {
+		this.endRows = endRows;
 	}
 	
-	public GridRow getSpanningRow() {
-		return null;
+	public void setSpanningRow(GridRow spanningRow) {
+		this.spanningRow = spanningRow;
 	}
 	
 	public final void setWidth(int width) {
@@ -69,24 +80,24 @@ public class Grid {
 		}
 		
 		if (params.interBorderWidth > 0) {
-			for (GridColumn gridColumn : getStartColumns()) {
+			for (GridColumn gridColumn : startColumns) {
 				int x = gridColumn.getPos() + gridColumn.getSize();
 				g.drawLine(x, 0, x, height-1);
 			}
 			
-			for (GridColumn gridColumn : getEndColumns()) {
+			for (GridColumn gridColumn : endColumns) {
 				int x = gridColumn.getPos() - 1;
 				g.drawLine(x, 0, x, height-1);
 			}
 		}
 		
 		if (params.interBorderHeight > 0) {
-			for (GridRow gridRow : getStartRows()) {
+			for (GridRow gridRow : startRows) {
 				int y = gridRow.getPos() + gridRow.getSize();
 				g.drawLine(0, y, width-1, y);
 			}
 			
-			for (GridRow gridRow : getEndRows()) {
+			for (GridRow gridRow : endRows) {
 				int y = gridRow.getPos() - 1;
 				g.drawLine(0, y, width-1, y);
 			}
@@ -97,28 +108,26 @@ public class Grid {
 		int startColumnXPos = params.outerBorderWidth;
 		int endColumnXPos = width - params.outerBorderWidth;
 		
-		GridColumn spanningColumn = getSpanningColumn();
 		if (spanningColumn != null) {
 			spanningColumn.setSlot(GridSlot.spanning);
 			spanningColumn.setPos(startColumnXPos);
 			spanningColumn.setSize(endColumnXPos - startColumnXPos);
 		}
 		
-		for (GridColumn gridColumn : getStartColumns()) {
+		for (GridColumn gridColumn : startColumns) {
 			gridColumn.setSlot(GridSlot.start);
 			gridColumn.setInterBorderSize(params.interBorderWidth);
 			gridColumn.setPos(startColumnXPos);
 			startColumnXPos += gridColumn.getSize() + gridColumn.getInterBorderSize();
 		}
 		
-		for (GridColumn gridColumn : getEndColumns()) {
+		for (GridColumn gridColumn : endColumns) {
 			gridColumn.setSlot(GridSlot.end);
 			gridColumn.setInterBorderSize(params.interBorderWidth);
 			endColumnXPos -= gridColumn.getSize() + gridColumn.getInterBorderSize();
 			gridColumn.setPos(endColumnXPos);
 		}
 		
-		GridColumn centerColumn = getCenterColumn();
 		if (centerColumn != null) {
 			centerColumn.setSlot(GridSlot.center);
 			centerColumn.setPos(startColumnXPos);
@@ -130,28 +139,26 @@ public class Grid {
 		int startRowYPos = params.outerBorderHeight;
 		int endRowYPos = height - params.outerBorderHeight;
 		
-		GridRow spanningRow = getSpanningRow();
 		if (spanningRow != null) {
 			spanningRow.setSlot(GridSlot.spanning);
 			spanningRow.setPos(startRowYPos);
 			spanningRow.setSize(endRowYPos - startRowYPos);
 		}
 		
-		for (GridRow gridRow : getStartRows()) {
+		for (GridRow gridRow : startRows) {
 			gridRow.setSlot(GridSlot.start);
 			gridRow.setInterBorderSize(params.interBorderHeight);
 			gridRow.setPos(startRowYPos);
 			startRowYPos += gridRow.getSize() + gridRow.getInterBorderSize();
 		}
 		
-		for (GridRow gridRow : getEndRows()) {
+		for (GridRow gridRow : endRows) {
 			gridRow.setSlot(GridSlot.end);
 			gridRow.setInterBorderSize(params.interBorderHeight);
 			endRowYPos -= gridRow.getSize() + gridRow.getInterBorderSize();
 			gridRow.setPos(endRowYPos);
 		}
 		
-		GridRow centerRow = getCenterRow();
 		if (centerRow != null) {
 			centerRow.setSlot(GridSlot.center);
 			centerRow.setPos(startRowYPos);
@@ -161,16 +168,16 @@ public class Grid {
 	
 	private GridElement getElementToResize(Point pointerCoords) {
 		GridElementToResize currentBest = new GridElementToResize(pointerCoords, null, Integer.MAX_VALUE);
-		for (GridColumn gridElement : getStartColumns()) {
+		for (GridColumn gridElement : startColumns) {
 			currentBest.setIfBetter(gridElement);
 		}
-		for (GridColumn gridElement : getEndColumns()) {
+		for (GridColumn gridElement : endColumns) {
 			currentBest.setIfBetter(gridElement);
 		}
-		for (GridRow gridElement : getStartRows()) {
+		for (GridRow gridElement : startRows) {
 			currentBest.setIfBetter(gridElement);
 		}
-		for (GridRow gridElement : getEndRows()) {
+		for (GridRow gridElement : endRows) {
 			currentBest.setIfBetter(gridElement);
 		}
 		return currentBest.gridElement;
