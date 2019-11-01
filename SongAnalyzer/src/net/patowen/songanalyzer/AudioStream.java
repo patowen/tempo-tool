@@ -73,6 +73,10 @@ public class AudioStream {
 				currentSubsample -= 1;
 				currentSample ++;
 			}
+			while (currentSubsample < 0) {
+				currentSubsample += 1;
+				currentSample --;
+			}
 			currentTickSample ++;
 		}
 		
