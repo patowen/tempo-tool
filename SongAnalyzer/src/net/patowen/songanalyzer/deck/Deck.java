@@ -17,6 +17,7 @@ import net.patowen.songanalyzer.exception.IllegalMackTypeException;
 import net.patowen.songanalyzer.grid.Grid;
 import net.patowen.songanalyzer.grid.GridColumn;
 import net.patowen.songanalyzer.grid.GridRow;
+import net.patowen.songanalyzer.grid.GridSizer;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputActionStandard;
 import net.patowen.songanalyzer.userinput.InputDictionary;
@@ -52,21 +53,11 @@ public class Deck extends View {
 		fallbackInputDictionary.constructDictionary();
 	}
 	
-	private void setSuperMackPositions() {
+	@Override
+	public void render(Graphics2D g) {
 		grid.setWidth(width);
 		grid.setHeight(height);
 		
-		for (DeckRow deckRow : deckRows) {
-			deckRow.mack.setXPos(trackColumn.getPos());
-			deckRow.mack.setYPos(deckRow.getPos());
-			deckRow.mack.setWidth(trackColumn.getSize());
-			deckRow.mack.setHeight(deckRow.getSize());
-		}
-	}
-	
-	@Override
-	public void render(Graphics2D g) {
-		setSuperMackPositions();
 		bundle.trackBounds.setWidth(trackColumn.getSize());
 		
 		g.setColor(Color.WHITE);
@@ -111,8 +102,8 @@ public class Deck extends View {
 		deckRows.clear();
 		bundle.trackBounds.setBounds(0, 60);
 		
-		deckRows.add(new DeckRow(MackSeek.type, bundle));
-		deckRows.add(new DeckRow(MackMarker.type, bundle));
+		deckRows.add(new DeckRow(trackColumn, MackSeek.type, bundle));
+		deckRows.add(new DeckRow(trackColumn, MackMarker.type, bundle));
 	}
 	
 	private interface Keys {
@@ -146,7 +137,7 @@ public class Deck extends View {
 		for (Obj obj : arr.get()) {
 			Dict mackDict = obj.asDict();
 			try {
-				DeckRow deckRow = new DeckRow(mackDict.get(MackKeys.type).asInt(), bundle);
+				DeckRow deckRow = new DeckRow(trackColumn, mackDict.get(MackKeys.type).asInt(), bundle);
 				deckRow.setSize(mackDict.get(MackKeys.height).asInt());
 				deckRow.mack.load(mackDict);
 				deckRows.add(deckRow);
@@ -187,7 +178,7 @@ public class Deck extends View {
 	private static class DeckRow extends GridRow {
 		final Mack mack;
 		
-		DeckRow(int type, DeckBundle bundle) {
+		DeckRow(GridColumn trackColumn, int type, DeckBundle bundle) {
 			switch (type) {
 			case MackSeek.type:
 				mack = new MackSeek(bundle);
@@ -199,6 +190,7 @@ public class Deck extends View {
 				throw new IllegalMackTypeException(type);
 			}
 			
+			mack.setSizer(new GridSizer(trackColumn, this));
 			setSize(mack.getDefaultHeight());
 			setResizable(true);
 		}

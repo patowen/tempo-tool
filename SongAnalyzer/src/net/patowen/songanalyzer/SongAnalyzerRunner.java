@@ -17,6 +17,7 @@ public class SongAnalyzerRunner {
 	private JFrame frame;
 	private JPanel panel;
 	private Root root;
+	private RootSizer rootSizer = new RootSizer();
 	
 	@SuppressWarnings("serial")
 	public SongAnalyzerRunner() {
@@ -33,7 +34,7 @@ public class SongAnalyzerRunner {
 		panel = new JPanel() {
 			@Override
 			public void paint(Graphics g) {
-				root.render((Graphics2D) g);
+				root.forwardRender((Graphics2D) g);
 			}
 		};
 		panel.setPreferredSize(new Dimension(800, 600));
@@ -42,12 +43,12 @@ public class SongAnalyzerRunner {
 		panel.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
-				root.setWidth(e.getComponent().getWidth());
-				root.setHeight(e.getComponent().getHeight());
+				rootSizer.setSize(e.getComponent().getWidth(), e.getComponent().getHeight());
 			}
 		});
 		
 		root = new Root(panel);
+		root.setSizer(rootSizer);
 		
 		new InputController(panel, root);
 		

@@ -26,6 +26,7 @@ import net.patowen.songanalyzer.deck.Deck;
 import net.patowen.songanalyzer.grid.Grid;
 import net.patowen.songanalyzer.grid.GridColumn;
 import net.patowen.songanalyzer.grid.GridRow;
+import net.patowen.songanalyzer.grid.GridSizer;
 import net.patowen.songanalyzer.header.Header;
 import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
@@ -70,9 +71,12 @@ public class Root extends View {
 		if (!this.config.loadConfig()) {
 			System.err.println("Loading the configuration file failed");
 		}
-		
-		deck = new Deck(bundle);
+
 		header = new Header(bundle);
+		deck = new Deck(bundle);
+		
+		header.setSizer(new GridSizer(gridColumn, headerRow));
+		deck.setSizer(new GridSizer(gridColumn, deckRow));
 		
 		grid.setAsOuterGrid();
 		grid.setStartRows(Collections.singletonList(headerRow));
@@ -121,16 +125,6 @@ public class Root extends View {
 		grid.setHeight(height);
 		g.setColor(Color.WHITE);
 		grid.renderGridlines(g);
-		
-		header.setWidth(gridColumn.getSize());
-		header.setHeight(headerRow.getSize());
-		header.setXPos(gridColumn.getPos());
-		header.setYPos(headerRow.getPos());
-		
-		deck.setWidth(gridColumn.getSize());
-		deck.setHeight(deckRow.getSize());
-		deck.setXPos(gridColumn.getPos());
-		deck.setYPos(deckRow.getPos());
 		
 		header.forwardRender(g);
 		deck.forwardRender(g);

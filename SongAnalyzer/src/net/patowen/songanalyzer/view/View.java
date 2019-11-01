@@ -9,6 +9,8 @@ import net.patowen.songanalyzer.userinput.InputType;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
 
 public abstract class View {
+	private Sizer sizer;
+	
 	protected int width, height;
 	private int xPos, yPos;
 	
@@ -18,23 +20,16 @@ public abstract class View {
 	
 	public abstract MouseHoverFeedback applyMouseHover(Point mousePos);
 	
-	public void setXPos(int xPos) {
-		this.xPos = xPos;
-	}
-	
-	public void setYPos(int yPos) {
-		this.yPos = yPos;
-	}
-	
-	public final void setWidth(int width) {
-		this.width = width;
-	}
-	
-	public final void setHeight(int height) {
-		this.height = height;
+	public final void setSizer(Sizer sizer) {
+		this.sizer = sizer;
 	}
 	
 	public void forwardRender(Graphics2D g) {
+		xPos = sizer.getXPos();
+		yPos = sizer.getYPos();
+		width = sizer.getWidth();
+		height = sizer.getHeight();
+		
 		AffineTransform transform = g.getTransform();
 		g.translate(xPos, yPos);
 		render(g);

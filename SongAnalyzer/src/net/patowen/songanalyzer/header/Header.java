@@ -9,6 +9,7 @@ import net.patowen.songanalyzer.bundle.RootBundle;
 import net.patowen.songanalyzer.grid.Grid;
 import net.patowen.songanalyzer.grid.GridColumn;
 import net.patowen.songanalyzer.grid.GridRow;
+import net.patowen.songanalyzer.grid.GridSizer;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputType;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
@@ -27,6 +28,7 @@ public class Header extends View {
 		grid.setCenterRow(gridRow);
 		
 		audioFileSelector = new AudioFileSelector(bundle);
+		audioFileSelector.setSizer(new GridSizer(audioFileSelectorColumn, gridRow));
 		audioFileSelectorColumn.setSize(audioFileSelector.getPreferredWidth());
 		
 		ArrayList<GridColumn> columnList = new ArrayList<>();
@@ -46,10 +48,6 @@ public class Header extends View {
 		g.setColor(Color.WHITE);
 		grid.renderGridlines(g);
 		
-		audioFileSelector.setXPos(audioFileSelectorColumn.getPos());
-		audioFileSelector.setYPos(gridRow.getPos());
-		audioFileSelector.setWidth(audioFileSelectorColumn.getSize());
-		audioFileSelector.setHeight(gridRow.getSize());
 		audioFileSelector.forwardRender(g);
 	}
 
