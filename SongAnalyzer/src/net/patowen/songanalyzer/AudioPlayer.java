@@ -107,6 +107,10 @@ public class AudioPlayer {
 		return audioStream != null;
 	}
 	
+	public void setSpeed(double speed) {
+		this.speed = speed;
+	}
+	
 	public void chooseAudioFileFromUser(Config config, DialogManager fileDialogManager) {
 		Path path = fileDialogManager.getUserChosenPath(
 				config.getConfigEntryPath(Keys.DEFAULT_SONG_FOLDER),

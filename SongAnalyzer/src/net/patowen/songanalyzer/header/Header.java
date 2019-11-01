@@ -25,6 +25,7 @@ public class Header extends View {
 		grid.setCenterRow(gridRow);
 		
 		headerColumns.add(new HeaderColumn(gridRow, new AudioFileSelector(bundle)));
+		headerColumns.add(new HeaderColumn(gridRow, new PlaySpeedInput(bundle)));
 		grid.setStartColumns(headerColumns);
 	}
 	
