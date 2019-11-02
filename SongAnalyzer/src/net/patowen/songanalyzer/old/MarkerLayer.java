@@ -8,6 +8,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.TreeSet;
 
+import net.patowen.songanalyzer.TickerSource;
+
 public class MarkerLayer extends TrackLayer {
 	private TrackStatus status;
 	private TreeSet<Double> marks;

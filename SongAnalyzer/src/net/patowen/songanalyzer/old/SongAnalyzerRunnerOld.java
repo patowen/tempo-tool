@@ -9,7 +9,7 @@ import net.patowen.songanalyzer.AudioStream;
 
 public class SongAnalyzerRunnerOld {
 	public static void main(String[] args) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
-		AudioStream stream = new AudioStream(new File("C:\\Users\\Patrick\\Desktop\\test.wav"));
+		AudioStream stream = new AudioStream(new File("C:\\Users\\Patrick\\Desktop\\test.wav"), null);
 		System.gc();
 		new TrackView(stream);
 	}

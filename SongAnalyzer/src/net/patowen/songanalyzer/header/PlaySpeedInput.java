@@ -84,7 +84,7 @@ public class PlaySpeedInput extends HeaderView {
 	private static class RationalNumber implements Comparable<RationalNumber> {
 		public int numerator;
 		
-		 // Denominator must be positive, undefined behavior if negative.
+		// Denominator must be positive, undefined behavior if negative.
 		// Zero is treated as positive if we are not restricted to real numbers.
 		public int denominator;
 		

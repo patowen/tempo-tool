@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer.old;
+package net.patowen.songanalyzer;
 
 import java.util.ArrayList;
 

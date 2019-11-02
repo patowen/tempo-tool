@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
 
+import net.patowen.songanalyzer.TickerSource;
 import net.patowen.songanalyzer.bundle.DeckBundle;
 import net.patowen.songanalyzer.data.Arr;
 import net.patowen.songanalyzer.data.Dict;
@@ -41,6 +42,18 @@ public class MackMarker extends Mack {
 		inputDictionary.addInputMapping(new InputMapping(new AddMarkAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new DeleteMarkAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, true, false), 1));
 		inputDictionary.constructDictionary();
+		
+		bundle.ticker.addSource(new TickerSource() {
+			@Override
+			public Double getNextTickInclusive(double pos) {
+				return marks.ceiling(pos);
+			}
+			
+			@Override
+			public Double getNextTickExclusive(double pos) {
+				return marks.higher(pos);
+			}
+		});
 		
 		this.trackBounds = bundle.trackBounds;
 		this.userActionList = bundle.userActionList;

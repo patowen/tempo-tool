@@ -6,6 +6,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import net.patowen.songanalyzer.TickerSource;
+
 public abstract class TrackLayer {
 	private int height;
 	

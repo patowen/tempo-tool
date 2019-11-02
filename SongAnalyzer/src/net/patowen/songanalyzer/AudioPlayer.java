@@ -13,14 +13,16 @@ import net.patowen.songanalyzer.SoundFileLoadingThread.Status;
 public class AudioPlayer {
 	private final AnimationSource playingAnimation;
 	private final AnimationSource bufferingAnimation;
+	private final Ticker ticker;
 	
 	private Path audioFile;
 	private AudioStream audioStream;
 	private double speed;
 	
-	public AudioPlayer(AnimationController animationController) {
+	public AudioPlayer(AnimationController animationController, Ticker ticker) {
 		playingAnimation = animationController.createAnimationSource();
 		bufferingAnimation = animationController.createAnimationSource();
+		this.ticker = ticker;
 		
 		audioStream = null;
 		audioFile = null;
@@ -51,7 +53,7 @@ public class AudioPlayer {
 		
 		this.audioFile = null;
 		
-		audioStream = new AudioStream(audioFile.toFile());
+		audioStream = new AudioStream(audioFile.toFile(), ticker);
 		this.audioFile = audioFile;
 		bufferingAnimation.start();
 	}

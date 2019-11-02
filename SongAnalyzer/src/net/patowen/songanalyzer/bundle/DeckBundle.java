@@ -4,6 +4,7 @@ import net.patowen.songanalyzer.AnimationController;
 import net.patowen.songanalyzer.AudioPlayer;
 import net.patowen.songanalyzer.Config;
 import net.patowen.songanalyzer.DialogManager;
+import net.patowen.songanalyzer.Ticker;
 import net.patowen.songanalyzer.deck.TrackBounds;
 import net.patowen.songanalyzer.undo.UserActionList;
 
@@ -14,6 +15,7 @@ public class DeckBundle {
 	public final UserActionList userActionList;
 	public final DialogManager fileDialogManager;
 	public final AnimationController animationController;
+	public final Ticker ticker;
 	public final AudioPlayer audioPlayer;
 	
 	public final TrackBounds trackBounds;
@@ -23,6 +25,7 @@ public class DeckBundle {
 		userActionList = rootBundle.userActionList;
 		fileDialogManager = rootBundle.dialogManager;
 		animationController = rootBundle.animationController;
+		ticker = rootBundle.ticker;
 		audioPlayer = rootBundle.audioPlayer;
 		
 		trackBounds = new TrackBounds(0, 60);

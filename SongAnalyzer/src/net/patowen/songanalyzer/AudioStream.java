@@ -15,8 +15,6 @@ import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.Timer;
 
-import net.patowen.songanalyzer.old.Ticker;
-
 // Anyone interested in some spaghetti?
 public class AudioStream {
 	private int numChannels; // Usually 2 for stereo
@@ -87,7 +85,7 @@ public class AudioStream {
 		return ((double)currentSample + currentSubsample) / (double)samplingRate;
 	}
 	
-	public AudioStream(File file) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+	public AudioStream(File file, Ticker ticker) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
 		AudioInputStream in = AudioSystem.getAudioInputStream(file);
 		AudioFormat baseFormat = in.getFormat();
 		AudioFormat decodedFormat = new AudioFormat
@@ -128,7 +126,7 @@ public class AudioStream {
 		updateTimer = new Timer(0, audioStreamUpdater);
 		updateTimer.setDelay(100);
 		
-		ticker = new Ticker();
+		this.ticker = ticker;
 		hasCurrentTick = false;
 	}
 	
