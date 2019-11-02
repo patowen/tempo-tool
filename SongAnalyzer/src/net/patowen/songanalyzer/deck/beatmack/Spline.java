@@ -56,7 +56,11 @@ public class Spline {
 		if (i >= 0) {
 			return y[i];
 		}
-		i = -i - 1;
+		i = -i - 2;
+		
+		if (i < 0 || i >= numRegions) {
+			return 0;
+		}
 		
 		double t = (xVal - x[i]) / (x[i+1] - x[i]);
 		double s = 1 - t;
