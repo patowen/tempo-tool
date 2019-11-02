@@ -3,7 +3,6 @@ package net.patowen.songanalyzer.header;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -60,15 +59,10 @@ public class PlaySpeedInput extends HeaderView {
 	
 	@Override
 	public void render(Graphics2D g) {
-		Shape prevClip = g.getClip();
-		g.clipRect(0, 0, width, height);
-		
 		g.setColor(Color.WHITE);
 		String text;
 		text = currentPlaySpeed.numerator + "/" + currentPlaySpeed.denominator;
 		g.drawString(text, 12, height - 12);
-		
-		g.setClip(prevClip);
 	}
 	
 	@Override

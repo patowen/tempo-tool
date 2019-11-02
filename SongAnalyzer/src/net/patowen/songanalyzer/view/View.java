@@ -2,6 +2,7 @@ package net.patowen.songanalyzer.view;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 
 import net.patowen.songanalyzer.userinput.InputAction;
@@ -32,7 +33,12 @@ public abstract class View {
 		
 		AffineTransform transform = g.getTransform();
 		g.translate(xPos, yPos);
+		
+		Shape prevClip = g.getClip();
+		g.clipRect(0, 0, width, height);
 		render(g);
+		g.setClip(prevClip);
+		
 		g.setTransform(transform);
 	}
 	

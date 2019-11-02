@@ -3,7 +3,6 @@ package net.patowen.songanalyzer.deck;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Shape;
 import java.awt.event.MouseEvent;
 
 import net.patowen.songanalyzer.bundle.DeckBundle;
@@ -40,15 +39,10 @@ public class SeekMack extends Mack {
 	@Override
 	public void render(Graphics2D g) {
 		if (bundle.audioPlayer.hasAudioStream()) {
-			Shape prevClip = g.getClip();
-			g.clipRect(0, 0, width, height);
-			
 			g.setColor(new Color(128, 128, 128));
 			int xLeft = bundle.trackBounds.secondsToPixel(0);
 			int xRight = bundle.trackBounds.secondsToPixel(bundle.audioPlayer.getLength());
 			g.fillRect(xLeft, 8, xRight - xLeft + 1, height - 16);
-			
-			g.setClip(prevClip);
 		}
 	}
 	

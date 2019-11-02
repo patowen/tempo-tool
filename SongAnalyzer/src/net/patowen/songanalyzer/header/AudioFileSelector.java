@@ -3,7 +3,6 @@ package net.patowen.songanalyzer.header;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.nio.file.Path;
 
@@ -43,9 +42,6 @@ public class AudioFileSelector extends HeaderView {
 	
 	@Override
 	public void render(Graphics2D g) {
-		Shape prevClip = g.getClip();
-		g.clipRect(0, 0, width, height);
-		
 		g.setColor(Color.WHITE);
 		Path audioFile = audioPlayer.getAudioFile();
 		String text;
@@ -55,8 +51,6 @@ public class AudioFileSelector extends HeaderView {
 			text = audioFile.getFileName().toString();
 		}
 		g.drawString(text, 12, height - 12);
-		
-		g.setClip(prevClip);
 	}
 	
 	@Override
