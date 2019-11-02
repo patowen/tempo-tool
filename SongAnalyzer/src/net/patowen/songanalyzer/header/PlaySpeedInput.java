@@ -134,7 +134,7 @@ public class PlaySpeedInput extends HeaderView {
 		
 		@Override
 		public void onDrag(Point startRelative) {
-			double testAngle = initialAngle - startRelative.y * 0.001;
+			double testAngle = initialAngle + startRelative.x * 0.001;
 			Double floorAngle = angles.floorKey(testAngle);
 			Double ceilingAngle = angles.ceilingKey(testAngle);
 			double newAngle;
