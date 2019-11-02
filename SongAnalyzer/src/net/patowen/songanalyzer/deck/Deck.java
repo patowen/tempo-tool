@@ -13,6 +13,7 @@ import net.patowen.songanalyzer.data.Arr;
 import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.data.Obj;
+import net.patowen.songanalyzer.deck.beatmack.BeatMack;
 import net.patowen.songanalyzer.exception.IllegalMackTypeException;
 import net.patowen.songanalyzer.grid.Grid;
 import net.patowen.songanalyzer.grid.GridColumn;

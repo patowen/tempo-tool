@@ -1,4 +1,4 @@
-package net.patowen.songanalyzer.deck;
+package net.patowen.songanalyzer.deck.beatmack;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -6,6 +6,7 @@ import java.awt.Point;
 import net.patowen.songanalyzer.bundle.DeckBundle;
 import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
+import net.patowen.songanalyzer.deck.Mack;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputType;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
