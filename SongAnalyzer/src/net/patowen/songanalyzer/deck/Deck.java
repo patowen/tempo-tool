@@ -104,6 +104,7 @@ public class Deck extends View {
 		
 		deckRows.add(new DeckRow(trackColumn, SeekMack.type, bundle));
 		deckRows.add(new DeckRow(trackColumn, MarkerMack.type, bundle));
+		deckRows.add(new DeckRow(trackColumn, BeatMack.type, bundle));
 	}
 	
 	private interface Keys {
@@ -185,6 +186,9 @@ public class Deck extends View {
 				break;
 			case MarkerMack.type:
 				mack = new MarkerMack(bundle);
+				break;
+			case BeatMack.type:
+				mack = new BeatMack(bundle);
 				break;
 			default:
 				throw new IllegalMackTypeException(type);
