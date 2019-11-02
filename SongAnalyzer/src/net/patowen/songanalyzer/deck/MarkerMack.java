@@ -25,7 +25,7 @@ import net.patowen.songanalyzer.userinput.InputType;
 import net.patowen.songanalyzer.userinput.InputTypeMouse;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
 
-public class MackMarker extends Mack {
+public class MarkerMack extends Mack {
 	public static final int type = 1;
 	
 	private InputDictionary inputDictionary;
@@ -37,7 +37,7 @@ public class MackMarker extends Mack {
 	
 	private int markSelectionRange = 3;
 	
-	public MackMarker(DeckBundle bundle) {
+	public MarkerMack(DeckBundle bundle) {
 		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new AddMarkAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new DeleteMarkAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, true, false), 1));

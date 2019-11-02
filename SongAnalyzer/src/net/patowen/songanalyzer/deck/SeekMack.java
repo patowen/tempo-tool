@@ -17,14 +17,14 @@ import net.patowen.songanalyzer.userinput.InputType;
 import net.patowen.songanalyzer.userinput.InputTypeMouse;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
 
-public class MackSeek extends Mack {
+public class SeekMack extends Mack {
 	public static final int type = 0;
 	
 	private InputDictionary inputDictionary;
 	
 	private final DeckBundle bundle;
 	
-	public MackSeek(DeckBundle bundle) {
+	public SeekMack(DeckBundle bundle) {
 		this.bundle = bundle;
 		
 		inputDictionary = new InputDictionary();

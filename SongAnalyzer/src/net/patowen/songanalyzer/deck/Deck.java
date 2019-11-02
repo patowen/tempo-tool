@@ -102,8 +102,8 @@ public class Deck extends View {
 		deckRows.clear();
 		bundle.trackBounds.setBounds(0, 60);
 		
-		deckRows.add(new DeckRow(trackColumn, MackSeek.type, bundle));
-		deckRows.add(new DeckRow(trackColumn, MackMarker.type, bundle));
+		deckRows.add(new DeckRow(trackColumn, SeekMack.type, bundle));
+		deckRows.add(new DeckRow(trackColumn, MarkerMack.type, bundle));
 	}
 	
 	private interface Keys {
@@ -180,11 +180,11 @@ public class Deck extends View {
 		
 		DeckRow(GridColumn trackColumn, int type, DeckBundle bundle) {
 			switch (type) {
-			case MackSeek.type:
-				mack = new MackSeek(bundle);
+			case SeekMack.type:
+				mack = new SeekMack(bundle);
 				break;
-			case MackMarker.type:
-				mack = new MackMarker(bundle);
+			case MarkerMack.type:
+				mack = new MarkerMack(bundle);
 				break;
 			default:
 				throw new IllegalMackTypeException(type);
