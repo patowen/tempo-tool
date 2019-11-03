@@ -27,7 +27,7 @@ public class BeatMack extends Mack {
 		spline.x[0] = 1;
 		spline.y[0] = 0;
 		spline.x[1] = 2;
-		spline.y[1] = 0.5;
+		spline.y[1] = 1;
 		spline.x[2] = 5;
 		spline.y[2] = 3;
 		
@@ -44,6 +44,7 @@ public class BeatMack extends Mack {
 	@Override
 	public void render(Graphics2D g) {
 		renderBeats(g);
+		renderKnots(g);
 	}
 	
 	private void renderBeats(Graphics2D g) {
@@ -55,6 +56,14 @@ public class BeatMack extends Mack {
 				g.drawLine(i, 0, i, height-1);
 			}
 			currentPhase = nextPhase;
+		}
+	}
+	
+	private void renderKnots(Graphics2D g) {
+		g.setColor(Color.CYAN);
+		for (int i=0; i<spline.x.length; i++) {
+			int pixelX = trackBounds.secondsToPixel(spline.x[i]);
+			g.drawLine(pixelX, height/2 - 4, pixelX, height/2 + 4);
 		}
 	}
 	

@@ -95,4 +95,16 @@ public class Spline {
 		
 		return (y[i+1] - y[i] + (s - t)*(s*a[i] + t*b[i]) + t*s*(b[i] - a[i])) / (x[i+1] - x[i]);
 	}
+	
+	public Double invEval(double y, double guess) {
+		for (int i=0; i<10; i++) {
+			double newGuess = guess - (eval(guess) - y) / derivative(guess);
+			if (newGuess > guess - 1e-12 && newGuess < guess + 1e-12) {
+				return newGuess;
+			}
+			guess = newGuess;
+		}
+		System.err.println("Newton's method failed to converge in time");
+		return null;
+	}
 }
