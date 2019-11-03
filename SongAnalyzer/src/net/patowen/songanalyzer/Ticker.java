@@ -31,6 +31,7 @@ public class Ticker {
 		nextTick = computeNextTickInclusive(startPos);
 	}
 	
+	// TODO: Remove and replace with a reset whenever ticker sources are adjusted
 	public Double getNextTick(double pos) {
 		if (nextTick != null && pos > nextTick) {
 			nextTick = computeNextTickInclusive(nextTick);
