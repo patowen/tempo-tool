@@ -2,8 +2,7 @@ package net.patowen.songanalyzer.deck.beatmack;
 
 import java.util.Arrays;
 
-// Ostensibly immutable; recreated when knots move
-// Use linear extrapolation at endpoints
+// A new Spline needs to be constructed when the number of knots changes.
 public class Spline {
 	private final int numRegions;
 	
