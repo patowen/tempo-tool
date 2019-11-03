@@ -45,6 +45,12 @@ public class AudioPlayer {
 		}
 	}
 	
+	public void resetTicker() {
+		if (audioStream != null) {
+			audioStream.resetTicker();
+		}
+	}
+	
 	private void setAudioFile(Path audioFile) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
 		if (audioStream != null) {
 			audioStream.destroy();

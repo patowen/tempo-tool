@@ -48,7 +48,7 @@ public class AudioStream {
 		int samplesThisPass = line.available() / bytesPerSample;
 		
 		double currentPos = getCurrentSampleInSeconds();
-		Double nextTickPos = ticker.getNextTick(currentPos);
+		Double nextTickPos = ticker.getNextTick();
 		
 		for (int i=0; i < samplesThisPass; i++) {
 			currentPos = getCurrentSampleInSeconds();
@@ -190,11 +190,15 @@ public class AudioStream {
 		
 		playing = true;
 		playSpeed = speed;
-		ticker.reset(getCurrentSampleInSeconds());
+		resetTicker();
 		initialSample = currentSample;
 		initialFramePosition = line.getFramePosition();
 		line.start();
 		updateTimer.restart();
+	}
+	
+	public void resetTicker() {
+		ticker.reset(getCurrentSampleInSeconds());
 	}
 
 	public void pause() {
@@ -223,9 +227,5 @@ public class AudioStream {
 	
 	public boolean isPlaying() {
 		return playing;
-	}
-	
-	public Ticker getTicker() {
-		return ticker;
 	}
 }

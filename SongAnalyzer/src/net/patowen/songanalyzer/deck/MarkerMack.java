@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
 
+import net.patowen.songanalyzer.AudioPlayer;
 import net.patowen.songanalyzer.TickerSource;
 import net.patowen.songanalyzer.bundle.DeckBundle;
 import net.patowen.songanalyzer.data.Arr;
@@ -31,6 +32,7 @@ public class MarkerMack extends Mack {
 	
 	private final TrackBounds trackBounds;
 	private final UserActionList userActionList;
+	private final AudioPlayer audioPlayer;
 	
 	private TreeSet<Double> marks;
 	
@@ -56,6 +58,7 @@ public class MarkerMack extends Mack {
 		
 		this.trackBounds = bundle.trackBounds;
 		this.userActionList = bundle.userActionList;
+		this.audioPlayer = bundle.audioPlayer;
 		this.marks = new TreeSet<>();
 	}
 	
@@ -151,11 +154,13 @@ public class MarkerMack extends Mack {
 		@Override
 		public void exec() {
 			marks.addAll(addedMarks);
+			audioPlayer.resetTicker();
 		}
 
 		@Override
 		public void undo() {
 			marks.removeAll(addedMarks);
+			audioPlayer.resetTicker();
 		}
 	}
 	
@@ -169,11 +174,13 @@ public class MarkerMack extends Mack {
 		@Override
 		public void exec() {
 			marks.removeAll(deletedMarks);
+			audioPlayer.resetTicker();
 		}
 
 		@Override
 		public void undo() {
 			marks.addAll(deletedMarks);
+			audioPlayer.resetTicker();
 		}
 	}
 	
