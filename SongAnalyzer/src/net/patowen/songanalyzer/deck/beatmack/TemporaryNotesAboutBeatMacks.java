@@ -1,13 +1,4 @@
 package net.patowen.songanalyzer.deck.beatmack;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class PiecewiseBeatFunction implements BeatFunction {
-	private List<Double> domain = new ArrayList<>(); //Size n+1
-	private List<BeatFunction> regions = new ArrayList<>(); //Size n
-}
-
 /*
  * Constant tempo section operations:
  * Shift phase (drag beats together left or right)
