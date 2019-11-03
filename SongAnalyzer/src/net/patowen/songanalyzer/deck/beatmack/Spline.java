@@ -26,8 +26,12 @@ public class Spline {
 		system = new TridiagonalSystem(numRegions + 1);
 	}
 	
-	// Precondition: system of equations is zeroed
 	public void computeSpline() {
+		Arrays.fill(system.a, 0.0);
+		Arrays.fill(system.b, 0.0);
+		Arrays.fill(system.c, 0.0);
+		Arrays.fill(system.d, 0.0);
+		
 		for (int i=0; i<numRegions; i++) {
 			double coeffTerm = 1.0 / (x[i+1] - x[i]);
 			
@@ -51,15 +55,20 @@ public class Spline {
 	}
 	
 	public double eval(double xVal) {
-		// TODO: Extrapolation
 		int i = Arrays.binarySearch(x, xVal);
 		if (i >= 0) {
 			return y[i];
 		}
 		i = -i - 2;
 		
-		if (i < 0 || i >= numRegions) {
-			return 0;
+		if (i == -1) {
+			double t = (xVal - x[i+1]) / (x[i+2] - x[i+1]);
+			return y[i+1] + t * (y[i+2] - y[i+1] + a[i+1]);
+		}
+		
+		if (i == numRegions) {
+			double s = (x[i] - xVal) / (x[i] - x[i-1]);
+			return y[i] - s * (y[i] - y[i-1] - b[i-1]);
 		}
 		
 		double t = (xVal - x[i]) / (x[i+1] - x[i]);
