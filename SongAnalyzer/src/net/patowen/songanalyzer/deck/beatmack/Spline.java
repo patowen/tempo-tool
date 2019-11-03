@@ -76,4 +76,24 @@ public class Spline {
 		
 		return s*y[i] + t*y[i+1] + t*s*(s*a[i] + t*b[i]);
 	}
+	
+	public double derivative(double xVal) {
+		int i = Arrays.binarySearch(x, xVal);
+		if (i < 0) {
+			i = -i - 2;
+		}
+		
+		if (i == -1) {
+			return (y[i+2] - y[i+1] + a[i+1]) / (x[i+2] - x[i+1]);
+		}
+		
+		if (i == numRegions) {
+			return (y[i] - y[i-1] - b[i-1]) / (x[i] - x[i-1]);
+		}
+		
+		double t = (xVal - x[i]) / (x[i+1] - x[i]);
+		double s = 1 - t;
+		
+		return y[i+1] - y[i] + (s - t)*(s*a[i] + t*b[i]) + t*s*(b[i] - a[i]);
+	}
 }
