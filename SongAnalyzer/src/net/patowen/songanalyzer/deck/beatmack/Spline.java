@@ -93,6 +93,6 @@ public class Spline {
 		double t = (xVal - x[i]) / (x[i+1] - x[i]);
 		double s = 1 - t;
 		
-		return y[i+1] - y[i] + (s - t)*(s*a[i] + t*b[i]) + t*s*(b[i] - a[i]);
+		return (y[i+1] - y[i] + (s - t)*(s*a[i] + t*b[i]) + t*s*(b[i] - a[i])) / (x[i+1] - x[i]);
 	}
 }

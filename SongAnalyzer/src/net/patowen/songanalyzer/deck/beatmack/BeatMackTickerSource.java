@@ -26,10 +26,10 @@ public class BeatMackTickerSource implements TickerSource {
 	}
 	
 	public Double getTimeForPhase(double phase, double guess) {
-		for (int i=0; i<10; i++) {
+		for (int i=0; i<300; i++) {
 			double newGuess = guess - (spline.eval(guess) - phase) / spline.derivative(guess);
-			if (newGuess == guess) { // TODO: Consider allowing more error
-				return guess;
+			if (newGuess > guess - 1e-12 && newGuess < guess + 1e-12) {
+				return newGuess;
 			}
 			guess = newGuess;
 		}

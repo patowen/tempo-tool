@@ -32,6 +32,8 @@ public class BeatMack extends Mack {
 		spline.y[2] = 3;
 		
 		spline.computeSpline();
+		
+		bundle.ticker.addSource(new BeatMackTickerSource(spline));
 	}
 
 	@Override
