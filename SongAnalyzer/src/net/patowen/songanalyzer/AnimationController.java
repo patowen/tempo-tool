@@ -44,7 +44,6 @@ public class AnimationController {
 	
 	private void updateTimer() {
 		if (!runningAnimations.isEmpty()) {
-			System.out.println("Timer");
 			timer.restart();
 		} else {
 			timer.stop();
