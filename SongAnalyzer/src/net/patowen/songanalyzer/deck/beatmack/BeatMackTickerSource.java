@@ -21,7 +21,7 @@ public class BeatMackTickerSource implements TickerSource {
 	
 	@Override
 	public Double getNextTickExclusive(double pos) {
-		double phase = spline.eval(pos);
+		double phase = spline.eval(pos + 1e-9);
 		return spline.invEval(Math.floor(phase + 1), pos);
 	}
 }
