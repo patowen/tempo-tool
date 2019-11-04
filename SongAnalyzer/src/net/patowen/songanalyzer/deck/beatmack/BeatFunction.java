@@ -48,6 +48,8 @@ public class BeatFunction {
 		newKnot.regionBefore = region;
 		newKnot.regionAfter = region;
 		
+		knots.put(newKnot.time, newKnot);
+		
 		createSpline();
 	}
 	
@@ -68,6 +70,8 @@ public class BeatFunction {
 		if (nextKnot != null) {
 			nextKnot.regionBefore = mergedRegion;
 		}
+		
+		knots.remove(knot.time);
 		
 		createSpline();
 	}

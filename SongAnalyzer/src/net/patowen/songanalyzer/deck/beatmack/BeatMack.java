@@ -13,6 +13,7 @@ import net.patowen.songanalyzer.deck.TrackBounds;
 import net.patowen.songanalyzer.deck.beatmack.BeatFunction.Knot;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputActionDrag;
+import net.patowen.songanalyzer.userinput.InputActionStandard;
 import net.patowen.songanalyzer.userinput.InputDictionary;
 import net.patowen.songanalyzer.userinput.InputMapping;
 import net.patowen.songanalyzer.userinput.InputType;
@@ -33,6 +34,8 @@ public class BeatMack extends Mack {
 	public BeatMack(DeckBundle bundle) {
 		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new MoveKnotAtMouse(), new InputTypeMouse(MouseEvent.BUTTON1, false, false, false), 1));
+		inputDictionary.addInputMapping(new InputMapping(new InsertKnotAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, false, false), 1));
+		inputDictionary.addInputMapping(new InputMapping(new DeleteKnotAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, true, false), 1));
 		inputDictionary.constructDictionary();
 		
 		trackBounds = bundle.trackBounds;
@@ -147,6 +150,42 @@ public class BeatMack extends Mack {
 
 		@Override
 		public void onEnd(Point startRelative) {
+		}
+	}
+	
+	private class InsertKnotAtMouse implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			if (isWithinView(pos)) {
+				double time = trackBounds.pixelToSeconds(pos.x);
+				double beatTime = beatFunction.findTimeForClosestBeat(time);
+				
+				int beatPixelX = trackBounds.secondsToPixel(beatTime);
+				
+				if (pos.x >= beatPixelX - selectionRange && pos.x <= beatPixelX + selectionRange) {
+					beatFunction.insertKnotOnBeat(beatTime);
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+	
+	private class DeleteKnotAtMouse implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			if (isWithinView(pos)) {
+				double time = trackBounds.pixelToSeconds(pos.x);
+				Knot potentialKnot = beatFunction.findClosestKnot(time);
+				
+				int knotPixelX = trackBounds.secondsToPixel(potentialKnot.getTime());
+				
+				if (pos.x >= knotPixelX - selectionRange && pos.x <= knotPixelX + selectionRange) {
+					beatFunction.deleteKnot(potentialKnot);
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }
