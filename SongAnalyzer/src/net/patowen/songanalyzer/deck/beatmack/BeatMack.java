@@ -131,32 +131,6 @@ public class BeatMack extends Mack {
 					initialTime = knot.getTime();
 					return true;
 				}
-				
-				/*double seconds = trackBounds.pixelToSeconds(pos.x);
-				int index = Arrays.binarySearch(spline.x, seconds);
-				
-				int lowerIndex = (index < 0) ? -index - 2 : index;
-				int upperIndex = lowerIndex + 1;
-				
-				int closestIndex;
-				if (lowerIndex < 0) {
-					closestIndex = upperIndex;
-				} else if (upperIndex >= spline.x.length) {
-					closestIndex = lowerIndex;
-				} else {
-					if (seconds - spline.x[lowerIndex] < spline.x[upperIndex] - seconds) {
-						closestIndex = lowerIndex;
-					} else {
-						closestIndex = upperIndex;
-					}
-				}
-				
-				int knotPixelX = trackBounds.secondsToPixel(spline.x[closestIndex]);
-				if (pos.x >= knotPixelX - selectionRange && pos.x <= knotPixelX + selectionRange) {
-					knot = closestIndex;
-					initialX = spline.x[closestIndex];
-					return true;
-				}*/
 			}
 			return false;
 		}
@@ -164,15 +138,11 @@ public class BeatMack extends Mack {
 		@Override
 		public void onDrag(Point startRelative) {
 			beatFunction.moveKnot(knot, trackBounds.subpixelToSeconds(trackBounds.secondsToSubpixel(initialTime) + startRelative.x));
-			//spline.x[knot] = trackBounds.subpixelToSeconds(trackBounds.secondsToSubpixel(initialX) + startRelative.x);
-			//spline.computeSpline();
 		}
 
 		@Override
 		public void onCancel() {
 			beatFunction.moveKnot(knot, initialTime);
-			//spline.x[knot] = initialX;
-			//spline.computeSpline();
 		}
 
 		@Override
