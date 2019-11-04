@@ -1,7 +1,13 @@
 package net.patowen.songanalyzer.deck.beatmack;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import net.patowen.songanalyzer.data.Arr;
+import net.patowen.songanalyzer.data.Dict;
+import net.patowen.songanalyzer.data.FileFormatException;
+import net.patowen.songanalyzer.data.Obj;
 
 public class BeatFunction {
 	private Spline spline;
@@ -172,6 +178,76 @@ public class BeatFunction {
 		return new CubicRegion();
 	}
 	
+	private interface Keys {
+		int knots = 0;
+		int regions = 1;
+	}
+	
+	private interface KnotKeys {
+		int time = 0;
+		int phase = 1;
+	}
+	
+	private interface RegionKeys {
+		int type = 0;
+	}
+	
+	public void save(Dict dict) {
+		Arr knotArr = new Arr();
+		Arr regionArr = new Arr();
+		
+		for (Knot knot : knots.values()) {
+			Dict knotDict = new Dict();
+			knotDict.set(KnotKeys.time, knot.time);
+			knotDict.set(KnotKeys.phase, knot.phase);
+			knotArr.add(knotDict);
+			
+			Region region = knot.regionBefore;
+			Dict regionDict = new Dict();
+			regionDict.set(RegionKeys.type, region.getType());
+			region.save(regionDict);
+			regionArr.add(regionDict);
+		}
+		
+		Region finalRegion = knots.lastEntry().getValue().regionAfter;
+		Dict finalRegionDict = new Dict();
+		finalRegionDict.set(RegionKeys.type, finalRegion.getType());
+		regionArr.add(finalRegionDict);
+		
+		dict.set(Keys.knots, knotArr);
+		dict.set(Keys.regions, regionArr);
+	}
+	
+	public void load(Dict dict) throws FileFormatException {
+		List<Obj> knotArr = dict.get(Keys.knots).asArr().get();
+		List<Obj> regionArr = dict.get(Keys.regions).asArr().get();
+		
+		Region[] regions = new Region[regionArr.size()];
+		for (int i=0; i<regions.length; i++) {
+			Dict regionDict = regionArr.get(i).asDict();
+			switch (regionDict.get(RegionKeys.type).asInt()) {
+			case CubicRegion.type:
+				regions[i] = new CubicRegion();
+				break;
+			default:
+				throw new FileFormatException("Unexpected region type in beat function");
+			}
+			regions[i].load(regionDict);
+		}
+		
+		for (int i=0; i<knotArr.size(); i++) {
+			Dict knotDict = knotArr.get(i).asDict();
+			Knot knot = new Knot();
+			knot.time = knotDict.get(KnotKeys.time).asDouble();
+			knot.phase = knotDict.get(KnotKeys.phase).asDouble();
+			knot.regionBefore = regions[i];
+			knot.regionAfter = regions[i+1];
+			knots.put(knot.time, knot);
+		}
+		
+		createSpline();
+	}
+	
 	public static class Knot {
 		private double time;
 		private double phase;
@@ -187,12 +263,29 @@ public class BeatFunction {
 	}
 	
 	private interface Region {
+		public void save(Dict dict);
 		
+		public void load(Dict dict) throws FileFormatException;
+		
+		public int getType();
 	}
 	
 	// TODO: Linear region
 	
 	private class CubicRegion implements Region {
+		public static final int type = 0;
 		
+		@Override
+		public void save(Dict dict) {
+		}
+		
+		@Override
+		public void load(Dict dict) throws FileFormatException {
+		}
+		
+		@Override
+		public int getType() {
+			return type;
+		}
 	}
 }
