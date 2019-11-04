@@ -219,6 +219,8 @@ public class BeatFunction {
 	}
 	
 	public void load(Dict dict) throws FileFormatException {
+		knots.clear();
+		
 		List<Obj> knotArr = dict.get(Keys.knots).asArr().get();
 		List<Obj> regionArr = dict.get(Keys.regions).asArr().get();
 		

@@ -98,23 +98,34 @@ public class BeatMack extends Mack {
 	private int phaseToPixel(double phase) {
 		return height - 1 - (int)(Math.floor(phase * height));
 	}
-
+	
 	@Override
 	public InputAction applyInputAction(InputType inputType, Point mousePos, double value) {
 		return inputDictionary.applyInput(inputType, mousePos, value);
 	}
-
+	
 	@Override
 	public MouseHoverFeedback applyMouseHover(Point mousePos) {
 		return null;
 	}
-
+	
+	private interface Keys {
+		int beatFunction = 0;
+	}
+	
 	@Override
 	public void save(Dict dict) {
+		Dict beatFunctionDict = new Dict();
+		beatFunction.save(beatFunctionDict);
+		dict.set(Keys.beatFunction, beatFunctionDict);
 	}
-
+	
 	@Override
 	public void load(Dict dict) throws FileFormatException {
+		Dict defaultBeatFunctionDict = new Dict();
+		beatFunction.save(defaultBeatFunctionDict);
+		Dict beatFunctionDict = dict.getOrDefault(Keys.beatFunction, defaultBeatFunctionDict).asDict();
+		beatFunction.load(beatFunctionDict);
 	}
 	
 	private class MoveKnotAtMouse implements InputActionDrag {
