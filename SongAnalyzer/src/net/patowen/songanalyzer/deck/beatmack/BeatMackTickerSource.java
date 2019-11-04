@@ -4,15 +4,15 @@ import net.patowen.songanalyzer.TickerSource;
 
 public class BeatMackTickerSource implements TickerSource {
 	// TODO: Point to something that won't get replaced
-	private Spline spline;
+	private BeatFunction beatFunction;
 	
-	public BeatMackTickerSource(Spline spline) {
-		this.spline = spline;
+	public BeatMackTickerSource(BeatFunction beatFunction) {
+		this.beatFunction = beatFunction;
 	}
 	
 	@Override
 	public Double getNextTickInclusive(double pos) {
-		double phase = spline.eval(pos);
+		double phase = beatFunction.getPhaseFromTime(pos);
 		if (phase == Math.floor(phase)) {
 			return pos;
 		}
@@ -21,7 +21,6 @@ public class BeatMackTickerSource implements TickerSource {
 	
 	@Override
 	public Double getNextTickExclusive(double pos) {
-		double phase = spline.eval(pos + 1e-9);
-		return spline.invEval(Math.floor(phase + 1), pos);
+		return beatFunction.findTimeForNextBeat(pos);
 	}
 }

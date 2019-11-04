@@ -4,13 +4,13 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
 
 import net.patowen.songanalyzer.bundle.DeckBundle;
 import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.deck.Mack;
 import net.patowen.songanalyzer.deck.TrackBounds;
+import net.patowen.songanalyzer.deck.beatmack.BeatFunction.Knot;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputActionDrag;
 import net.patowen.songanalyzer.userinput.InputDictionary;
@@ -26,7 +26,7 @@ public class BeatMack extends Mack {
 	
 	private final TrackBounds trackBounds;
 	
-	private Spline spline;
+	private BeatFunction beatFunction;
 	
 	private int selectionRange = 3;
 	
@@ -37,17 +37,9 @@ public class BeatMack extends Mack {
 		
 		trackBounds = bundle.trackBounds;
 		
-		spline = new Spline(2);
-		spline.x[0] = 1;
-		spline.y[0] = 0;
-		spline.x[1] = 2;
-		spline.y[1] = 1;
-		spline.x[2] = 5;
-		spline.y[2] = 3;
+		beatFunction = new BeatFunction();
 		
-		spline.computeSpline();
-		
-		bundle.ticker.addSource(new BeatMackTickerSource(spline));
+		bundle.ticker.addSource(new BeatMackTickerSource(beatFunction));
 	}
 
 	@Override
@@ -63,9 +55,9 @@ public class BeatMack extends Mack {
 	
 	private void renderBeats(Graphics2D g) {
 		g.setColor(Color.GRAY);
-		double currentPhase = spline.eval(trackBounds.subpixelToSeconds(0));
+		double currentPhase = beatFunction.getPhaseFromTime(trackBounds.subpixelToSeconds(0));
 		for (int i=0; i<width-1; i++) {
-			double nextPhase = spline.eval(trackBounds.subpixelToSeconds(i+1));
+			double nextPhase = beatFunction.getPhaseFromTime(trackBounds.subpixelToSeconds(i+1));
 			if (Math.ceil(currentPhase) < Math.ceil(nextPhase)) {
 				g.drawLine(i, 0, i, height-1);
 			}
@@ -75,8 +67,8 @@ public class BeatMack extends Mack {
 	
 	private void renderKnots(Graphics2D g) {
 		g.setColor(Color.CYAN);
-		for (int i=0; i<spline.x.length; i++) {
-			int pixelX = trackBounds.secondsToPixel(spline.x[i]);
+		for (BeatFunction.Knot knot : beatFunction.getAllKnots()) {
+			int pixelX = trackBounds.secondsToPixel(knot.getTime());
 			g.drawLine(pixelX, height/2 - 4, pixelX, height/2 + 4);
 		}
 	}
@@ -84,10 +76,10 @@ public class BeatMack extends Mack {
 	@SuppressWarnings("unused")
 	private void renderPhaseGraph(Graphics2D g) {
 		g.setColor(Color.CYAN);
-		double phasePrev = spline.eval(trackBounds.pixelToSeconds(-1));
+		double phasePrev = beatFunction.getPhaseFromTime(trackBounds.pixelToSeconds(-1));
 		double phaseBase = Math.floor(phasePrev);
 		for (int pixelX = 0; pixelX <= width; pixelX++) {
-			double phase = spline.eval(trackBounds.pixelToSeconds(pixelX));
+			double phase = beatFunction.getPhaseFromTime(trackBounds.pixelToSeconds(pixelX));
 			while (true) {
 				g.drawLine(pixelX - 1, phaseToPixel(phasePrev - phaseBase), pixelX, phaseToPixel(phase - phaseBase));
 				if (phase - phaseBase > 1) {
@@ -123,13 +115,24 @@ public class BeatMack extends Mack {
 	}
 	
 	private class MoveKnotAtMouse implements InputActionDrag {
-		private int knot;
-		private double initialX;
+		private Knot knot;
+		private double initialTime;
 		
 		@Override
 		public boolean onAction(Point pos, double value) {
 			if (isWithinView(pos)) {
-				double seconds = trackBounds.pixelToSeconds(pos.x);
+				double time = trackBounds.pixelToSeconds(pos.x);
+				Knot potentialKnot = beatFunction.findClosestKnot(time);
+				
+				int knotPixelX = trackBounds.secondsToPixel(potentialKnot.getTime());
+				
+				if (pos.x >= knotPixelX - selectionRange && pos.x <= knotPixelX + selectionRange) {
+					knot = potentialKnot;
+					initialTime = knot.getTime();
+					return true;
+				}
+				
+				/*double seconds = trackBounds.pixelToSeconds(pos.x);
 				int index = Arrays.binarySearch(spline.x, seconds);
 				
 				int lowerIndex = (index < 0) ? -index - 2 : index;
@@ -153,21 +156,23 @@ public class BeatMack extends Mack {
 					knot = closestIndex;
 					initialX = spline.x[closestIndex];
 					return true;
-				}
+				}*/
 			}
 			return false;
 		}
 
 		@Override
 		public void onDrag(Point startRelative) {
-			spline.x[knot] = trackBounds.subpixelToSeconds(trackBounds.secondsToSubpixel(initialX) + startRelative.x);
-			spline.computeSpline();
+			beatFunction.moveKnot(knot, trackBounds.subpixelToSeconds(trackBounds.secondsToSubpixel(initialTime) + startRelative.x));
+			//spline.x[knot] = trackBounds.subpixelToSeconds(trackBounds.secondsToSubpixel(initialX) + startRelative.x);
+			//spline.computeSpline();
 		}
 
 		@Override
 		public void onCancel() {
-			spline.x[knot] = initialX;
-			spline.computeSpline();
+			beatFunction.moveKnot(knot, initialTime);
+			//spline.x[knot] = initialX;
+			//spline.computeSpline();
 		}
 
 		@Override

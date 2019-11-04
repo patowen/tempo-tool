@@ -73,14 +73,16 @@ public class BeatFunction {
 	}
 	
 	public void moveKnot(Knot knot, double time) {
+		knots.remove(knot.time);
+		
 		if (knots.floorKey(knot.time) != knots.floorKey(time)) {
 			// Can't move a knot past another knot
+			knots.put(knot.time, knot);
 			return;
 		}
 		
-		knots.remove(knot.time);
 		knot.time = time;
-		knots.put(time, knot);
+		knots.put(knot.time, knot);
 		
 		updateSpline();
 	}
@@ -102,6 +104,10 @@ public class BeatFunction {
 		}
 		
 		return knots.get(upper - time < time - lower ? upper : lower);
+	}
+	
+	public Iterable<Knot> getAllKnots() {
+		return knots.values();
 	}
 	
 	public double findTimeForClosestBeat(double time) {
@@ -162,7 +168,7 @@ public class BeatFunction {
 		return new CubicRegion();
 	}
 	
-	private static class Knot {
+	public static class Knot {
 		private double time;
 		private double phase;
 		
@@ -170,6 +176,10 @@ public class BeatFunction {
 		private Region regionAfter;
 		
 		private int splineIndex;
+		
+		public double getTime() {
+			return time;
+		}
 	}
 	
 	private interface Region {
