@@ -1,5 +1,6 @@
 package net.patowen.songanalyzer;
 
+import java.awt.Graphics2D;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -109,6 +110,12 @@ public class AudioPlayer {
 			return 0;
 		}
 		return audioStream.getLength();
+	}
+	
+	public void visualize(Graphics2D g, int width, int height, double startTime, double timeLength) {
+		if (audioStream != null) {
+			audioStream.visualize(g, width, height, startTime, timeLength);
+		}
 	}
 	
 	public boolean hasAudioStream() {

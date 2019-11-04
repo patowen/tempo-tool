@@ -1,4 +1,6 @@
 package net.patowen.songanalyzer;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -227,5 +229,39 @@ public class AudioStream {
 	
 	public boolean isPlaying() {
 		return playing;
+	}
+	
+	public void visualize(Graphics2D g, int width, int height, double startTime, double timeLength) {
+		double samplesPerPixel = (double)samplingRate * timeLength / (double)width;
+		if (samplesPerPixel > 200) {
+			double startSubpixel = (0.0 - startTime) / timeLength * (double)width;
+			double endSubpixel = (getLength() - startTime) / timeLength * (double)width;
+			int startPixel = Math.max((int)Math.floor(startSubpixel + 0.5), 0);
+			int endPixel = Math.min((int)Math.floor(endSubpixel + 0.5), width);
+
+			g.setColor(new Color(128, 128, 128));
+			g.fillRect(startPixel, 8, endPixel - startPixel, height - 16);
+		} else {
+			int startSample = (int)Math.floor(startTime * samplingRate);
+			int endSample = (int)Math.ceil((startTime + timeLength) * samplingRate);
+			
+			int xPrevious = 0, yPrevious = 0;
+			int numSamples = getNumSamples();
+			g.setColor(Color.WHITE);
+			for (int sample = startSample; sample <= endSample; sample++) {
+				int x = (int)Math.floor((double) (sample - startSample) / (double) samplingRate / timeLength * width);
+				double totalAmp = 0;
+				for (int i=0; i<numChannels; i++) {
+					totalAmp += getAmpRaw(numSamples, sample, i);
+				}
+				int y = (int)Math.floor(-(totalAmp * (double)height) / (32768.0 * (double)numChannels * 2) + ((double)height / 2.0));
+				
+				if (sample != startSample) {
+					g.drawLine(xPrevious, yPrevious, x, y);
+				}
+				xPrevious = x;
+				yPrevious = y;
+			}
+		}
 	}
 }

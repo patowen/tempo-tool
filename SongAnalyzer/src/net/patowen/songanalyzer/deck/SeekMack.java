@@ -39,10 +39,9 @@ public class SeekMack extends Mack {
 	@Override
 	public void render(Graphics2D g) {
 		if (bundle.audioPlayer.hasAudioStream()) {
-			g.setColor(new Color(128, 128, 128));
-			int xLeft = bundle.trackBounds.secondsToPixel(0);
-			int xRight = bundle.trackBounds.secondsToPixel(bundle.audioPlayer.getLength());
-			g.fillRect(xLeft, 8, xRight - xLeft + 1, height - 16);
+			double start = bundle.trackBounds.pixelToSeconds(0);
+			double end = bundle.trackBounds.pixelToSeconds(width);
+			bundle.audioPlayer.visualize(g, width, height, start, end - start);
 		}
 	}
 	
