@@ -54,7 +54,7 @@ public class BeatMack extends Mack {
 		minTempo = 0;
 		maxTempo = 5;
 		
-		bundle.ticker.addSource(new BeatMackTickerSource(beatFunction));
+		//bundle.ticker.addSource(new BeatMackTickerSource(beatFunction));
 	}
 
 	@Override

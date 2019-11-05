@@ -100,9 +100,14 @@ public class Deck extends View {
 					}
 				}
 			}
+		} else {
+			for (DeckRow deckRow : deckRows) {
+				InputAction inputAction = deckRow.mack.forwardInput(inputType, mousePos, value);
+				if (inputAction != null) {
+					return inputAction;
+				}
+			}
 		}
-		
-		// TODO Keyboard controls on active mack
 		
 		return fallbackInputDictionary.applyInput(inputType, mousePos, value);
 	}

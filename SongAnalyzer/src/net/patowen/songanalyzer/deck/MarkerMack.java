@@ -3,6 +3,7 @@ package net.patowen.songanalyzer.deck;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,6 +23,7 @@ import net.patowen.songanalyzer.userinput.InputActionStandard;
 import net.patowen.songanalyzer.userinput.InputDictionary;
 import net.patowen.songanalyzer.userinput.InputMapping;
 import net.patowen.songanalyzer.userinput.InputType;
+import net.patowen.songanalyzer.userinput.InputTypeKeyboard;
 import net.patowen.songanalyzer.userinput.InputTypeMouse;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
 
@@ -42,6 +44,7 @@ public class MarkerMack extends Mack {
 		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new AddMarkAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new DeleteMarkAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, true, false), 1));
+		inputDictionary.addInputMapping(new InputMapping(new AddMarkAtPlayerPos(), new InputTypeKeyboard(KeyEvent.VK_N, false, false, false), 1));
 		inputDictionary.constructDictionary();
 		
 		bundle.ticker.addSource(new TickerSource() {
@@ -125,6 +128,18 @@ public class MarkerMack extends Mack {
 					userActionList.applyAction(new MarkCreationAction(Collections.singleton(markPos)));
 					return true;
 				}
+			}
+			return false;
+		}
+	}
+	
+	private class AddMarkAtPlayerPos implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			double markPos = audioPlayer.getPos();
+			if (!marks.contains(markPos)) {
+				userActionList.applyAction(new MarkCreationAction(Collections.singleton(markPos)));
+				return true;
 			}
 			return false;
 		}
