@@ -74,6 +74,7 @@ public class BeatMack extends Mack {
 		renderKnots(g);
 	}
 	
+	@SuppressWarnings("unused")
 	private void renderBeats(Graphics2D g) {
 		g.setColor(Color.GRAY);
 		double currentPhase = beatFunction.getPhaseFromTime(trackBounds.subpixelToSeconds(0));
@@ -108,8 +109,7 @@ public class BeatMack extends Mack {
 			double offset = closest - currentTime;
 			int x = trackBounds.secondsToPixel(currentTime);
 			int y = (int)Math.floor(height / 2 + offset * 1000);
-
-			System.out.println(x + " " + y);
+			
 			g.drawLine(x, y, x, y);
 		}
 	}
