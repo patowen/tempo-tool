@@ -35,6 +35,11 @@ public class TrackBounds {
 		totalSeconds *= factor;
 	}
 	
+	public void shiftSecondsToSubpixel(double seconds, double subpixel) {
+		double oldSeconds = subpixelToSeconds(subpixel);
+		secondsStart += seconds - oldSeconds;
+	}
+	
 	public void setBounds(double secondsStart, double totalSeconds) {
 		this.secondsStart = secondsStart;
 		this.totalSeconds = totalSeconds;

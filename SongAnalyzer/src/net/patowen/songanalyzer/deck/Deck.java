@@ -56,6 +56,14 @@ public class Deck extends View {
 	
 	@Override
 	public void render(Graphics2D g) {
+		if (bundle.audioPlayer.isPlaying()) {
+			double maxTime = bundle.trackBounds.subpixelToSeconds(width * 0.8);
+			double time = bundle.audioPlayer.getPos();
+			if (time > maxTime) {
+				bundle.trackBounds.shiftSecondsToSubpixel(time, width * 0.2);
+			}
+		}
+		
 		grid.setWidth(width);
 		grid.setHeight(height);
 		
