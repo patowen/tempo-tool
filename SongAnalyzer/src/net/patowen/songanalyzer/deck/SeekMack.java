@@ -1,10 +1,10 @@
 package net.patowen.songanalyzer.deck;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
+import net.patowen.songanalyzer.AudioPlayer;
 import net.patowen.songanalyzer.bundle.DeckBundle;
 import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
@@ -21,10 +21,12 @@ public class SeekMack extends Mack {
 	
 	private InputDictionary inputDictionary;
 	
-	private final DeckBundle bundle;
+	private final AudioPlayer audioPlayer;
+	private final TrackBounds trackBounds;
 	
 	public SeekMack(DeckBundle bundle) {
-		this.bundle = bundle;
+		this.audioPlayer = bundle.audioPlayer;
+		this.trackBounds = bundle.trackBounds;
 		
 		inputDictionary = new InputDictionary();
 		inputDictionary.addInputMapping(new InputMapping(new Seek(), new InputTypeMouse(MouseEvent.BUTTON1, false, false, false), 1));
@@ -38,10 +40,10 @@ public class SeekMack extends Mack {
 	
 	@Override
 	public void render(Graphics2D g) {
-		if (bundle.audioPlayer.hasAudioStream()) {
-			double start = bundle.trackBounds.pixelToSeconds(0);
-			double end = bundle.trackBounds.pixelToSeconds(width);
-			bundle.audioPlayer.visualize(g, width, height, start, end - start);
+		if (audioPlayer.hasAudioStream()) {
+			double start = trackBounds.pixelToSeconds(0);
+			double end = trackBounds.pixelToSeconds(width);
+			audioPlayer.visualize(g, width, height, start, end - start);
 		}
 	}
 	
@@ -67,7 +69,7 @@ public class SeekMack extends Mack {
 		@Override
 		public boolean onAction(Point pos, double value) {
 			if (isWithinView(pos)) {
-				bundle.audioPlayer.setPos(bundle.trackBounds.pixelToSeconds(pos.x));
+				audioPlayer.setPos(trackBounds.pixelToSeconds(pos.x));
 				return true;
 			}
 			return false;
