@@ -199,7 +199,9 @@ public class Deck extends View {
 				mack = new SeekMack(bundle);
 				break;
 			case MarkerMack.type:
-				mack = new MarkerMack(bundle);
+				MarkerMack markerMack = new MarkerMack(bundle);
+				bundle.primaryMarkerMackPointer.markerMack = markerMack;
+				mack = markerMack;
 				break;
 			case BeatMack.type:
 				mack = new BeatMack(bundle);

@@ -9,6 +9,8 @@ import net.patowen.songanalyzer.bundle.DeckBundle;
 import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.deck.Mack;
+import net.patowen.songanalyzer.deck.MarkerMack;
+import net.patowen.songanalyzer.deck.PrimaryMarkerMackPointer;
 import net.patowen.songanalyzer.deck.TrackBounds;
 import net.patowen.songanalyzer.deck.beatmack.BeatFunction.Knot;
 import net.patowen.songanalyzer.undo.UserAction;
@@ -30,6 +32,7 @@ public class BeatMack extends Mack {
 	
 	private final UserActionList userActionList;
 	private final TrackBounds trackBounds;
+	private final PrimaryMarkerMackPointer primaryMarkerMackPointer;
 	
 	private BeatFunction beatFunction;
 	
@@ -48,13 +51,14 @@ public class BeatMack extends Mack {
 		
 		userActionList = bundle.userActionList;
 		trackBounds = bundle.trackBounds;
+		primaryMarkerMackPointer = bundle.primaryMarkerMackPointer;
 		
 		beatFunction = new BeatFunction();
 		
 		minTempo = 0;
 		maxTempo = 5;
 		
-		//bundle.ticker.addSource(new BeatMackTickerSource(beatFunction));
+		bundle.ticker.addSource(new BeatMackTickerSource(beatFunction));
 	}
 
 	@Override
@@ -64,7 +68,8 @@ public class BeatMack extends Mack {
 
 	@Override
 	public void render(Graphics2D g) {
-		renderBeats(g);
+		//renderBeats(g);
+		renderScatterplot(g);
 		renderTempoGraph(g);
 		renderKnots(g);
 	}
@@ -78,6 +83,34 @@ public class BeatMack extends Mack {
 				g.drawLine(i, 0, i, height-1);
 			}
 			currentPhase = nextPhase;
+		}
+	}
+	
+	private void renderScatterplot(Graphics2D g) {
+		g.setColor(Color.WHITE);
+		MarkerMack markerMack = primaryMarkerMackPointer.markerMack;
+		if (markerMack == null) {
+			return;
+		}
+		
+		Double currentTime = trackBounds.subpixelToSeconds(0);
+		double maxTime = trackBounds.subpixelToSeconds(width);
+		
+		while (currentTime < maxTime) {
+			currentTime = beatFunction.findTimeForNextBeat(currentTime);
+			if (currentTime == null) {
+				return;
+			}
+			Double closest = markerMack.getClosestMark(currentTime);
+			if (closest == null) {
+				return;
+			}
+			double offset = closest - currentTime;
+			int x = trackBounds.secondsToPixel(currentTime);
+			int y = (int)Math.floor(height / 2 + offset * 1000);
+
+			System.out.println(x + " " + y);
+			g.drawLine(x, y, x, y);
 		}
 	}
 	
@@ -224,7 +257,10 @@ public class BeatMack extends Mack {
 		public boolean onAction(Point pos, double value) {
 			if (isWithinView(pos)) {
 				double time = trackBounds.pixelToSeconds(pos.x);
-				double beatTime = beatFunction.findTimeForClosestBeat(time);
+				Double beatTime = beatFunction.findTimeForClosestBeat(time);
+				if (beatTime == null) {
+					return false;
+				}
 				
 				int beatPixelX = trackBounds.secondsToPixel(beatTime);
 				

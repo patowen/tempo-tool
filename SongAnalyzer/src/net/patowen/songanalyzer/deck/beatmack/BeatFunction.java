@@ -125,7 +125,7 @@ public class BeatFunction {
 		return knots.values();
 	}
 	
-	public double findTimeForClosestBeat(double time) {
+	public Double findTimeForClosestBeat(double time) {
 		double phase = getPhaseFromTime(time);
 		double lowerPhase = Math.floor(phase);
 		double upperPhase = lowerPhase + 1;
@@ -135,7 +135,7 @@ public class BeatFunction {
 		return upperTime - time < time - lowerTime ? upperTime : lowerTime;
 	}
 	
-	public double findTimeForNextBeat(double time) {
+	public Double findTimeForNextBeat(double time) {
 		double phase = getPhaseFromTime(time + 1e-9);
 		double goalPhase = Math.floor(phase + 1);
 		return getTimeFromPhase(goalPhase, time);
@@ -149,7 +149,7 @@ public class BeatFunction {
 		return spline.derivative(time);
 	}
 	
-	private double getTimeFromPhase(double phase, double guess) {
+	private Double getTimeFromPhase(double phase, double guess) {
 		return spline.invEval(phase, guess);
 	}
 	
