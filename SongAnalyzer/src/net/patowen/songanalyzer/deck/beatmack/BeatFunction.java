@@ -36,14 +36,17 @@ public class BeatFunction {
 		createSpline();
 	}
 	
-	public void insertKnotOnBeat(double time) {
+	public Knot getKnotOnBeat(double time) {
 		double phase = Math.floor(getPhaseFromTime(time) + 0.5);
 		Knot newKnot = new Knot();
 		newKnot.time = time;
 		newKnot.phase = phase;
-		
-		Knot previousKnot = getKnotFromEntry(knots.floorEntry(time));
-		Knot nextKnot = getKnotFromEntry(knots.ceilingEntry(time));
+		return newKnot;
+	}
+	
+	public void insertKnot(Knot knot) {
+		Knot previousKnot = getKnotFromEntry(knots.floorEntry(knot.time));
+		Knot nextKnot = getKnotFromEntry(knots.ceilingEntry(knot.time));
 		Region region;
 		if (nextKnot == null) {
 			region = previousKnot.regionAfter;
@@ -51,10 +54,12 @@ public class BeatFunction {
 			region = nextKnot.regionBefore;
 		}
 		
-		newKnot.regionBefore = region;
-		newKnot.regionAfter = region;
+		Region[] newRegions = splitRegion(region);
 		
-		knots.put(newKnot.time, newKnot);
+		knot.regionBefore = newRegions[0];
+		knot.regionAfter = newRegions[1];
+		
+		knots.put(knot.time, knot);
 		
 		createSpline();
 	}
@@ -140,6 +145,10 @@ public class BeatFunction {
 		return spline.eval(time);
 	}
 	
+	public double getTempoFromTime(double time) {
+		return spline.derivative(time);
+	}
+	
 	private double getTimeFromPhase(double phase, double guess) {
 		return spline.invEval(phase, guess);
 	}
@@ -171,6 +180,12 @@ public class BeatFunction {
 			return null;
 		}
 		return entry.getValue();
+	}
+	
+	// Splitting followed by merging regions should be a no-op, or undo/redo will be broken.
+	private Region[] splitRegion(Region region) {
+		// TODO: Implement
+		return new Region[] {new CubicRegion(), new CubicRegion()};
 	}
 	
 	private Region mergeRegions(Region regionBefore, Region regionAfter) {

@@ -11,6 +11,8 @@ import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.deck.Mack;
 import net.patowen.songanalyzer.deck.TrackBounds;
 import net.patowen.songanalyzer.deck.beatmack.BeatFunction.Knot;
+import net.patowen.songanalyzer.undo.UserAction;
+import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
 import net.patowen.songanalyzer.userinput.InputActionDrag;
 import net.patowen.songanalyzer.userinput.InputActionStandard;
@@ -18,6 +20,7 @@ import net.patowen.songanalyzer.userinput.InputDictionary;
 import net.patowen.songanalyzer.userinput.InputMapping;
 import net.patowen.songanalyzer.userinput.InputType;
 import net.patowen.songanalyzer.userinput.InputTypeMouse;
+import net.patowen.songanalyzer.userinput.InputTypeScroll;
 import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
 
 public class BeatMack extends Mack {
@@ -25,9 +28,13 @@ public class BeatMack extends Mack {
 	
 	private InputDictionary inputDictionary;
 	
+	private final UserActionList userActionList;
 	private final TrackBounds trackBounds;
 	
 	private BeatFunction beatFunction;
+	
+	private double minTempo;
+	private double maxTempo;
 	
 	private int selectionRange = 3;
 	
@@ -36,11 +43,16 @@ public class BeatMack extends Mack {
 		inputDictionary.addInputMapping(new InputMapping(new MoveKnotAtMouse(), new InputTypeMouse(MouseEvent.BUTTON1, false, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new InsertKnotAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new DeleteKnotAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, true, false), 1));
+		inputDictionary.addInputMapping(new InputMapping(new VerticalZoom(), new InputTypeScroll(false, true, false), 1));
 		inputDictionary.constructDictionary();
 		
+		userActionList = bundle.userActionList;
 		trackBounds = bundle.trackBounds;
 		
 		beatFunction = new BeatFunction();
+		
+		minTempo = 0;
+		maxTempo = 5;
 		
 		bundle.ticker.addSource(new BeatMackTickerSource(beatFunction));
 	}
@@ -53,6 +65,7 @@ public class BeatMack extends Mack {
 	@Override
 	public void render(Graphics2D g) {
 		renderBeats(g);
+		renderTempoGraph(g);
 		renderKnots(g);
 	}
 	
@@ -73,6 +86,21 @@ public class BeatMack extends Mack {
 		for (BeatFunction.Knot knot : beatFunction.getAllKnots()) {
 			int pixelX = trackBounds.secondsToPixel(knot.getTime());
 			g.drawLine(pixelX, height/2 - 4, pixelX, height/2 + 4);
+		}
+	}
+	
+	private void renderTempoGraph(Graphics2D g) {
+		g.setColor(Color.BLUE);
+		int xPrevious = 0, yPrevious = 0;
+		for (int x = -1; x < width+1; x++) {
+			double time = trackBounds.pixelToSeconds(x);
+			double tempo = beatFunction.getTempoFromTime(time);
+			int y = (int)Math.floor((tempo - maxTempo) / (minTempo - maxTempo) * height);
+			if (x != -1) {
+				g.drawLine(xPrevious, yPrevious, x, y);
+			}
+			xPrevious = x;
+			yPrevious = y;
 		}
 	}
 	
@@ -161,6 +189,33 @@ public class BeatMack extends Mack {
 
 		@Override
 		public void onEnd(Point startRelative) {
+			beatFunction.moveKnot(knot, initialTime);
+			userActionList.applyAction(new KnotMotionAction(
+					knot,
+					initialTime,
+					trackBounds.subpixelToSeconds(trackBounds.secondsToSubpixel(initialTime) + startRelative.x)));
+		}
+	}
+	
+	private class KnotMotionAction implements UserAction {
+		private final Knot knot;
+		private final double startTime;
+		private final double endTime;
+		
+		public KnotMotionAction(Knot knot, double startTime, double endTime) {
+			this.knot = knot;
+			this.startTime = startTime;
+			this.endTime = endTime;
+		}
+		
+		@Override
+		public void exec() {
+			beatFunction.moveKnot(knot, endTime);
+		}
+		
+		@Override
+		public void undo() {
+			beatFunction.moveKnot(knot, startTime);
 		}
 	}
 	
@@ -174,11 +229,30 @@ public class BeatMack extends Mack {
 				int beatPixelX = trackBounds.secondsToPixel(beatTime);
 				
 				if (pos.x >= beatPixelX - selectionRange && pos.x <= beatPixelX + selectionRange) {
-					beatFunction.insertKnotOnBeat(beatTime);
+					Knot knot = beatFunction.getKnotOnBeat(beatTime);
+					userActionList.applyAction(new KnotInsertionAction(knot));
 					return true;
 				}
 			}
 			return false;
+		}
+	}
+	
+	private class KnotInsertionAction implements UserAction {
+		private final Knot knot;
+		
+		public KnotInsertionAction(Knot knot) {
+			this.knot = knot;
+		}
+		
+		@Override
+		public void exec() {
+			beatFunction.insertKnot(knot);
+		}
+
+		@Override
+		public void undo() {
+			beatFunction.deleteKnot(knot);
 		}
 	}
 	
@@ -192,9 +266,43 @@ public class BeatMack extends Mack {
 				int knotPixelX = trackBounds.secondsToPixel(potentialKnot.getTime());
 				
 				if (pos.x >= knotPixelX - selectionRange && pos.x <= knotPixelX + selectionRange) {
-					beatFunction.deleteKnot(potentialKnot);
+					userActionList.applyAction(new KnotDeletionAction(potentialKnot));
 					return true;
 				}
+			}
+			return false;
+		}
+	}
+	
+	private class KnotDeletionAction implements UserAction {
+		private final Knot knot;
+		
+		public KnotDeletionAction(Knot knot) {
+			this.knot = knot;
+		}
+		
+		@Override
+		public void exec() {
+			beatFunction.deleteKnot(knot);
+		}
+
+		@Override
+		public void undo() {
+			beatFunction.insertKnot(knot);
+		}
+	}
+	
+	private class VerticalZoom implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			if (isWithinView(pos)) {
+				double centerTempo = maxTempo + pos.y * (minTempo - maxTempo) / (double)height;
+				double zoomFactor = Math.exp(value * 0.1);
+				
+				minTempo = (minTempo - centerTempo) * zoomFactor + centerTempo;
+				maxTempo = (maxTempo - centerTempo) * zoomFactor + centerTempo;
+				
+				return true;
 			}
 			return false;
 		}
