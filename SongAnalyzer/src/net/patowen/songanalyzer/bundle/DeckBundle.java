@@ -5,7 +5,7 @@ import net.patowen.songanalyzer.AudioPlayer;
 import net.patowen.songanalyzer.Config;
 import net.patowen.songanalyzer.DialogManager;
 import net.patowen.songanalyzer.Ticker;
-import net.patowen.songanalyzer.deck.PrimaryMarkerMackPointer;
+import net.patowen.songanalyzer.deck.MackRefs;
 import net.patowen.songanalyzer.deck.TrackBounds;
 import net.patowen.songanalyzer.undo.UserActionList;
 
@@ -20,7 +20,7 @@ public class DeckBundle {
 	public final AudioPlayer audioPlayer;
 	
 	public final TrackBounds trackBounds;
-	public final PrimaryMarkerMackPointer primaryMarkerMackPointer;
+	public final MackRefs mackRefs;
 	
 	public DeckBundle(RootBundle rootBundle) {
 		config = rootBundle.config;
@@ -31,6 +31,6 @@ public class DeckBundle {
 		audioPlayer = rootBundle.audioPlayer;
 		
 		trackBounds = new TrackBounds(0, 60);
-		primaryMarkerMackPointer = new PrimaryMarkerMackPointer();
+		mackRefs = new MackRefs();
 	}
 }

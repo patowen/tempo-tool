@@ -10,7 +10,7 @@ import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.deck.Mack;
 import net.patowen.songanalyzer.deck.MarkerMack;
-import net.patowen.songanalyzer.deck.PrimaryMarkerMackPointer;
+import net.patowen.songanalyzer.deck.MackRefs;
 import net.patowen.songanalyzer.deck.TrackBounds;
 import net.patowen.songanalyzer.deck.beatmack.BeatFunction.Knot;
 import net.patowen.songanalyzer.undo.UserAction;
@@ -32,7 +32,7 @@ public class BeatMack extends Mack {
 	
 	private final UserActionList userActionList;
 	private final TrackBounds trackBounds;
-	private final PrimaryMarkerMackPointer primaryMarkerMackPointer;
+	private final MackRefs mackRefs;
 	
 	private BeatFunction beatFunction;
 	
@@ -51,7 +51,7 @@ public class BeatMack extends Mack {
 		
 		userActionList = bundle.userActionList;
 		trackBounds = bundle.trackBounds;
-		primaryMarkerMackPointer = bundle.primaryMarkerMackPointer;
+		mackRefs = bundle.mackRefs;
 		
 		beatFunction = new BeatFunction();
 		
@@ -89,8 +89,8 @@ public class BeatMack extends Mack {
 	
 	private void renderScatterplot(Graphics2D g) {
 		g.setColor(Color.WHITE);
-		MarkerMack markerMack = primaryMarkerMackPointer.markerMack;
-		if (markerMack == null) {
+		MarkerMack metronomeMarkerMack = mackRefs.metronomeMarkerMack;
+		if (metronomeMarkerMack == null) {
 			return;
 		}
 		
@@ -102,7 +102,7 @@ public class BeatMack extends Mack {
 			if (currentTime == null) {
 				return;
 			}
-			Double closest = markerMack.getClosestMark(currentTime);
+			Double closest = metronomeMarkerMack.getClosestMark(currentTime);
 			if (closest == null) {
 				return;
 			}

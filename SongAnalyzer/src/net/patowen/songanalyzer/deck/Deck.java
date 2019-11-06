@@ -200,7 +200,7 @@ public class Deck extends View {
 				break;
 			case MarkerMack.type:
 				MarkerMack markerMack = new MarkerMack(bundle);
-				bundle.primaryMarkerMackPointer.markerMack = markerMack;
+				bundle.mackRefs.metronomeMarkerMack = markerMack;
 				mack = markerMack;
 				break;
 			case BeatMack.type:
