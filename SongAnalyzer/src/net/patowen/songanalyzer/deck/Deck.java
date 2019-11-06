@@ -199,17 +199,21 @@ public class Deck extends View {
 		final Mack mack;
 		
 		DeckRow(GridColumn trackColumn, int type, DeckBundle bundle) {
+			MackRefs mackRefs = bundle.mackRefs;
+			
 			switch (type) {
 			case SeekMack.type:
 				mack = new SeekMack(bundle);
 				break;
 			case MarkerMack.type:
 				MarkerMack markerMack = new MarkerMack(bundle);
-				bundle.mackRefs.metronomeMarkerMack = markerMack;
+				mackRefs.metronomeMarkerMack = markerMack;
 				mack = markerMack;
 				break;
 			case BeatMack.type:
-				mack = new BeatMack(bundle);
+				BeatMack beatMack = new BeatMack(bundle);
+				mackRefs.mainBeatMack = beatMack;
+				mack = beatMack;
 				break;
 			default:
 				throw new IllegalMackTypeException(type);
