@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.patowen.songanalyzer.AudioPlayer;
 import net.patowen.songanalyzer.bundle.DeckBundle;
 import net.patowen.songanalyzer.bundle.RootBundle;
 import net.patowen.songanalyzer.data.Arr;
@@ -33,6 +34,8 @@ public class Deck extends View {
 	private InputDictionary fallbackInputDictionary;
 	
 	private final DeckBundle bundle;
+	private final AudioPlayer audioPlayer;
+	private final TrackBounds trackBounds;
 	
 	private final Grid grid = new Grid();
 	
@@ -42,6 +45,8 @@ public class Deck extends View {
 	
 	public Deck(RootBundle rootBundle) {
 		bundle = new DeckBundle(rootBundle);
+		audioPlayer = bundle.audioPlayer;
+		trackBounds = bundle.trackBounds;
 		
 		tabColumn.trySetSize(8);
 		
@@ -56,18 +61,18 @@ public class Deck extends View {
 	
 	@Override
 	public void render(Graphics2D g) {
-		if (bundle.audioPlayer.isPlaying()) {
-			double maxTime = bundle.trackBounds.subpixelToSeconds(width * 0.8);
-			double time = bundle.audioPlayer.getPos();
+		if (audioPlayer.isPlaying()) {
+			double maxTime = trackBounds.subpixelToSeconds(width * 0.8);
+			double time = audioPlayer.getPos();
 			if (time > maxTime) {
-				bundle.trackBounds.shiftSecondsToSubpixel(time, width * 0.2);
+				trackBounds.shiftSecondsToSubpixel(time, width * 0.2);
 			}
 		}
 		
 		grid.setWidth(width);
 		grid.setHeight(height);
 		
-		bundle.trackBounds.setWidth(trackColumn.getSize());
+		trackBounds.setWidth(trackColumn.getSize());
 		
 		g.setColor(Color.WHITE);
 		grid.renderGridlines(g);
@@ -78,8 +83,8 @@ public class Deck extends View {
 		
 		g.setColor(Color.GREEN);
 		
-		if (bundle.audioPlayer.hasAudioStream()) {
-			int pos = bundle.trackBounds.secondsToPixel(bundle.audioPlayer.getPos()) + trackColumn.getPos();
+		if (audioPlayer.hasAudioStream()) {
+			int pos = trackBounds.secondsToPixel(audioPlayer.getPos()) + trackColumn.getPos();
 			g.drawLine(pos, 0, pos, height);
 		}
 	}
@@ -114,7 +119,7 @@ public class Deck extends View {
 	
 	public void reset() {
 		deckRows.clear();
-		bundle.trackBounds.setBounds(0, 60);
+		trackBounds.setBounds(0, 60);
 		
 		deckRows.add(new DeckRow(trackColumn, SeekMack.type, bundle));
 		deckRows.add(new DeckRow(trackColumn, MarkerMack.type, bundle));
@@ -146,7 +151,7 @@ public class Deck extends View {
 	
 	public void load(Dict dict) throws FileFormatException {
 		deckRows.clear();
-		bundle.trackBounds.setBounds(0, 60);
+		trackBounds.setBounds(0, 60);
 		
 		Arr arr = dict.get(Keys.macks).asArr();
 		for (Obj obj : arr.get()) {
@@ -183,7 +188,7 @@ public class Deck extends View {
 		public boolean onAction(Point pos, double value) {
 			if (isWithinView(pos)) {
 				double zoomFactor = Math.exp(value * 0.1);
-				bundle.trackBounds.zoom(bundle.trackBounds.pixelToSeconds(pos.x), zoomFactor);
+				trackBounds.zoom(trackBounds.pixelToSeconds(pos.x), zoomFactor);
 				return true;
 			}
 			return false;
