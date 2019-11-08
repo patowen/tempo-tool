@@ -213,20 +213,40 @@ public class BeatMack extends Mack {
 		int avgTempoBpm = (int)Math.round(((double)(beats.size() - 1)) / (beats.get(beats.size() - 1) - beats.get(0)) * 60);
 		writer.write("Using display tempo: " + avgTempoBpm + System.lineSeparator());
 		double avgTempo = (double)avgTempoBpm / 60.0;
+		double tolerance = 0.005;
 		
 		writer.write("\"_BPMChanges\":[");
-		for (int i=0; i<beats.size()-1; i++) {
-			if (i != 0) {
-				writer.write(",");
+		int startIndex = 0;
+		for (int endIndex = 1; endIndex < beats.size(); endIndex++) {
+			if (endIndex + 1 == beats.size() || getDeviationFromAverageTempo(beats, startIndex, endIndex + 1) > tolerance) {
+				double start = beats.get(startIndex);
+				double end = beats.get(endIndex);
+				double bpm = 60.0 * (double)(endIndex - startIndex) / (end - start);
+				double time = start * avgTempo;
+				if (startIndex != 0) {
+					writer.write(",");
+				}
+				writer.write("{\"_BPM\":" + bpm + ",\"_time\":" + time + ",\"_beatsPerBar\":4,\"_metronomeOffset\":1}");
+				
+				startIndex = endIndex;
 			}
-			
-			double start = beats.get(i);
-			double end = beats.get(i+1);
-			double bpm = 60.0 / (end - start);
-			double time = start * avgTempo;
-			writer.write("{\"_BPM\":" + bpm + ",\"_time\":" + time + ",\"_beatsPerBar\":4,\"_metronomeOffset\":1}");
 		}
 		writer.write("]");
+	}
+	
+	private double getDeviationFromAverageTempo(ArrayList<Double> beats, int startIndex, int endIndex) {
+		double maxDeviation = 0;
+		double secondsPerBeat = (beats.get(endIndex) - beats.get(startIndex)) / (double)(endIndex - startIndex);
+		double firstBeat = beats.get(startIndex);
+		
+		for (int i=startIndex+1; i<endIndex-1; i++) {
+			double deviation = Math.abs(beats.get(i) - (firstBeat + secondsPerBeat * (i - startIndex)));
+			if (deviation > maxDeviation) {
+				maxDeviation = deviation;
+			}
+		}
+		
+		return maxDeviation;
 	}
 	
 	private class MoveKnotAtMouse implements InputActionDrag {
