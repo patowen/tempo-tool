@@ -4,13 +4,16 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import net.patowen.songanalyzer.bundle.DeckBundle;
 import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.deck.Mack;
-import net.patowen.songanalyzer.deck.MarkerMack;
 import net.patowen.songanalyzer.deck.MackRefs;
+import net.patowen.songanalyzer.deck.MarkerMack;
 import net.patowen.songanalyzer.deck.TrackBounds;
 import net.patowen.songanalyzer.deck.beatmack.BeatFunction.Knot;
 import net.patowen.songanalyzer.undo.UserAction;
@@ -187,6 +190,43 @@ public class BeatMack extends Mack {
 		beatFunction.save(defaultBeatFunctionDict);
 		Dict beatFunctionDict = dict.getOrDefault(Keys.beatFunction, defaultBeatFunctionDict).asDict();
 		beatFunction.load(beatFunctionDict);
+	}
+	
+	public void beatsaberExport(FileWriter writer, double totalTime) throws IOException {
+		double lastBeat = -1e-6;
+		ArrayList<Double> beats = new ArrayList<Double>();
+		
+		while (true) {
+			double currentBeat = beatFunction.findTimeForNextBeat(lastBeat);
+			if (currentBeat >= totalTime) {
+				break;
+			}
+			beats.add(currentBeat);
+			lastBeat = currentBeat;
+		}
+		
+		if (beats.size() < 2) {
+			writer.write("Song too short; no beats.");
+			return;
+		}
+		
+		int avgTempoBpm = (int)Math.round(((double)(beats.size() - 1)) / (beats.get(beats.size() - 1) - beats.get(0)) * 60);
+		writer.write("Using display tempo: " + avgTempoBpm + System.lineSeparator());
+		double avgTempo = (double)avgTempoBpm / 60.0;
+		
+		writer.write("\"_BPMChanges\":[");
+		for (int i=0; i<beats.size()-1; i++) {
+			if (i != 0) {
+				writer.write(",");
+			}
+			
+			double start = beats.get(i);
+			double end = beats.get(i+1);
+			double bpm = 60.0 / (end - start);
+			double time = start * avgTempo;
+			writer.write("{\"_BPM\":" + bpm + ",\"_time\":" + time + ",\"_beatsPerBar\":4,\"_metronomeOffset\":1}");
+		}
+		writer.write("]");
 	}
 	
 	private class MoveKnotAtMouse implements InputActionDrag {

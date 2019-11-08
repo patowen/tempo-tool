@@ -206,8 +206,8 @@ public class Root extends View {
 		Path path = dialogManager.getUserChosenPath(
 				config.getConfigEntryPath(Config.Keys.DEFAULT_BEATSABER_EXPORT_FOLDER),
 				null,
-				"Beat Saber data files",
-				new String[] {"dat"},
+				"Beat Saber copy/paste instructions (txt)",
+				new String[] {"txt"},
 				DialogManager.DialogKind.SAVE);
 		
 		if (path == null) {

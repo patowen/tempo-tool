@@ -38,6 +38,7 @@ public class Deck extends View {
 	private final DeckBundle bundle;
 	private final AudioPlayer audioPlayer;
 	private final TrackBounds trackBounds;
+	private final MackRefs mackRefs;
 	
 	private final Grid grid = new Grid();
 	
@@ -49,6 +50,7 @@ public class Deck extends View {
 		bundle = new DeckBundle(rootBundle);
 		audioPlayer = bundle.audioPlayer;
 		trackBounds = bundle.trackBounds;
+		mackRefs = bundle.mackRefs;
 		
 		tabColumn.trySetSize(8);
 		
@@ -129,7 +131,13 @@ public class Deck extends View {
 	}
 	
 	public void beatsaberExport(FileWriter writer) throws IOException {
-		writer.write("Hello world!");
+		BeatMack beatMack = mackRefs.mainBeatMack;
+		if (beatMack == null) {
+			writer.write("Main beat mack not set. No data.");
+			return;
+		}
+		
+		beatMack.beatsaberExport(writer, audioPlayer.getLength());
 	}
 	
 	private interface Keys {
