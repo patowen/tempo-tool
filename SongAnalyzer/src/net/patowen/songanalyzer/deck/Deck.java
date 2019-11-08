@@ -3,6 +3,8 @@ package net.patowen.songanalyzer.deck;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -124,6 +126,10 @@ public class Deck extends View {
 		deckRows.add(new DeckRow(trackColumn, SeekMack.type, bundle));
 		deckRows.add(new DeckRow(trackColumn, MarkerMack.type, bundle));
 		deckRows.add(new DeckRow(trackColumn, BeatMack.type, bundle));
+	}
+	
+	public void beatsaberExport(FileWriter writer) throws IOException {
+		writer.write("Hello world!");
 	}
 	
 	private interface Keys {

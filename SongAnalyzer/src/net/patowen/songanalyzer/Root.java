@@ -10,6 +10,7 @@ import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -93,6 +94,7 @@ public class Root extends View {
 		inputDictionary.addInputMapping(new InputMapping(new Save(), new InputTypeKeyboard(KeyEvent.VK_S, true, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new SaveWithForcedDialog(), new InputTypeKeyboard(KeyEvent.VK_S, true, true, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new Open(), new InputTypeKeyboard(KeyEvent.VK_O, true, false, false), 1));
+		inputDictionary.addInputMapping(new InputMapping(new BeatsaberExport(), new InputTypeKeyboard(KeyEvent.VK_B, true, false, false), 1));
 		
 		inputDictionary.addInputMapping(new InputMapping(new TogglePlay(), new InputTypeKeyboard(KeyEvent.VK_SPACE, false, false, false), 1));
 		
@@ -198,6 +200,31 @@ public class Root extends View {
 		} catch (EOFException e) {
 			throw new FileFormatException("File contents ended earlier than expected");
 		}
+	}
+	
+	private void doBeatsaberExportFlow() {
+		Path path = dialogManager.getUserChosenPath(
+				config.getConfigEntryPath(Config.Keys.DEFAULT_BEATSABER_EXPORT_FOLDER),
+				null,
+				"Beat Saber data files",
+				new String[] {"dat"},
+				DialogManager.DialogKind.SAVE);
+		
+		if (path == null) {
+			return;
+		}
+		
+		try (FileWriter writer = new FileWriter(path.toFile())) {
+			beatsaberExport(writer);
+		} catch (IOException e) {
+			dialogManager.showErrorDialog(path, DialogManager.DialogKind.SAVE);
+		}
+		
+		config.setConfigEntryPath(Config.Keys.DEFAULT_BEATSABER_EXPORT_FOLDER, path.getParent());
+	}
+	
+	private void beatsaberExport(FileWriter writer) throws IOException {
+		deck.beatsaberExport(writer);
 	}
 	
 	private boolean prechosenSaveOrLoad(Path path, DialogManager.DialogKind dialogKind, boolean quiet) {
@@ -307,6 +334,14 @@ public class Root extends View {
 		@Override
 		public boolean onAction(Point pos, double value) {
 			dialogLoad();
+			return true;
+		}
+	}
+	
+	private class BeatsaberExport implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			doBeatsaberExportFlow();
 			return true;
 		}
 	}

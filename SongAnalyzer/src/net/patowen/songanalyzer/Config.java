@@ -31,12 +31,14 @@ public class Config {
 		String DEFAULT_FILE = "defaultFile"; // Which file to open when launching the program
 		String DEFAULT_FOLDER = "defaultFolder"; // Which folder to open by default when saving or loading
 		String DEFAULT_SONG_FOLDER = "defaultSongFolder"; // Which folder to open by default when loading sound files
+		String DEFAULT_BEATSABER_EXPORT_FOLDER = "DefaultBeatsaberExportFolder";
 	}
 	
 	private void initConfigEntries() {
 		addConfigEntryPath(Keys.DEFAULT_FILE, null);
 		addConfigEntryPath(Keys.DEFAULT_FOLDER, Paths.get(""));
 		addConfigEntryPath(Keys.DEFAULT_SONG_FOLDER, Paths.get(""));
+		addConfigEntryPath(Keys.DEFAULT_BEATSABER_EXPORT_FOLDER, Paths.get(""));
 	}
 	
 	public boolean loadConfig() {
