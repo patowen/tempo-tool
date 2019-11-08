@@ -21,8 +21,11 @@ public class DialogManager {
 		this.parent = parent;
 	}
 	
-	public Path getUserChosenPath(Path startDirectory, String filterDescription, String[] filterExtensions, DialogKind dialogKind) {
+	public Path getUserChosenPath(Path startDirectory, Path startFile, String filterDescription, String[] filterExtensions, DialogKind dialogKind) {
 		JFileChooser fileChooser = new JFileChooser(startDirectory.toFile());
+		if (startFile != null) {
+			fileChooser.setSelectedFile(startFile.toFile());
+		}
 		FileNameExtensionFilter filter = new FileNameExtensionFilter(filterDescription, filterExtensions);
 		fileChooser.setFileFilter(filter);
 		

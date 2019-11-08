@@ -129,6 +129,7 @@ public class AudioPlayer {
 	public void chooseAudioFileFromUser(Config config, DialogManager fileDialogManager) {
 		Path path = fileDialogManager.getUserChosenPath(
 				config.getConfigEntryPath(Keys.DEFAULT_SONG_FOLDER),
+				null,
 				"Supported sound files",
 				new String[] {"wav", "mp3"},
 				DialogKind.OPEN);

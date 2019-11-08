@@ -230,6 +230,7 @@ public class Root extends View {
 	private Path dialogSaveOrLoad(DialogManager.DialogKind dialogKind) {
 		Path path = dialogManager.getUserChosenPath(
 				config.getConfigEntryPath(Config.Keys.DEFAULT_FOLDER),
+				config.getConfigEntryPath(Config.Keys.DEFAULT_FILE),
 				"Song analyis files",
 				new String[] {"songanalysis"},
 				dialogKind);

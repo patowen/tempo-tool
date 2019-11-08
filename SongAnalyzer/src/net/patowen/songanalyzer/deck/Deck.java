@@ -165,6 +165,9 @@ public class Deck extends View {
 				throw new FileFormatException("Unknown mack type " + e.getType());
 			}
 		}
+		
+		grid.setWidth(width);
+		grid.setHeight(height);
 	}
 
 	@Override
