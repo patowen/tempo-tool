@@ -41,12 +41,9 @@ public class BeatFunction {
 		Knot newKnot = new Knot();
 		newKnot.time = time;
 		newKnot.phase = phase;
-		return newKnot;
-	}
-	
-	public void insertKnot(Knot knot) {
-		Knot previousKnot = getKnotFromEntry(knots.floorEntry(knot.time));
-		Knot nextKnot = getKnotFromEntry(knots.ceilingEntry(knot.time));
+		
+		Knot previousKnot = getKnotFromEntry(knots.floorEntry(time));
+		Knot nextKnot = getKnotFromEntry(knots.ceilingEntry(time));
 		Region region;
 		if (nextKnot == null) {
 			region = previousKnot.regionAfter;
@@ -56,10 +53,22 @@ public class BeatFunction {
 		
 		Region[] newRegions = splitRegion(region);
 		
-		knot.regionBefore = newRegions[0];
-		knot.regionAfter = newRegions[1];
+		newKnot.regionBefore = newRegions[0];
+		newKnot.regionAfter = newRegions[1];
 		
+		return newKnot;
+	}
+	
+	public void insertKnot(Knot knot) {
 		knots.put(knot.time, knot);
+		Knot previousKnot = getKnotFromEntry(knots.lowerEntry(knot.time));
+		Knot nextKnot = getKnotFromEntry(knots.ceilingEntry(knot.time));
+		if (previousKnot != null) {
+			previousKnot.regionAfter = knot.regionBefore;
+		}
+		if (nextKnot != null) {
+			nextKnot.regionBefore = knot.regionAfter;
+		}
 		
 		createSpline();
 	}
