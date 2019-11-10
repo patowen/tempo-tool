@@ -20,15 +20,15 @@ public class BeatFunction {
 		startKnot.time = 0;
 		startKnot.phase = 0;
 		
-		startKnot.regionBefore = new CubicRegion();
-		startKnot.regionAfter = new CubicRegion();
+		startKnot.regionBefore = Region.cubic;
+		startKnot.regionAfter = Region.cubic;
 		
 		Knot laterKnot = new Knot();
 		laterKnot.time = 8;
 		laterKnot.phase = 8;
 		
 		laterKnot.regionBefore = startKnot.regionAfter;
-		laterKnot.regionAfter = new CubicRegion();
+		laterKnot.regionAfter = Region.cubic;
 		
 		knots.put(startKnot.time, startKnot);
 		knots.put(laterKnot.time, laterKnot);
@@ -44,14 +44,14 @@ public class BeatFunction {
 		
 		Knot previousKnot = getKnotFromEntry(knots.floorEntry(time));
 		Knot nextKnot = getKnotFromEntry(knots.ceilingEntry(time));
-		Region region;
+		int region;
 		if (nextKnot == null) {
 			region = previousKnot.regionAfter;
 		} else {
 			region = nextKnot.regionBefore;
 		}
 		
-		Region[] newRegions = splitRegion(region);
+		int[] newRegions = splitRegion(region);
 		
 		newKnot.regionBefore = newRegions[0];
 		newKnot.regionAfter = newRegions[1];
@@ -82,7 +82,7 @@ public class BeatFunction {
 		Knot previousKnot = getKnotFromEntry(knots.lowerEntry(knot.time));
 		Knot nextKnot = getKnotFromEntry(knots.higherEntry(knot.time));
 		
-		Region mergedRegion = mergeRegions(knot.regionBefore, knot.regionAfter);
+		int mergedRegion = mergeRegions(knot.regionBefore, knot.regionAfter);
 		if (previousKnot != null) {
 			previousKnot.regionAfter = mergedRegion;
 		}
@@ -192,14 +192,14 @@ public class BeatFunction {
 	}
 	
 	// Splitting followed by merging regions should be a no-op, or undo/redo will be broken.
-	private Region[] splitRegion(Region region) {
+	private int[] splitRegion(int region) {
 		// TODO: Implement
-		return new Region[] {new CubicRegion(), new CubicRegion()};
+		return new int[] {Region.cubic, Region.cubic};
 	}
 	
-	private Region mergeRegions(Region regionBefore, Region regionAfter) {
+	private int mergeRegions(int regionBefore, int regionAfter) {
 		// TODO: Implement
-		return new CubicRegion();
+		return Region.cubic;
 	}
 	
 	private interface Keys {
@@ -226,16 +226,15 @@ public class BeatFunction {
 			knotDict.set(KnotKeys.phase, knot.phase);
 			knotArr.add(knotDict);
 			
-			Region region = knot.regionBefore;
+			int region = knot.regionBefore;
 			Dict regionDict = new Dict();
-			regionDict.set(RegionKeys.type, region.getType());
-			region.save(regionDict);
+			regionDict.set(RegionKeys.type, region);
 			regionArr.add(regionDict);
 		}
 		
-		Region finalRegion = knots.lastEntry().getValue().regionAfter;
+		int finalRegion = knots.lastEntry().getValue().regionAfter;
 		Dict finalRegionDict = new Dict();
-		finalRegionDict.set(RegionKeys.type, finalRegion.getType());
+		finalRegionDict.set(RegionKeys.type, finalRegion);
 		regionArr.add(finalRegionDict);
 		
 		dict.set(Keys.knots, knotArr);
@@ -248,17 +247,10 @@ public class BeatFunction {
 		List<Obj> knotArr = dict.get(Keys.knots).asArr().get();
 		List<Obj> regionArr = dict.get(Keys.regions).asArr().get();
 		
-		Region[] regions = new Region[regionArr.size()];
+		int[] regions = new int[regionArr.size()];
 		for (int i=0; i<regions.length; i++) {
 			Dict regionDict = regionArr.get(i).asDict();
-			switch (regionDict.get(RegionKeys.type).asInt()) {
-			case CubicRegion.type:
-				regions[i] = new CubicRegion();
-				break;
-			default:
-				throw new FileFormatException("Unexpected region type in beat function");
-			}
-			regions[i].load(regionDict);
+			regions[i] = regionDict.get(RegionKeys.type).asInt();
 		}
 		
 		for (int i=0; i<knotArr.size(); i++) {
@@ -278,8 +270,8 @@ public class BeatFunction {
 		private double time;
 		private double phase;
 		
-		private Region regionBefore;
-		private Region regionAfter;
+		private int regionBefore;
+		private int regionAfter;
 		
 		private int splineIndex;
 		
@@ -289,29 +281,7 @@ public class BeatFunction {
 	}
 	
 	private interface Region {
-		public void save(Dict dict);
-		
-		public void load(Dict dict) throws FileFormatException;
-		
-		public int getType();
-	}
-	
-	// TODO: Linear region
-	
-	private class CubicRegion implements Region {
-		public static final int type = 0;
-		
-		@Override
-		public void save(Dict dict) {
-		}
-		
-		@Override
-		public void load(Dict dict) throws FileFormatException {
-		}
-		
-		@Override
-		public int getType() {
-			return type;
-		}
+		int cubic = 0;
+		int linear = 1;
 	}
 }
