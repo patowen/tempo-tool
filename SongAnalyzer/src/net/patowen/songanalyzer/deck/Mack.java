@@ -18,4 +18,6 @@ public abstract class Mack extends View {
 	public abstract void save(Dict dict);
 	
 	public abstract void load(Dict dict) throws FileFormatException;
+	
+	public abstract void destroy();
 }

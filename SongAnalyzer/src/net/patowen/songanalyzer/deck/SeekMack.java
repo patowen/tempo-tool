@@ -65,6 +65,10 @@ public class SeekMack extends Mack {
 	public void load(Dict dict) throws FileFormatException {
 	}
 	
+	@Override
+	public void destroy() {
+	}
+	
 	private class Seek implements InputActionStandard {
 		@Override
 		public boolean onAction(Point pos, double value) {

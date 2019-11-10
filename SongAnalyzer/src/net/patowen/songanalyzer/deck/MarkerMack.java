@@ -218,4 +218,8 @@ public class MarkerMack extends Mack {
 			marks.add(obj.asDouble());
 		}
 	}
+	
+	@Override
+	public void destroy() {
+	}
 }

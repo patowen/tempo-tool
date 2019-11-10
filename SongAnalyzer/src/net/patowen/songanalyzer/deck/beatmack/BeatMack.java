@@ -8,6 +8,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import net.patowen.songanalyzer.Ticker;
+import net.patowen.songanalyzer.TickerSource;
 import net.patowen.songanalyzer.bundle.DeckBundle;
 import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
@@ -36,6 +38,8 @@ public class BeatMack extends Mack {
 	private final UserActionList userActionList;
 	private final TrackBounds trackBounds;
 	private final MackRefs mackRefs;
+	private final Ticker ticker;
+	private final TickerSource tickerSource;
 	
 	private BeatFunction beatFunction;
 	
@@ -55,13 +59,15 @@ public class BeatMack extends Mack {
 		userActionList = bundle.userActionList;
 		trackBounds = bundle.trackBounds;
 		mackRefs = bundle.mackRefs;
+		ticker = bundle.ticker;
 		
 		beatFunction = new BeatFunction();
 		
 		minTempo = 0;
 		maxTempo = 5;
 		
-		bundle.ticker.addSource(new BeatMackTickerSource(beatFunction));
+		tickerSource = new BeatMackTickerSource(beatFunction);
+		//ticker.addSource(tickerSource);
 	}
 
 	@Override
@@ -190,6 +196,11 @@ public class BeatMack extends Mack {
 		beatFunction.save(defaultBeatFunctionDict);
 		Dict beatFunctionDict = dict.getOrDefault(Keys.beatFunction, defaultBeatFunctionDict).asDict();
 		beatFunction.load(beatFunctionDict);
+	}
+	
+	@Override
+	public void destroy() {
+		ticker.removeSource(tickerSource);
 	}
 	
 	public void beatsaberExport(FileWriter writer, double totalTime) throws IOException {
