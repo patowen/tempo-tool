@@ -46,6 +46,18 @@ public class AudioPlayer {
 		}
 	}
 	
+	public void reset() {
+		if (audioStream != null) {
+			audioStream.destroy();
+			audioStream = null;
+		}
+		playingAnimation.stop();
+		bufferingAnimation.stop();
+		
+		audioFile = null;
+		speed = 1;
+	}
+	
 	public void resetTicker() {
 		if (audioStream != null) {
 			audioStream.resetTicker();

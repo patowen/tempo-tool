@@ -94,6 +94,7 @@ public class Root extends View {
 		inputDictionary.addInputMapping(new InputMapping(new Save(), new InputTypeKeyboard(KeyEvent.VK_S, true, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new SaveWithForcedDialog(), new InputTypeKeyboard(KeyEvent.VK_S, true, true, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new Open(), new InputTypeKeyboard(KeyEvent.VK_O, true, false, false), 1));
+		inputDictionary.addInputMapping(new InputMapping(new NewFile(), new InputTypeKeyboard(KeyEvent.VK_N, true, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new BeatsaberExport(), new InputTypeKeyboard(KeyEvent.VK_B, true, false, false), 1));
 		
 		inputDictionary.addInputMapping(new InputMapping(new TogglePlay(), new InputTypeKeyboard(KeyEvent.VK_SPACE, false, false, false), 1));
@@ -155,6 +156,9 @@ public class Root extends View {
 	}
 	
 	private void reset() {
+		userActionList.clear();
+		audioPlayer.reset();
+		header.reset();
 		deck.reset();
 	}
 	
@@ -334,6 +338,15 @@ public class Root extends View {
 		@Override
 		public boolean onAction(Point pos, double value) {
 			dialogLoad();
+			return true;
+		}
+	}
+	
+	private class NewFile implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			reset();
+			currentFile = null;
 			return true;
 		}
 	}

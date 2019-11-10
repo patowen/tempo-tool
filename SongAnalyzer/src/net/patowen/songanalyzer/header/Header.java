@@ -15,18 +15,27 @@ import net.patowen.songanalyzer.userinput.MouseHoverFeedback;
 import net.patowen.songanalyzer.view.View;
 
 public class Header extends View {
+	private final RootBundle bundle;
+	
 	private final Grid grid;
 	private final GridRow gridRow;
 	private final List<HeaderColumn> headerColumns = new ArrayList<>();
 	
 	public Header(RootBundle bundle) {
+		this.bundle = bundle;
+		
 		grid = new Grid();
 		gridRow = new GridRow();
 		grid.setCenterRow(gridRow);
 		
+		reset();
+		grid.setStartColumns(headerColumns);
+	}
+	
+	public void reset() {
+		headerColumns.clear();
 		headerColumns.add(new HeaderColumn(gridRow, new AudioFileSelector(bundle)));
 		headerColumns.add(new HeaderColumn(gridRow, new PlaySpeedInput(bundle)));
-		grid.setStartColumns(headerColumns);
 	}
 	
 	public int getPreferredHeight() {
