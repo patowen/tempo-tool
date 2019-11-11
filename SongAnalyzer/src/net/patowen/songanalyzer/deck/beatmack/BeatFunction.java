@@ -193,12 +193,13 @@ public class BeatFunction {
 	
 	// Splitting followed by merging regions should be a no-op, or undo/redo will be broken.
 	private int[] splitRegion(int region) {
-		// TODO: Implement
-		return new int[] {Region.cubic, Region.cubic};
+		return new int[] {region, region};
 	}
 	
 	private int mergeRegions(int regionBefore, int regionAfter) {
-		// TODO: Implement
+		if (regionBefore == Region.linear || regionAfter == Region.linear) {
+			return Region.linear;
+		}
 		return Region.cubic;
 	}
 	
