@@ -1,6 +1,7 @@
 package net.patowen.songanalyzer.deck.beatmack;
 
 import java.util.Arrays;
+import java.util.List;
 
 // A new Spline needs to be constructed when the number of knots changes.
 public class Spline {
@@ -14,8 +15,11 @@ public class Spline {
 	
 	private final TridiagonalSystem system;
 	
-	public Spline(int numRegions) {
-		this.numRegions = numRegions;
+	public Spline(List<KnotType> knots) {
+		if (knots.size() < 2) {
+			throw new IllegalArgumentException("Spline needs at least two knots");
+		}
+		this.numRegions = knots.size() - 1;
 		
 		x = new double[numRegions + 1];
 		y = new double[numRegions + 1];
@@ -106,5 +110,12 @@ public class Spline {
 		}
 		System.err.println("Newton's method failed to converge in time");
 		return null;
+	}
+	
+	public enum KnotType {
+		Smoothest,
+		ConformToEarlier,
+		ConformToLater,
+		NonDifferentiable,
 	}
 }

@@ -1,5 +1,6 @@
 package net.patowen.songanalyzer.deck.beatmack;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -8,6 +9,7 @@ import net.patowen.songanalyzer.data.Arr;
 import net.patowen.songanalyzer.data.Dict;
 import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.data.Obj;
+import net.patowen.songanalyzer.deck.beatmack.Spline.KnotType;
 
 public class BeatFunction {
 	private Spline spline;
@@ -163,14 +165,26 @@ public class BeatFunction {
 	}
 	
 	private void createSpline() {
-		spline = new Spline(knots.size() - 1);
+		ArrayList<KnotType> splineKnots = new ArrayList<>();
 		int splineIndex = 0;
 		
 		for (Knot knot : knots.values()) {
 			knot.splineIndex = splineIndex;
+			
+			KnotType knotType;
+			if (knots.firstEntry().getValue() == knot) {
+				knotType = KnotType.ConformToLater;
+			} else if (knots.lastEntry().getValue() == knot) {
+				knotType = KnotType.ConformToEarlier;
+			} else {
+				knotType = KnotType.Smoothest;
+			}
+			
+			splineKnots.add(knotType);
 			splineIndex++;
 		}
 		
+		spline = new Spline(splineKnots);
 		updateSpline();
 	}
 	
