@@ -78,8 +78,9 @@ public class BeatMack extends Mack {
 	@Override
 	public void render(Graphics2D g) {
 		//renderBeats(g);
-		renderScatterplot(g);
-		renderTempoGraph(g);
+		//renderScatterplot(g);
+		//renderTempoGraph(g);
+		renderPhaseGraph(g);
 		renderKnots(g);
 	}
 	
