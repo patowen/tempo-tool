@@ -17,8 +17,6 @@ public class Spline {
 	private final Section[] sections;
 	
 	public Spline(List<KnotType> knots) {
-		System.out.println(knots);
-		
 		if (knots.size() < 2) {
 			throw new IllegalArgumentException("Spline needs at least two knots");
 		}
@@ -140,7 +138,8 @@ public class Spline {
 			}
 			guess = newGuess;
 		}
-		//System.err.println("Newton's method failed to converge in time");
+		
+		System.err.println("Newton's method failed to converge in time");
 		return null;
 	}
 	
@@ -188,7 +187,7 @@ public class Spline {
 					system.d[i] += constTerm;
 				}
 				
-				if (useEarlier[i]) {
+				if (useEarlier[i+1]) {
 					system.a[i+1] += coeffTerm;
 					system.b[i+1] += 2 * coeffTerm;
 					system.d[i+1] += constTerm;
@@ -198,8 +197,8 @@ public class Spline {
 			system.solve();
 			
 			for (int i=0; i<numRegions; i++) {
-				a[offset + i] = system.x[i] * (x[offset + i + 1] - x[offset + i]) - (y[offset + i+1] - y[offset + i]);
-				b[offset + i] = -system.x[i+1] * (x[offset + i + 1] - x[offset + i]) + (y[offset + i+1] - y[offset + i]);
+				a[offset + i] = system.x[i] * (x[offset + i + 1] - x[offset + i]) - (y[offset + i + 1] - y[offset + i]);
+				b[offset + i] = -system.x[i+1] * (x[offset + i + 1] - x[offset + i]) + (y[offset + i + 1] - y[offset + i]);
 			}
 		}
 	}
