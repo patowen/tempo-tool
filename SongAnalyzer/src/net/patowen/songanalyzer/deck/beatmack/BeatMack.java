@@ -224,9 +224,10 @@ public class BeatMack extends Mack {
 		}
 		
 		int avgTempoBpm = (int)Math.round(((double)(beats.size() - 1)) / (beats.get(beats.size() - 1) - beats.get(0)) * 60);
+		avgTempoBpm = 75;
 		writer.write("Using display tempo: " + avgTempoBpm + System.lineSeparator());
 		double avgTempo = (double)avgTempoBpm / 60.0;
-		double tolerance = 0.005;
+		double tolerance = 0.000005;
 		
 		writer.write("\"_BPMChanges\":[");
 		int startIndex = 0;
@@ -252,7 +253,7 @@ public class BeatMack extends Mack {
 		double secondsPerBeat = (beats.get(endIndex) - beats.get(startIndex)) / (double)(endIndex - startIndex);
 		double firstBeat = beats.get(startIndex);
 		
-		for (int i=startIndex+1; i<endIndex-1; i++) {
+		for (int i=startIndex+1; i<=endIndex-1; i++) {
 			double deviation = Math.abs(beats.get(i) - (firstBeat + secondsPerBeat * (i - startIndex)));
 			if (deviation > maxDeviation) {
 				maxDeviation = deviation;
@@ -416,7 +417,6 @@ public class BeatMack extends Mack {
 				double desired = Math.max(1, original + value);
 				
 				userActionList.applyAction(new PhaseDisplacementModificationAction(time, original, desired));
-				System.out.println(desired);
 				
 				return true;
 			}

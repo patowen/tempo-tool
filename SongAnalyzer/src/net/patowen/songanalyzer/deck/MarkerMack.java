@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.TreeSet;
 
 import net.patowen.songanalyzer.AudioPlayer;
-import net.patowen.songanalyzer.TickerSource;
 import net.patowen.songanalyzer.bundle.DeckBundle;
 import net.patowen.songanalyzer.data.Arr;
 import net.patowen.songanalyzer.data.Dict;

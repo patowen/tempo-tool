@@ -94,20 +94,24 @@ public class Spline {
 		}
 		i = -i - 2;
 		
-		if (i == -1) {
-			double t = (xVal - x[i+1]) / (x[i+2] - x[i+1]);
-			return y[i+1] + t * (y[i+2] - y[i+1] + a[i+1]);
+		return eval(xVal, i);
+	}
+	
+	public double eval(double xVal, int region) {
+		if (region == -1) {
+			double t = (xVal - x[region+1]) / (x[region+2] - x[region+1]);
+			return y[region+1] + t * (y[region+2] - y[region+1] + a[region+1]);
 		}
 		
-		if (i == numRegions) {
-			double s = (x[i] - xVal) / (x[i] - x[i-1]);
-			return y[i] - s * (y[i] - y[i-1] - b[i-1]);
+		if (region == numRegions) {
+			double s = (x[region] - xVal) / (x[region] - x[region-1]);
+			return y[region] - s * (y[region] - y[region-1] - b[region-1]);
 		}
 		
-		double t = (xVal - x[i]) / (x[i+1] - x[i]);
+		double t = (xVal - x[region]) / (x[region+1] - x[region]);
 		double s = 1 - t;
 		
-		return s*y[i] + t*y[i+1] + t*s*(s*a[i] + t*b[i]);
+		return s*y[region] + t*y[region+1] + t*s*(s*a[region] + t*b[region]);
 	}
 	
 	public double derivative(double xVal) {
@@ -116,23 +120,43 @@ public class Spline {
 			i = -i - 2;
 		}
 		
-		if (i == -1) {
-			return (y[i+2] - y[i+1] + a[i+1]) / (x[i+2] - x[i+1]);
+		return derivative(xVal, i);
+	}
+	
+	public double derivative(double xVal, int region) {
+		if (region == -1) {
+			return (y[region+2] - y[region+1] + a[region+1]) / (x[region+2] - x[region+1]);
 		}
 		
-		if (i == numRegions) {
-			return (y[i] - y[i-1] - b[i-1]) / (x[i] - x[i-1]);
+		if (region == numRegions) {
+			return (y[region] - y[region-1] - b[region-1]) / (x[region] - x[region-1]);
 		}
 		
-		double t = (xVal - x[i]) / (x[i+1] - x[i]);
+		double t = (xVal - x[region]) / (x[region+1] - x[region]);
 		double s = 1 - t;
 		
-		return (y[i+1] - y[i] + (s - t)*(s*a[i] + t*b[i]) + t*s*(b[i] - a[i])) / (x[i+1] - x[i]);
+		return (y[region+1] - y[region] + (s - t)*(s*a[region] + t*b[region]) + t*s*(b[region] - a[region])) / (x[region+1] - x[region]);
 	}
 	
 	public Double invEval(double y, double guess) {
+		// Start in the right region
+		int region = Arrays.binarySearch(this.y, y);
+		if (region >= 0) {
+			return x[region];
+		}
+		
+		region = -region - 2;
+		if (region >= 0 && guess < x[region]) {
+			guess = x[region];
+		}
+		
+		if (region < numRegions && guess > x[region + 1]) {
+			guess = x[region + 1];
+		}
+		
+		// Newton's method
 		for (int i=0; i<10; i++) {
-			double newGuess = guess - (eval(guess) - y) / derivative(guess);
+			double newGuess = guess - (eval(guess, region) - y) / derivative(guess, region);
 			if (newGuess > guess - 1e-12 && newGuess < guess + 1e-12) {
 				return newGuess;
 			}
