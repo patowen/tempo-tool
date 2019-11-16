@@ -161,7 +161,7 @@ public class AudioStream {
 	private double getTickAmp(int index) {
 		double pos = (double)index / (double)samplingRate;
 		if (pos > 0 && pos < 0.01) {
-			return Math.sin(Math.PI * 2 * 800 * pos) * Short.MAX_VALUE;
+			return Math.sin(Math.PI * 2 * 1000 * pos) * Math.exp(-pos*100) * Short.MAX_VALUE;
 		}
 		return 0;
 	}
