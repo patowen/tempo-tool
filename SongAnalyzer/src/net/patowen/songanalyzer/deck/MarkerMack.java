@@ -47,7 +47,7 @@ public class MarkerMack extends Mack {
 		inputDictionary.addInputMapping(new InputMapping(new AddMarkAtPlayerPos(), new InputTypeKeyboard(KeyEvent.VK_N, false, false, false), 1));
 		inputDictionary.constructDictionary();
 		
-		bundle.ticker.addSource(new TickerSource() {
+		/*bundle.ticker.addSource(new TickerSource() {
 			@Override
 			public Double getNextTickInclusive(double pos) {
 				return marks.ceiling(pos);
@@ -57,7 +57,7 @@ public class MarkerMack extends Mack {
 			public Double getNextTickExclusive(double pos) {
 				return marks.higher(pos);
 			}
-		});
+		});*/
 		
 		this.trackBounds = bundle.trackBounds;
 		this.userActionList = bundle.userActionList;

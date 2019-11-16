@@ -75,12 +75,28 @@ public class BeatFunction {
 		createSpline();
 	}
 	
-	public void deleteKnot(Knot knot) {
-		if (knots.size() <= 2) {
-			// Minimum of 2 knots for correct functionality
-			return;
+	public boolean canDeleteKnot(Knot knot) {
+		return knots.size() > 2;
+	}
+	
+	public boolean regionHasPhaseDisplacement(double time) {
+		return (!knots.containsKey(time) && time > knots.firstKey() && time < knots.lastKey());
+	}
+	
+	public double getRegionPhaseDisplacement(double time) {
+		return knots.higherEntry(time).getValue().phase - knots.lowerEntry(time).getValue().phase;
+	}
+	
+	public void setRegionPhaseDisplacement(double time, double phaseDisplacement) {
+		double phaseDisplacementDelta = phaseDisplacement - getRegionPhaseDisplacement(time);
+		for (Knot knot : knots.tailMap(time).values()) {
+			knot.phase += phaseDisplacementDelta;
 		}
 		
+		updateSpline();
+	}
+	
+	public void deleteKnot(Knot knot) {
 		Knot previousKnot = getKnotFromEntry(knots.lowerEntry(knot.time));
 		Knot nextKnot = getKnotFromEntry(knots.higherEntry(knot.time));
 		
@@ -177,7 +193,7 @@ public class BeatFunction {
 			} else if (knots.lastEntry().getValue() == knot) {
 				knotType = KnotType.ConformToEarlier;
 			} else {
-				knotType = KnotType.Smoothest;
+				knotType = KnotType.NonDifferentiable;
 			}
 			
 			splineKnots.add(knotType);

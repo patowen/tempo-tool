@@ -53,6 +53,7 @@ public class BeatMack extends Mack {
 		inputDictionary.addInputMapping(new InputMapping(new MoveKnotAtMouse(), new InputTypeMouse(MouseEvent.BUTTON1, false, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new InsertKnotAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new DeleteKnotAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, true, false), 1));
+		inputDictionary.addInputMapping(new InputMapping(new ChangeRegionPhaseDisplacement(), new InputTypeScroll(true, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new VerticalZoom(), new InputTypeScroll(false, true, false), 1));
 		inputDictionary.constructDictionary();
 		
@@ -67,7 +68,7 @@ public class BeatMack extends Mack {
 		maxTempo = 5;
 		
 		tickerSource = new BeatMackTickerSource(beatFunction);
-		//ticker.addSource(tickerSource);
+		ticker.addSource(tickerSource);
 	}
 
 	@Override
@@ -374,8 +375,10 @@ public class BeatMack extends Mack {
 				int knotPixelX = trackBounds.secondsToPixel(potentialKnot.getTime());
 				
 				if (pos.x >= knotPixelX - selectionRange && pos.x <= knotPixelX + selectionRange) {
-					userActionList.applyAction(new KnotDeletionAction(potentialKnot));
-					return true;
+					if (beatFunction.canDeleteKnot(potentialKnot)) {
+						userActionList.applyAction(new KnotDeletionAction(potentialKnot));
+						return true;
+					}
 				}
 			}
 			return false;
@@ -393,10 +396,53 @@ public class BeatMack extends Mack {
 		public void exec() {
 			beatFunction.deleteKnot(knot);
 		}
-
+		
 		@Override
 		public void undo() {
 			beatFunction.insertKnot(knot);
+		}
+	}
+	
+	private class ChangeRegionPhaseDisplacement implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			if (isWithinView(pos)) {
+				double time = trackBounds.pixelToSeconds(pos.x);
+				if (!beatFunction.regionHasPhaseDisplacement(time)) {
+					return false;
+				}
+				
+				double original = beatFunction.getRegionPhaseDisplacement(time);
+				double desired = Math.max(1, original + value);
+				
+				userActionList.applyAction(new PhaseDisplacementModificationAction(time, original, desired));
+				System.out.println(desired);
+				
+				return true;
+			}
+			return false;
+		}
+	}
+	
+	private class PhaseDisplacementModificationAction implements UserAction {
+		final double time;
+		final double original;
+		final double desired;
+		
+		public PhaseDisplacementModificationAction(double time, double original, double desired) {
+			this.time = time;
+			this.original = original;
+			this.desired = desired;
+		}
+		
+		@Override
+		public void exec() {
+			beatFunction.setRegionPhaseDisplacement(time, desired);
+		}
+		
+		@Override
+		public void undo() {
+			beatFunction.setRegionPhaseDisplacement(time, original);
 		}
 	}
 	
