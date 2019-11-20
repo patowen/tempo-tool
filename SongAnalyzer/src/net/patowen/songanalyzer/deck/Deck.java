@@ -83,7 +83,6 @@ public class Deck extends View {
 		
 		for (DeckRow deckRow : deckRows) {
 			deckRow.mack.forwardRender(g);
-			deckRow.mackTab.setSelected(deckRow.mack == mackRefs.selectedMack);
 			deckRow.mackTab.forwardRender(g);
 		}
 		
@@ -107,21 +106,12 @@ public class Deck extends View {
 				for (DeckRow deckRow : deckRows) {
 					InputAction inputAction = deckRow.mack.forwardInput(inputType, mousePos, value);
 					if (inputAction != null) {
-						mackRefs.selectedMack = deckRow.mack;
 						return inputAction;
 					}
 					
-					if (deckRow.mack != mackRefs.selectedMack
-							&& mousePos.y >= deckRow.getPos() && mousePos.y < deckRow.getPos() + deckRow.getSize()) {
-						mackRefs.selectedMack = deckRow.mack;
-						
-						// TODO: Opportunity for refactor. An input has to be returned to force a refactor.
-						return new InputActionStandard() {
-							@Override
-							public boolean onAction(Point pos, double value) {
-								return true;
-							}
-						};
+					inputAction = deckRow.mackTab.forwardInput(inputType, mousePos, value);
+					if (inputAction != null) {
+						return inputAction;
 					}
 				}
 			}
@@ -257,7 +247,7 @@ public class Deck extends View {
 			trySetSize(mack.getDefaultHeight());
 			setMinimumSize(mack.getMinimumHeight());
 			
-			mackTab = new MackTab();
+			mackTab = new MackTab(bundle, mack);
 			mackTab.setSizer(new GridSizer(tabColumn, this));
 			
 			setResizable(true);
