@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -22,7 +21,7 @@ public class AudioStream {
 	private int numChannels; // Usually 2 for stereo
 	private int bytesPerSample; // Number of bytes in the byte buffer for each sample
 	private float samplingRate; // Usually 44100
-	private ArrayList<Byte> totalBuffer; // Contains uncompressed audio for the entire loaded sound file. Playing cannot begin until the entire sound file is loaded into memory.
+	private FragmentedByteList totalBuffer; // Contains uncompressed audio for the entire loaded sound file. Playing cannot begin until the entire sound file is loaded into memory.
 	private ByteBuffer fragmentBuffer; // Contains the audio that is about to be sent to the OS to play. Includes data from the totalBuffer, possibly slowed down, along with possible metronome ticks. Updated frequently.
 	private int currentSample; // Current position in the totalBuffer. When audio is paused, it is where it will start playing again. When audio is playing, it advances based on what has already been sent to the SourceDataLine, but it will be ahead of what has actually played and cannot be used directly for the play bar.
 	private double currentSubsample; // To allow sound to be played slowed down, fractional samples are allowed, and the fractional part is separated out.
@@ -95,7 +94,7 @@ public class AudioStream {
 						baseFormat.getChannels(), baseFormat.getChannels()*2, baseFormat.getSampleRate(), false);
 		AudioInputStream din = AudioSystem.getAudioInputStream(decodedFormat, in);
 
-		totalBuffer = new ArrayList<Byte>(65536);
+		totalBuffer = new FragmentedByteList(65536);
 		soundFileLoadingThread = new SoundFileLoadingThread(din, totalBuffer);
 		soundFileLoadingThread.start();
 
@@ -148,8 +147,8 @@ public class AudioStream {
 	
 	private double getAmpRaw(int numSamples, int index, int channel) {
 		if (index >= numSamples || index < 0) return 0;
-		int arrayPos = (index*numChannels+channel)*2;
-		return Byte.toUnsignedInt(totalBuffer.get(arrayPos)) + totalBuffer.get(arrayPos + 1) * 256;
+		int totalBufferPos = (index*numChannels+channel)*2;
+		return totalBuffer.get(totalBufferPos) + totalBuffer.get(totalBufferPos + 1) * 256;
 	}
 	
 	private double getAmpInterpolated(int numSamples, int index, double subIndex, int channel) {

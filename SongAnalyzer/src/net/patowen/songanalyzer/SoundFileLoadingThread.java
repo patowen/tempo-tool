@@ -2,14 +2,13 @@ package net.patowen.songanalyzer;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.swing.SwingUtilities;
 
 public class SoundFileLoadingThread extends Thread {
 	private final AudioInputStream audioInputStream;
-	private final ArrayList<Byte> totalBuffer;
+	private final FragmentedByteList totalBuffer;
 	private Status status;
 	
 	private byte[] tempBuffer;
@@ -21,7 +20,7 @@ public class SoundFileLoadingThread extends Thread {
 		ERROR
 	}
 	
-	public SoundFileLoadingThread(AudioInputStream audioInputStream, ArrayList<Byte> totalBuffer) {
+	public SoundFileLoadingThread(AudioInputStream audioInputStream, FragmentedByteList totalBuffer) {
 		this.audioInputStream = audioInputStream;
 		this.totalBuffer = totalBuffer;
 		tempBuffer = new byte[4096];
