@@ -34,6 +34,7 @@ public class MarkerMack extends Mack {
 	private final TrackBounds trackBounds;
 	private final UserActionList userActionList;
 	private final AudioPlayer audioPlayer;
+	private final MackRefs mackRefs;
 	
 	private TreeSet<Double> marks;
 	
@@ -61,6 +62,7 @@ public class MarkerMack extends Mack {
 		this.trackBounds = bundle.trackBounds;
 		this.userActionList = bundle.userActionList;
 		this.audioPlayer = bundle.audioPlayer;
+		this.mackRefs = bundle.mackRefs;
 		this.marks = new TreeSet<>();
 	}
 	
@@ -135,11 +137,14 @@ public class MarkerMack extends Mack {
 	private class AddMarkAtPlayerPos implements InputActionStandard {
 		@Override
 		public boolean onAction(Point pos, double value) {
-			double markPos = audioPlayer.getPos();
-			if (!marks.contains(markPos)) {
-				userActionList.applyAction(new MarkCreationAction(Collections.singleton(markPos)));
-				return true;
+			if (mackRefs.selectedMack == MarkerMack.this) {
+				double markPos = audioPlayer.getPos();
+				if (!marks.contains(markPos)) {
+					userActionList.applyAction(new MarkCreationAction(Collections.singleton(markPos)));
+					return true;
+				}
 			}
+		
 			return false;
 		}
 	}

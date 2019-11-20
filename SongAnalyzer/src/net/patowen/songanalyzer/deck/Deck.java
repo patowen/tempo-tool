@@ -83,6 +83,8 @@ public class Deck extends View {
 		
 		for (DeckRow deckRow : deckRows) {
 			deckRow.mack.forwardRender(g);
+			deckRow.mackTab.setSelected(deckRow.mack == mackRefs.selectedMack);
+			deckRow.mackTab.forwardRender(g);
 		}
 		
 		g.setColor(Color.GREEN);
@@ -105,7 +107,21 @@ public class Deck extends View {
 				for (DeckRow deckRow : deckRows) {
 					InputAction inputAction = deckRow.mack.forwardInput(inputType, mousePos, value);
 					if (inputAction != null) {
+						mackRefs.selectedMack = deckRow.mack;
 						return inputAction;
+					}
+					
+					if (deckRow.mack != mackRefs.selectedMack
+							&& mousePos.y >= deckRow.getPos() && mousePos.y < deckRow.getPos() + deckRow.getSize()) {
+						mackRefs.selectedMack = deckRow.mack;
+						
+						// TODO: Opportunity for refactor. An input has to be returned to force a refactor.
+						return new InputActionStandard() {
+							@Override
+							public boolean onAction(Point pos, double value) {
+								return true;
+							}
+						};
 					}
 				}
 			}
@@ -125,9 +141,9 @@ public class Deck extends View {
 		deckRows.clear();
 		trackBounds.setBounds(0, 60);
 		
-		deckRows.add(new DeckRow(trackColumn, SeekMack.type, bundle));
-		deckRows.add(new DeckRow(trackColumn, MarkerMack.type, bundle));
-		deckRows.add(new DeckRow(trackColumn, BeatMack.type, bundle));
+		deckRows.add(new DeckRow(trackColumn, tabColumn, SeekMack.type, bundle));
+		deckRows.add(new DeckRow(trackColumn, tabColumn, MarkerMack.type, bundle));
+		deckRows.add(new DeckRow(trackColumn, tabColumn, BeatMack.type, bundle));
 	}
 	
 	public void beatsaberExport(FileWriter writer) throws IOException {
@@ -171,7 +187,7 @@ public class Deck extends View {
 		for (Obj obj : arr.get()) {
 			Dict mackDict = obj.asDict();
 			try {
-				DeckRow deckRow = new DeckRow(trackColumn, mackDict.get(MackKeys.type).asInt(), bundle);
+				DeckRow deckRow = new DeckRow(trackColumn, tabColumn, mackDict.get(MackKeys.type).asInt(), bundle);
 				deckRow.trySetSize(mackDict.get(MackKeys.height).asInt());
 				deckRow.mack.load(mackDict);
 				deckRows.add(deckRow);
@@ -214,8 +230,9 @@ public class Deck extends View {
 	
 	private static class DeckRow extends GridRow {
 		final Mack mack;
+		final MackTab mackTab;
 		
-		DeckRow(GridColumn trackColumn, int type, DeckBundle bundle) {
+		DeckRow(GridColumn trackColumn, GridColumn tabColumn, int type, DeckBundle bundle) {
 			MackRefs mackRefs = bundle.mackRefs;
 			
 			switch (type) {
@@ -239,6 +256,10 @@ public class Deck extends View {
 			mack.setSizer(new GridSizer(trackColumn, this));
 			trySetSize(mack.getDefaultHeight());
 			setMinimumSize(mack.getMinimumHeight());
+			
+			mackTab = new MackTab();
+			mackTab.setSizer(new GridSizer(tabColumn, this));
+			
 			setResizable(true);
 		}
 	}
