@@ -3,7 +3,6 @@ package net.patowen.songanalyzer.deck.beatmack;
 import net.patowen.songanalyzer.TickerSource;
 
 public class BeatMackTickerSource implements TickerSource {
-	// TODO: Point to something that won't get replaced
 	private BeatFunction beatFunction;
 	
 	public BeatMackTickerSource(BeatFunction beatFunction) {

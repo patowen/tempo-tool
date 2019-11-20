@@ -259,7 +259,7 @@ public final class Grid {
 	}
 	
 	private final class ActionResize implements InputActionDrag {
-		private GridElement gridElement; // TODO: Use ResizingGridPart
+		private GridElement gridElement;
 		private int initialHeight;
 		
 		@Override

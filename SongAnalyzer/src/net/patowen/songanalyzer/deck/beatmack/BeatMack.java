@@ -41,7 +41,7 @@ public class BeatMack extends Mack {
 	private final Ticker ticker;
 	private final TickerSource tickerSource;
 	
-	private BeatFunction beatFunction;
+	private final BeatFunction beatFunction;
 	
 	private double minTempo;
 	private double maxTempo;
