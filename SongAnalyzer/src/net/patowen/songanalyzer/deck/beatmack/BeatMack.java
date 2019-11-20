@@ -205,6 +205,15 @@ public class BeatMack extends Mack {
 		ticker.removeSource(tickerSource);
 	}
 	
+	@Override
+	public void handleAudibleChange(boolean audible) {
+		if (audible) {
+			ticker.addSource(tickerSource);
+		} else {
+			ticker.removeSource(tickerSource);
+		}
+	}
+	
 	public void beatsaberExport(FileWriter writer, double totalTime) throws IOException {
 		double lastBeat = -1e-6;
 		ArrayList<Double> beats = new ArrayList<Double>();

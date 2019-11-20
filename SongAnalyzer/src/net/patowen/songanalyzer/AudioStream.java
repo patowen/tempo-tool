@@ -49,6 +49,7 @@ public class AudioStream {
 		int samplesThisPass = line.available() / bytesPerSample;
 		
 		double currentPos = getCurrentSampleInSeconds();
+		ticker.resetIfNotReady(currentPos);
 		Double nextTickPos = ticker.getNextTick();
 		
 		for (int i=0; i < samplesThisPass; i++) {

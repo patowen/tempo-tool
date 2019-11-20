@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.TreeSet;
 
 import net.patowen.songanalyzer.AudioPlayer;
+import net.patowen.songanalyzer.Ticker;
+import net.patowen.songanalyzer.TickerSource;
 import net.patowen.songanalyzer.bundle.DeckBundle;
 import net.patowen.songanalyzer.data.Arr;
 import net.patowen.songanalyzer.data.Dict;
@@ -35,6 +37,9 @@ public class MarkerMack extends Mack {
 	private final UserActionList userActionList;
 	private final AudioPlayer audioPlayer;
 	private final MackRefs mackRefs;
+	private final Ticker ticker;
+	
+	private final TickerSource tickerSource;
 	
 	private TreeSet<Double> marks;
 	
@@ -47,7 +52,7 @@ public class MarkerMack extends Mack {
 		inputDictionary.addInputMapping(new InputMapping(new AddMarkAtPlayerPos(), new InputTypeKeyboard(KeyEvent.VK_N, false, false, false), 1));
 		inputDictionary.constructDictionary();
 		
-		/*bundle.ticker.addSource(new TickerSource() {
+		tickerSource = new TickerSource() {
 			@Override
 			public Double getNextTickInclusive(double pos) {
 				return marks.ceiling(pos);
@@ -57,13 +62,16 @@ public class MarkerMack extends Mack {
 			public Double getNextTickExclusive(double pos) {
 				return marks.higher(pos);
 			}
-		});*/
+		};
 		
 		this.trackBounds = bundle.trackBounds;
 		this.userActionList = bundle.userActionList;
 		this.audioPlayer = bundle.audioPlayer;
 		this.mackRefs = bundle.mackRefs;
+		this.ticker = bundle.ticker;
+		
 		this.marks = new TreeSet<>();
+		ticker.addSource(tickerSource);
 	}
 	
 	@Override
@@ -226,5 +234,15 @@ public class MarkerMack extends Mack {
 	
 	@Override
 	public void destroy() {
+		ticker.removeSource(tickerSource);
+	}
+	
+	@Override
+	public void handleAudibleChange(boolean audible) {
+		if (audible) {
+			ticker.addSource(tickerSource);
+		} else {
+			ticker.removeSource(tickerSource);
+		}
 	}
 }

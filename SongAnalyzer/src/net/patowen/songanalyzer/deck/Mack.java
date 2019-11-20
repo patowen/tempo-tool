@@ -28,8 +28,10 @@ public abstract class Mack extends View {
 	}
 	
 	public final void setAudible(boolean audible) {
-		this.audible = audible;
-		handleAudibleChange(audible);
+		if (audible != this.audible) {
+			this.audible = audible;
+			handleAudibleChange(audible);
+		}
 	}
 	
 	protected void handleAudibleChange(boolean audible) {

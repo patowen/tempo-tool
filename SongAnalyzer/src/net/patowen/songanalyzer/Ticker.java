@@ -8,18 +8,25 @@ public class Ticker {
 	private Double lastPlayedTick;
 	private Double nextTick;
 	
+	private boolean ready;
+	
 	public Ticker() {
 		sources = new ArrayList<>();
 		lastPlayedTick = null;
 		nextTick = null;
+		ready = false;
 	}
 	
 	public void addSource(TickerSource source) {
-		sources.add(source);
+		if (!sources.contains(source)) {
+			sources.add(source);
+			ready = false;
+		}
 	}
 	
 	public void removeSource(TickerSource source) {
 		sources.remove(source);
+		ready = false;
 	}
 	
 	public void removeAllSources() {
@@ -29,13 +36,28 @@ public class Ticker {
 	public void reset(double startPos) {
 		lastPlayedTick = null;
 		nextTick = computeNextTickInclusive(startPos);
+		ready = true;
+	}
+	
+	public void resetIfNotReady(double startPos) {
+		if (!ready) {
+			reset(startPos);
+		}
 	}
 	
 	public Double getNextTick() {
+		if (!ready) {
+			throw new IllegalStateException("Not ready");
+		}
+		
 		return nextTick;
 	}
 	
 	public void markNextTickPlayed() {
+		if (!ready) {
+			throw new IllegalStateException("Not ready");
+		}
+		
 		lastPlayedTick = nextTick;
 		nextTick = computeNextTickExclusive(lastPlayedTick);
 	}
