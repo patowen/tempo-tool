@@ -347,6 +347,7 @@ public class Root extends View {
 		public boolean onAction(Point pos, double value) {
 			reset();
 			currentFile = null;
+			config.setConfigEntryPath(Config.Keys.DEFAULT_FILE, null);
 			return true;
 		}
 	}
