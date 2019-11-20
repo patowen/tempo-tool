@@ -128,6 +128,10 @@ public class Deck extends View {
 	}
 	
 	public void reset() {
+		for (DeckRow deckRow : deckRows) {
+			deckRow.mack.destroy();
+		}
+		
 		deckRows.clear();
 		trackBounds.setBounds(0, 60);
 		
@@ -170,6 +174,10 @@ public class Deck extends View {
 	}
 	
 	public void load(Dict dict) throws FileFormatException {
+		for (DeckRow deckRow : deckRows) {
+			deckRow.mack.destroy();
+		}
+		
 		deckRows.clear();
 		trackBounds.setBounds(0, 60);
 		
