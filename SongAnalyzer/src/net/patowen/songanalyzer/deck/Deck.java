@@ -101,26 +101,19 @@ public class Deck extends View {
 			return gridInputAction;
 		}
 		
-		if (inputType.isMouseBased()) {
-			if (mousePos.x >= 0 && mousePos.y >= 0 && mousePos.x < width && mousePos.y < height) {
-				for (DeckRow deckRow : deckRows) {
-					InputAction inputAction = deckRow.mack.forwardInput(inputType, mousePos, value);
-					if (inputAction != null) {
-						return inputAction;
-					}
-					
-					inputAction = deckRow.mackTab.forwardInput(inputType, mousePos, value);
-					if (inputAction != null) {
-						return inputAction;
-					}
-				}
+		if (inputType.isMouseBased() && !(mousePos.x >= 0 && mousePos.y >= 0 && mousePos.x < width && mousePos.y < height)) {
+			return null;
+		}
+		
+		for (DeckRow deckRow : deckRows) {
+			InputAction inputAction = deckRow.mack.forwardInput(inputType, mousePos, value);
+			if (inputAction != null) {
+				return inputAction;
 			}
-		} else {
-			for (DeckRow deckRow : deckRows) {
-				InputAction inputAction = deckRow.mack.forwardInput(inputType, mousePos, value);
-				if (inputAction != null) {
-					return inputAction;
-				}
+			
+			inputAction = deckRow.mackTab.forwardInput(inputType, mousePos, value);
+			if (inputAction != null) {
+				return inputAction;
 			}
 		}
 		

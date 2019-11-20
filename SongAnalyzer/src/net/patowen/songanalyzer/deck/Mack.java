@@ -5,6 +5,8 @@ import net.patowen.songanalyzer.data.FileFormatException;
 import net.patowen.songanalyzer.view.View;
 
 public abstract class Mack extends View {
+	private boolean audible = true;
+	
 	public abstract int getType();
 	
 	public int getMinimumHeight() {
@@ -20,4 +22,16 @@ public abstract class Mack extends View {
 	public abstract void load(Dict dict) throws FileFormatException;
 	
 	public abstract void destroy();
+	
+	public final boolean isAudible() {
+		return audible;
+	}
+	
+	public final void setAudible(boolean audible) {
+		this.audible = audible;
+		handleAudibleChange(audible);
+	}
+	
+	protected void handleAudibleChange(boolean audible) {
+	}
 }
