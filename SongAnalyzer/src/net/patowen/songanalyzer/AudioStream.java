@@ -16,8 +16,6 @@ import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.Timer;
 
-import org.tritonus.share.sampled.AudioFormats;
-
 import net.patowen.songanalyzer.SoundFileLoadingThread.Status;
 
 // Anyone interested in some spaghetti?
