@@ -25,7 +25,8 @@ public class AudioPlayer {
 		bufferingAnimation = animationController.createAnimationSource();
 		this.ticker = ticker;
 		
-		audioStream = null;
+		switchToBlankAudioStream();
+		
 		audioFile = null;
 		speed = 1;
 	}
@@ -47,15 +48,28 @@ public class AudioPlayer {
 	}
 	
 	public void reset() {
-		if (audioStream != null) {
-			audioStream.destroy();
-			audioStream = null;
-		}
+		switchToBlankAudioStream();
+		
 		playingAnimation.stop();
 		bufferingAnimation.stop();
 		
 		audioFile = null;
 		speed = 1;
+	}
+	
+	private void switchToBlankAudioStream() {
+		if (audioStream != null) {
+			audioStream.destroy();
+		}
+		
+		// We ideally want to be able to play tick sounds, but don't panic until a file is loaded and playing audio
+		// is still impossible.
+		try {
+			audioStream = new AudioStream(null, this.ticker);
+		} catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
+			e.printStackTrace();
+			audioStream = null;
+		}
 	}
 	
 	public void resetTicker() {
@@ -65,11 +79,7 @@ public class AudioPlayer {
 	}
 	
 	private void setAudioFile(Path audioFile) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
-		if (audioStream != null) {
-			audioStream.destroy();
-			audioStream = null;
-		}
-		
+		switchToBlankAudioStream();
 		this.audioFile = null;
 		
 		audioStream = new AudioStream(audioFile.toFile(), ticker);

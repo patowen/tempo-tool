@@ -16,6 +16,10 @@ import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.Timer;
 
+import org.tritonus.share.sampled.AudioFormats;
+
+import net.patowen.songanalyzer.SoundFileLoadingThread.Status;
+
 // Anyone interested in some spaghetti?
 public class AudioStream {
 	private int numChannels; // Usually 2 for stereo
@@ -88,31 +92,7 @@ public class AudioStream {
 	}
 	
 	public AudioStream(File file, Ticker ticker) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
-		AudioInputStream in = AudioSystem.getAudioInputStream(file);
-		AudioFormat baseFormat = in.getFormat();
-		AudioFormat decodedFormat = new AudioFormat
-				(AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(), 16,
-						baseFormat.getChannels(), baseFormat.getChannels()*2, baseFormat.getSampleRate(), false);
-		AudioInputStream din = AudioSystem.getAudioInputStream(decodedFormat, in);
-
 		totalBuffer = new FragmentedByteList(65536);
-		soundFileLoadingThread = new SoundFileLoadingThread(din, totalBuffer);
-		soundFileLoadingThread.start();
-
-		numChannels = decodedFormat.getChannels();
-		samplingRate = decodedFormat.getSampleRate();
-		
-		bytesPerSample = 2 * numChannels;
-		
-		AudioFormat format = new AudioFormat(samplingRate, 16, numChannels, true, true);
-		DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
-		line = (SourceDataLine)AudioSystem.getLine(info);
-		line.open(format);
-		
-		fragmentBuffer = ByteBuffer.allocate(line.getBufferSize());	
-		currentSample = 0;
-		playing = false;
-		playSpeed = 1;
 		
 		ActionListener audioStreamUpdater = new ActionListener() {
 			@Override
@@ -130,15 +110,77 @@ public class AudioStream {
 		
 		this.ticker = ticker;
 		hasCurrentTick = false;
+		
+		if (file == null) {
+			loadFromNothing();
+		} else {
+			loadFromFile(file);
+		}
+	}
+	
+	private void loadFromNothing() throws LineUnavailableException {
+		numChannels = 1;
+		samplingRate = 44100;
+		
+		initAudioLine();
+	}
+	
+	private void loadFromFile(File file) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
+		AudioInputStream in = AudioSystem.getAudioInputStream(file);
+		AudioFormat baseFormat = in.getFormat();
+		AudioFormat decodedFormat = new AudioFormat(
+				AudioFormat.Encoding.PCM_SIGNED,
+				baseFormat.getSampleRate(),
+				16,
+				baseFormat.getChannels(),
+				baseFormat.getChannels()*2,
+				baseFormat.getSampleRate(),
+				false);
+		AudioInputStream din = AudioSystem.getAudioInputStream(decodedFormat, in);
+
+		numChannels = decodedFormat.getChannels();
+		samplingRate = decodedFormat.getSampleRate();
+		
+		soundFileLoadingThread = new SoundFileLoadingThread(din, totalBuffer);
+		soundFileLoadingThread.start();
+		
+		initAudioLine();
+	}
+	
+	private void initAudioLine() throws LineUnavailableException {
+		bytesPerSample = 2 * numChannels;
+
+		AudioFormat format = new AudioFormat(samplingRate, 16, numChannels, true, true);
+		DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
+		line = (SourceDataLine)AudioSystem.getLine(info);
+		line.open(format);
+		
+		fragmentBuffer = ByteBuffer.allocate(line.getBufferSize());	
+		
+		currentSample = 0;
+		playing = false;
+		playSpeed = 1;
 	}
 	
 	public void destroy() {
-		soundFileLoadingThread.interrupt();
+		if (soundFileLoadingThread != null) {
+			soundFileLoadingThread.interrupt();
+			try {
+				soundFileLoadingThread.join();
+			} catch (InterruptedException e) {
+				// The UI thread shouldn't be interrupted.
+			}
+		}
+		
 		updateTimer.stop();
 		line.close();
 	}
 	
 	public SoundFileLoadingThread.Status getLoadingStatus() {
+		if (soundFileLoadingThread == null) {
+			return Status.DONE;
+		}
+		
 		return soundFileLoadingThread.getStatus();
 	}
 	
@@ -149,7 +191,7 @@ public class AudioStream {
 	private double getAmpRaw(int numSamples, int index, int channel) {
 		if (index >= numSamples || index < 0) return 0;
 		int totalBufferPos = (index*numChannels+channel)*2;
-		return totalBuffer.get(totalBufferPos) + totalBuffer.get(totalBufferPos + 1) * 256;
+		return Byte.toUnsignedInt(totalBuffer.get(totalBufferPos)) + totalBuffer.get(totalBufferPos + 1) * 256;
 	}
 	
 	private double getAmpInterpolated(int numSamples, int index, double subIndex, int channel) {
