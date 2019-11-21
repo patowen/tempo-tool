@@ -23,4 +23,5 @@ package net.patowen.songanalyzer.deck.beatmack;
  * Allow user to move marks in the marker mack.
  * Add support for thicker grid borders
  * Enforce a minimum size for grids (avoid negative center row/column sizes)
+ * Save maximization state of window in config
  */
