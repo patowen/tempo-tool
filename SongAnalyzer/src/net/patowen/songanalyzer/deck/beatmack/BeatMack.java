@@ -105,6 +105,7 @@ public class BeatMack extends Mack {
 			return;
 		}
 		
+		double previousTime = Double.NEGATIVE_INFINITY;
 		Double currentTime = trackBounds.subpixelToSeconds(0);
 		double maxTime = trackBounds.subpixelToSeconds(width);
 		
@@ -113,6 +114,10 @@ public class BeatMack extends Mack {
 			if (currentTime == null) {
 				return;
 			}
+			if (currentTime <= previousTime) {
+				return;
+			}
+			previousTime = currentTime;
 			Double closest = metronomeMarkerMack.getClosestMark(currentTime);
 			if (closest == null) {
 				return;

@@ -192,8 +192,16 @@ public class BeatFunction {
 				knotType = KnotType.ConformToLater;
 			} else if (knots.lastEntry().getValue() == knot) {
 				knotType = KnotType.ConformToEarlier;
-			} else {
+			} else if (knot.regionBefore == Region.cubic && knot.regionAfter == Region.cubic) {
+				knotType = KnotType.Smoothest;
+			} else if (knot.regionBefore == Region.cubic && knot.regionAfter == Region.linear) {
+				knotType = KnotType.ConformToLater;
+			} else if (knot.regionBefore == Region.linear && knot.regionAfter == Region.cubic) {
+				knotType = KnotType.ConformToEarlier;
+			} else if (knot.regionBefore == Region.linear && knot.regionAfter == Region.linear) {
 				knotType = KnotType.NonDifferentiable;
+			} else {
+				throw new IllegalStateException("Invalid region type");
 			}
 			
 			splineKnots.add(knotType);
