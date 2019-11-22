@@ -1,5 +1,7 @@
 package net.patowen.songanalyzer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
@@ -52,6 +54,33 @@ public class DividedRealLine<Knot, Region> {
 		regions.remove(knotPos);
 		regions.put(regions.floorKey(knotPos), mergedRegion);
 		knots.remove(knotPos);
+	}
+	
+	public void setKnotsAndRegions(List<Double> knotPositions, List<Knot> knots, List<Region> regions) {
+		if (knotPositions.size() != knots.size() || knotPositions.size() != regions.size() - 1) {
+			throw new IllegalArgumentException("Wrong number of items in one of the passed-in lists");
+		}
+		
+		this.knots.clear();
+		this.regions.clear();
+		
+		this.regions.put(Double.NEGATIVE_INFINITY, regions.get(0));
+		for (int i=0; i<knotPositions.size(); i++) {
+			this.knots.put(knotPositions.get(i), knots.get(i));
+			this.regions.put(knotPositions.get(i), regions.get(i+1));
+		}
+	}
+	
+	public List<Double> getKnotPositionList() {
+		return new ArrayList<>(knots.keySet());
+	}
+	
+	public List<Knot> getKnotList() {
+		return new ArrayList<>(knots.values());
+	}
+	
+	public List<Region> getRegionList() {
+		return new ArrayList<>(regions.values());
 	}
 	
 	public static final class RegionBoundaries {
