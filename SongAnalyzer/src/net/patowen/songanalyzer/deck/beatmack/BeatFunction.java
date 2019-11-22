@@ -165,7 +165,13 @@ public class BeatFunction {
 	public Double findTimeForNextBeat(double time) {
 		double phase = getPhaseFromTime(time + 1e-9);
 		double goalPhase = Math.floor(phase + 1);
-		return getTimeFromPhase(goalPhase, time);
+		
+		Double timeForNextBeat = getTimeFromPhase(goalPhase, time);
+		if (timeForNextBeat == null || timeForNextBeat <= time) {
+			return null;
+		}
+		
+		return timeForNextBeat;
 	}
 	
 	public double getPhaseFromTime(double time) {
