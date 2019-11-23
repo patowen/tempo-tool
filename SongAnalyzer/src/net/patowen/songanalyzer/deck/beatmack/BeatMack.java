@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import net.patowen.songanalyzer.DividedRealLine.InsertionRemoval;
 import net.patowen.songanalyzer.Ticker;
 import net.patowen.songanalyzer.TickerSource;
 import net.patowen.songanalyzer.bundle.DeckBundle;
@@ -18,6 +19,7 @@ import net.patowen.songanalyzer.deck.MackRefs;
 import net.patowen.songanalyzer.deck.MarkerMack;
 import net.patowen.songanalyzer.deck.TrackBounds;
 import net.patowen.songanalyzer.deck.beatmack.BeatFunction.Knot;
+import net.patowen.songanalyzer.deck.beatmack.BeatFunction.Region;
 import net.patowen.songanalyzer.undo.UserAction;
 import net.patowen.songanalyzer.undo.UserActionList;
 import net.patowen.songanalyzer.userinput.InputAction;
@@ -273,20 +275,20 @@ public class BeatMack extends Mack {
 	}
 	
 	private class MoveKnotAtMouse implements InputActionDrag {
-		private Knot knot;
+		private double currentTime;
 		private double initialTime;
 		
 		@Override
 		public boolean onAction(Point pos, double value) {
 			if (isWithinView(pos)) {
 				double time = trackBounds.pixelToSeconds(pos.x);
-				Knot potentialKnot = beatFunction.findClosestKnot(time);
+				double potentialKnot = beatFunction.findClosestKnot(time);
 				
-				int knotPixelX = trackBounds.secondsToPixel(potentialKnot.getTime());
+				int knotPixelX = trackBounds.secondsToPixel(potentialKnot);
 				
 				if (pos.x >= knotPixelX - selectionRange && pos.x <= knotPixelX + selectionRange) {
-					knot = potentialKnot;
-					initialTime = knot.getTime();
+					currentTime = potentialKnot;
+					initialTime = potentialKnot;
 					return true;
 				}
 			}
@@ -295,43 +297,40 @@ public class BeatMack extends Mack {
 
 		@Override
 		public void onDrag(Point startRelative) {
-			beatFunction.moveKnot(knot, trackBounds.subpixelToSeconds(trackBounds.secondsToSubpixel(initialTime) + startRelative.x));
+			beatFunction.moveKnot(currentTime, trackBounds.subpixelToSeconds(trackBounds.secondsToSubpixel(initialTime) + startRelative.x));
 		}
 
 		@Override
 		public void onCancel() {
-			beatFunction.moveKnot(knot, initialTime);
+			beatFunction.moveKnot(currentTime, initialTime);
 		}
 
 		@Override
 		public void onEnd(Point startRelative) {
-			beatFunction.moveKnot(knot, initialTime);
+			beatFunction.moveKnot(currentTime, initialTime);
 			userActionList.applyAction(new KnotMotionAction(
-					knot,
 					initialTime,
 					trackBounds.subpixelToSeconds(trackBounds.secondsToSubpixel(initialTime) + startRelative.x)));
 		}
 	}
 	
 	private class KnotMotionAction implements UserAction {
-		private final Knot knot;
 		private final double startTime;
 		private final double endTime;
 		
-		public KnotMotionAction(Knot knot, double startTime, double endTime) {
-			this.knot = knot;
+		public KnotMotionAction(double startTime, double endTime) {
 			this.startTime = startTime;
 			this.endTime = endTime;
 		}
 		
 		@Override
 		public void exec() {
-			beatFunction.moveKnot(knot, endTime);
+			beatFunction.moveKnot(startTime, endTime);
 		}
 		
 		@Override
 		public void undo() {
-			beatFunction.moveKnot(knot, startTime);
+			beatFunction.moveKnot(endTime, startTime);
 		}
 	}
 	
@@ -348,8 +347,8 @@ public class BeatMack extends Mack {
 				int beatPixelX = trackBounds.secondsToPixel(beatTime);
 				
 				if (pos.x >= beatPixelX - selectionRange && pos.x <= beatPixelX + selectionRange) {
-					Knot knot = beatFunction.getKnotOnBeat(beatTime);
-					userActionList.applyAction(new KnotInsertionAction(knot));
+					InsertionRemoval<Knot, Region> insertionRemoval = beatFunction.getKnotOnBeatToInsert(beatTime);
+					userActionList.applyAction(new KnotInsertionAction(insertionRemoval));
 					return true;
 				}
 			}
@@ -358,20 +357,20 @@ public class BeatMack extends Mack {
 	}
 	
 	private class KnotInsertionAction implements UserAction {
-		private final Knot knot;
+		private final InsertionRemoval<Knot, Region> insertionRemoval;
 		
-		public KnotInsertionAction(Knot knot) {
-			this.knot = knot;
+		public KnotInsertionAction(InsertionRemoval<Knot, Region> insertionRemoval) {
+			this.insertionRemoval = insertionRemoval;
 		}
 		
 		@Override
 		public void exec() {
-			beatFunction.insertKnot(knot);
+			beatFunction.insertKnot(insertionRemoval);
 		}
 
 		@Override
 		public void undo() {
-			beatFunction.deleteKnot(knot);
+			beatFunction.deleteKnot(insertionRemoval);
 		}
 	}
 	
@@ -380,13 +379,14 @@ public class BeatMack extends Mack {
 		public boolean onAction(Point pos, double value) {
 			if (isWithinView(pos)) {
 				double time = trackBounds.pixelToSeconds(pos.x);
-				Knot potentialKnot = beatFunction.findClosestKnot(time);
+				double potentialKnot = beatFunction.findClosestKnot(time);
 				
-				int knotPixelX = trackBounds.secondsToPixel(potentialKnot.getTime());
+				int knotPixelX = trackBounds.secondsToPixel(potentialKnot);
 				
 				if (pos.x >= knotPixelX - selectionRange && pos.x <= knotPixelX + selectionRange) {
 					if (beatFunction.canDeleteKnot(potentialKnot)) {
-						userActionList.applyAction(new KnotDeletionAction(potentialKnot));
+						InsertionRemoval<Knot, Region> insertionRemoval = beatFunction.getKnotToDelete(potentialKnot);
+						userActionList.applyAction(new KnotDeletionAction(insertionRemoval));
 						return true;
 					}
 				}
@@ -396,20 +396,20 @@ public class BeatMack extends Mack {
 	}
 	
 	private class KnotDeletionAction implements UserAction {
-		private final Knot knot;
+		private final InsertionRemoval<Knot, Region> insertionRemoval;
 		
-		public KnotDeletionAction(Knot knot) {
-			this.knot = knot;
+		public KnotDeletionAction(InsertionRemoval<Knot, Region> insertionRemoval) {
+			this.insertionRemoval = insertionRemoval;
 		}
 		
 		@Override
 		public void exec() {
-			beatFunction.deleteKnot(knot);
+			beatFunction.deleteKnot(insertionRemoval);
 		}
 		
 		@Override
 		public void undo() {
-			beatFunction.insertKnot(knot);
+			beatFunction.insertKnot(insertionRemoval);
 		}
 	}
 	

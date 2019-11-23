@@ -1,19 +1,27 @@
 package net.patowen.songanalyzer;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
 public class DividedRealLine<Knot, Region> {
-	private NavigableMap<Double, Knot> knots;
-	private NavigableMap<Double, Region> regions; // Lower boundaries
+	private final NavigableMap<Double, Knot> knots;
+	private final NavigableMap<Double, Region> regions; // Lower boundaries
 	
 	public DividedRealLine(Region initialRegion) {
 		knots = new TreeMap<>();
 		regions = new TreeMap<>();
 		
 		regions.put(Double.NEGATIVE_INFINITY, initialRegion);
+	}
+	
+	public int numKnots() {
+		return knots.size();
+	}
+	
+	public int numRegions() {
+		return regions.size();
 	}
 	
 	public Region getRegion(double pos) {
@@ -36,6 +44,22 @@ public class DividedRealLine<Knot, Region> {
 		return knots.containsKey(pos);
 	}
 	
+	public boolean isFirstKnot(double pos) {
+		return knots.firstKey() == pos;
+	}
+	
+	public boolean isLastKnot(double pos) {
+		return knots.lastKey() == pos;
+	}
+	
+	public Knot getKnot(double knotPos) {
+		return knots.get(knotPos);
+	}
+	
+	public Collection<Knot> getLaterKnots(double pos) {
+		return knots.tailMap(pos, false).values();
+	}
+	
 	public void insertKnot(double pos, Knot knot, Region earlierSplitRegion, Region laterSplitRegion) {
 		if (knots.containsKey(pos)) {
 			throw new IllegalArgumentException("There is already a knot here.");
@@ -46,6 +70,10 @@ public class DividedRealLine<Knot, Region> {
 		knots.put(pos, knot);
 	}
 	
+	public void insertKnot(InsertionRemoval<Knot, Region> insertionRemoval) {
+		insertKnot(insertionRemoval.pos, insertionRemoval.knot, insertionRemoval.earlierSplitRegion, insertionRemoval.laterSplitRegion);
+	}
+	
 	public void removeKnot(double knotPos, Region mergedRegion) {
 		if (!knots.containsKey(knotPos)) {
 			throw new IllegalArgumentException("Tried to remove a knot that doesn't exist.");
@@ -54,6 +82,37 @@ public class DividedRealLine<Knot, Region> {
 		regions.remove(knotPos);
 		regions.put(regions.floorKey(knotPos), mergedRegion);
 		knots.remove(knotPos);
+	}
+	
+	public void removeKnot(InsertionRemoval<Knot, Region> insertionRemoval) {
+		removeKnot(insertionRemoval.pos, insertionRemoval.mergedRegion);
+	}
+	
+	public boolean canMoveKnot(double knotPos, double newPos) {
+		if (!knots.containsKey(knotPos)) {
+			throw new IllegalArgumentException("Cannot move a knot that doesn't exist.");
+		}
+		
+		Double lowerKnotPos = knots.lowerKey(knotPos);
+		Double higherKnotPos = knots.higherKey(knotPos);
+		
+		return (lowerKnotPos == null || lowerKnotPos < newPos) && (higherKnotPos == null || higherKnotPos > newPos);
+	}
+	
+	public void moveKnot(double knotPos, double newPos) {
+		if (!knots.containsKey(knotPos)) {
+			throw new IllegalArgumentException("Cannot move a knot that doesn't exist.");
+		}
+		
+		if (!canMoveKnot(knotPos, newPos)) {
+			throw new IllegalArgumentException("Tried to move a knot past another knot.");
+		}
+		
+		Knot knot = knots.remove(knotPos);
+		knots.put(newPos, knot);
+		
+		Region region = regions.remove(knotPos);
+		regions.put(newPos, region);
 	}
 	
 	public void setKnotsAndRegions(List<Double> knotPositions, List<Knot> knots, List<Region> regions) {
@@ -71,16 +130,34 @@ public class DividedRealLine<Knot, Region> {
 		}
 	}
 	
-	public List<Double> getKnotPositionList() {
-		return new ArrayList<>(knots.keySet());
+	public Collection<Double> getKnotPositions() {
+		return knots.keySet();
 	}
 	
-	public List<Knot> getKnotList() {
-		return new ArrayList<>(knots.values());
+	public Collection<Knot> getKnots() {
+		return knots.values();
 	}
 	
-	public List<Region> getRegionList() {
-		return new ArrayList<>(regions.values());
+	public Collection<Region> getRegions() {
+		return regions.values();
+	}
+	
+	public InsertionRemoval<Knot, Region> prepareInsertion(double pos, Knot knot, Region earlierSplitRegion, Region laterSplitRegion) {
+		return new InsertionRemoval<Knot, Region>(
+				pos,
+				knot,
+				regions.floorEntry(pos).getValue(),
+				earlierSplitRegion,
+				laterSplitRegion);
+	}
+	
+	public InsertionRemoval<Knot, Region> prepareRemoval(double knotPos, Region mergedRegion) {
+		return new InsertionRemoval<Knot, Region>(
+				knotPos,
+				knots.get(knotPos),
+				mergedRegion,
+				regions.lowerEntry(knotPos).getValue(),
+				regions.get(knotPos));
 	}
 	
 	public static final class RegionBoundaries {
@@ -100,6 +177,22 @@ public class DividedRealLine<Knot, Region> {
 		private KnotNeighborhood(Region earlierRegion, Region laterRegion) {
 			this.earlierRegion = earlierRegion;
 			this.laterRegion = laterRegion;
+		}
+	}
+	
+	public static final class InsertionRemoval<Knot, Region> {
+		public final double pos;
+		public final Knot knot;
+		public final Region mergedRegion;
+		public final Region earlierSplitRegion;
+		public final Region laterSplitRegion;
+		
+		public InsertionRemoval(double pos, Knot knot, Region mergedRegion, Region earlierSplitRegion, Region laterSplitRegion) {
+			this.pos = pos;
+			this.knot = knot;
+			this.mergedRegion = mergedRegion;
+			this.earlierSplitRegion = earlierSplitRegion;
+			this.laterSplitRegion = laterSplitRegion;
 		}
 	}
 }
