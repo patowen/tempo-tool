@@ -3,12 +3,12 @@ package net.patowen.tempotool.deck.beatmack;
  * TODO before release:
  * Properly handle linear vs cubic in export, raising the tolerance back to 5 milliseconds
  * Allow user to change the visualization shown in a beat mack
- * Allow export of tempo spline and move Beat Saber export to a separate command line program (move tolerance-handling here)
  * Add application title
  * Add license
  * 
  * TODO after release:
  * Add BPM labels to tempo graph
+ * Allow export of tempo spline and move Beat Saber export to a separate command line program (move tolerance-handling here)
  * Consider allowing a linear transformation (destructive or saved as a transformation) to all marks at once (within a mack or between macks)
  * Consider allowing the user to round a constant-tempo section (possibly keeping the tempo fixed)
  * Consider allowing the use of rational numbers in tempo export
