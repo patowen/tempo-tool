@@ -5,7 +5,6 @@ package net.patowen.tempotool.deck.beatmack;
  * Allow user to change the visualization shown in a beat mack
  * Allow export of tempo spline and move Beat Saber export to a separate command line program (move tolerance-handling here)
  * Add application title
- * SongAnalyzer -> TempoTool (package and project name)
  * Add license
  * 
  * TODO after release:
