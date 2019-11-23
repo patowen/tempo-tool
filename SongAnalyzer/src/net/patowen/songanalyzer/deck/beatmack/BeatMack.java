@@ -129,8 +129,8 @@ public class BeatMack extends Mack {
 	
 	private void renderKnots(Graphics2D g) {
 		g.setColor(Color.CYAN);
-		for (BeatFunction.Knot knot : beatFunction.getAllKnots()) {
-			int pixelX = trackBounds.secondsToPixel(knot.getTime());
+		for (double time : beatFunction.getAllKnotTimes()) {
+			int pixelX = trackBounds.secondsToPixel(time);
 			g.drawLine(pixelX, height/2 - 4, pixelX, height/2 + 4);
 		}
 	}

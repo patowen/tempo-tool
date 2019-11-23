@@ -20,15 +20,13 @@ public class BeatFunction {
 		func = new DividedRealLine<BeatFunction.Knot, BeatFunction.Region>(new Region(Region.cubic));
 		
 		Knot startKnot = new Knot();
-		startKnot.time = 0;
 		startKnot.phase = 0;
 		
 		Knot laterKnot = new Knot();
-		laterKnot.time = 8;
 		laterKnot.phase = 8;
 		
-		func.insertKnot(startKnot.time, startKnot, new Region(Region.cubic), new Region(Region.cubic));
-		func.insertKnot(laterKnot.time, laterKnot, new Region(Region.cubic), new Region(Region.cubic));
+		func.insertKnot(0, startKnot, new Region(Region.cubic), new Region(Region.cubic));
+		func.insertKnot(8, laterKnot, new Region(Region.cubic), new Region(Region.cubic));
 		
 		createSpline();
 	}
@@ -36,7 +34,6 @@ public class BeatFunction {
 	public DividedRealLine.InsertionRemoval<Knot, Region> getKnotOnBeatToInsert(double time) {
 		double phase = Math.floor(getPhaseFromTime(time) + 0.5);
 		Knot newKnot = new Knot();
-		newKnot.time = time;
 		newKnot.phase = phase;
 		
 		Region region = func.getRegion(time);
@@ -115,8 +112,8 @@ public class BeatFunction {
 		return upper - time < time - lower ? upper : lower;
 	}
 	
-	public Iterable<Knot> getAllKnots() {
-		return func.getKnots();
+	public Iterable<Double> getAllKnotTimes() {
+		return func.getKnotPositions();
 	}
 	
 	public Double findTimeForClosestBeat(double time) {
@@ -189,9 +186,10 @@ public class BeatFunction {
 	}
 	
 	private void updateSpline() {
-		for (Knot knot : func.getKnots()) {
+		for (double time : func.getKnotPositions()) {
+			Knot knot = func.getKnot(time);
 			int i = knot.splineIndex;
-			spline.x[i] = knot.time;
+			spline.x[i] = time;
 			spline.y[i] = knot.phase;
 		}
 		
@@ -257,10 +255,11 @@ public class BeatFunction {
 		List<Knot> knots = new ArrayList<>();
 		for (int i=0; i<knotArr.size(); i++) {
 			Dict knotDict = knotArr.get(i).asDict();
+			double time = knotDict.get(KnotKeys.time).asDouble();
+			knotPositions.add(time);
+
 			Knot knot = new Knot();
-			knot.time = knotDict.get(KnotKeys.time).asDouble();
 			knot.phase = knotDict.get(KnotKeys.phase).asDouble();
-			knotPositions.add(knot.time);
 			knots.add(knot);
 		}
 		
@@ -276,14 +275,9 @@ public class BeatFunction {
 	}
 	
 	public static class Knot {
-		private double time;
 		private double phase;
 		
 		private int splineIndex;
-		
-		public double getTime() {
-			return time;
-		}
 	}
 	
 	public class Region {
