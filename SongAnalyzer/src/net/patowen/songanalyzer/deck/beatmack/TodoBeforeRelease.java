@@ -1,7 +1,6 @@
 package net.patowen.songanalyzer.deck.beatmack;
 /*
  * TODO before release:
- * Allow user to change sections of beat macks between linear and cubic
  * Properly handle linear vs cubic in export, raising the tolerance back to 5 milliseconds
  * Allow user to change the visualization shown in a beat mack
  * Allow export of tempo spline and move Beat Saber export to a separate command line program (move tolerance-handling here)
