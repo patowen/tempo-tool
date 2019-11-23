@@ -42,7 +42,6 @@ public class Spline {
 		}
 		
 		sectionLengths.set(sectionLengths.size() - 1, sectionLengths.get(sectionLengths.size() - 1) - 1);
-		System.out.println(sectionLengths);
 		
 		Section[] sections = new Section[sectionLengths.size()];
 		int totalIndex = 0;
@@ -57,24 +56,23 @@ public class Spline {
 				case Smoothest:
 					useEarlier[indexInSection] = true;
 					useLater[indexInSection] = true;
-					totalIndex++;
 					break;
 				case ConformToEarlier:
 					useEarlier[indexInSection] = true;
 					useLater[indexInSection] = false;
-					totalIndex++;
 					break;
 				case ConformToLater:
 					useEarlier[indexInSection] = false;
 					useLater[indexInSection] = true;
-					totalIndex++;
 					break;
 				case NonDifferentiable:
 					useEarlier[indexInSection] = indexInSection > 0;
 					useLater[indexInSection] = indexInSection < numRegions;
 					break;
 				}
+				totalIndex++;
 			}
+			totalIndex--;
 			
 			sections[sectionIndex] = new Section(offset, numRegions, useEarlier, useLater);
 		}
