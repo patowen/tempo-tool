@@ -32,6 +32,10 @@ public class BeatFunction {
 	}
 	
 	public DividedRealLine.InsertionRemoval<Knot, Region> getKnotOnBeatToInsert(double time) {
+		if (func.isKnot(time)) {
+			return null;
+		}
+		
 		double phase = Math.floor(getPhaseFromTime(time) + 0.5);
 		Knot newKnot = new Knot();
 		newKnot.phase = phase;
@@ -90,15 +94,16 @@ public class BeatFunction {
 		createSpline();
 	}
 	
-	public void moveKnot(double currentTime, double newTime) {
+	public boolean moveKnot(double currentTime, double newTime) {
 		if (!func.canMoveKnot(currentTime, newTime)) {
-			return;
+			return false;
 		}
 		
 		func.moveKnot(currentTime, newTime);
 		currentTime = newTime;
 		
 		updateSpline();
+		return true;
 	}
 	
 	public Double findClosestKnot(double time) {
@@ -156,6 +161,11 @@ public class BeatFunction {
 	}
 	
 	private Double getTimeFromPhase(double phase, double guess) {
+		double closestKnot = findClosestKnot(guess);
+		if (func.getKnot(closestKnot).phase == phase) {
+			return closestKnot;
+		}
+		
 		return spline.invEval(phase, guess);
 	}
 	

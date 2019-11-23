@@ -42,6 +42,7 @@ public class Spline {
 		}
 		
 		sectionLengths.set(sectionLengths.size() - 1, sectionLengths.get(sectionLengths.size() - 1) - 1);
+		System.out.println(sectionLengths);
 		
 		Section[] sections = new Section[sectionLengths.size()];
 		int totalIndex = 0;

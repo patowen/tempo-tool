@@ -316,7 +316,10 @@ public class BeatMack extends Mack {
 
 		@Override
 		public void onDrag(Point startRelative) {
-			beatFunction.moveKnot(currentTime, trackBounds.subpixelToSeconds(trackBounds.secondsToSubpixel(initialTime) + startRelative.x));
+			double newTime = trackBounds.subpixelToSeconds(trackBounds.secondsToSubpixel(initialTime) + startRelative.x);
+			if (beatFunction.moveKnot(currentTime, newTime)) {
+				currentTime = newTime;
+			}
 		}
 
 		@Override
@@ -367,8 +370,10 @@ public class BeatMack extends Mack {
 				
 				if (pos.x >= beatPixelX - selectionRange && pos.x <= beatPixelX + selectionRange) {
 					InsertionRemoval<Knot, Region> insertionRemoval = beatFunction.getKnotOnBeatToInsert(beatTime);
-					userActionList.applyAction(new KnotInsertionAction(insertionRemoval));
-					return true;
+					if (insertionRemoval != null) {
+						userActionList.applyAction(new KnotInsertionAction(insertionRemoval));
+						return true;
+					}
 				}
 			}
 			return false;
