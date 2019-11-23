@@ -55,6 +55,7 @@ public class BeatMack extends Mack {
 		inputDictionary.addInputMapping(new InputMapping(new MoveKnotAtMouse(), new InputTypeMouse(MouseEvent.BUTTON1, false, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new InsertKnotAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new DeleteKnotAtMouse(), new InputTypeMouse(MouseEvent.BUTTON3, false, true, false), 1));
+		inputDictionary.addInputMapping(new InputMapping(new CycleRegionType(), new InputTypeMouse(MouseEvent.BUTTON3, true, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new ChangeRegionPhaseDisplacement(), new InputTypeScroll(true, false, false), -1));
 		inputDictionary.addInputMapping(new InputMapping(new VerticalZoom(), new InputTypeScroll(false, true, false), 1));
 		inputDictionary.constructDictionary();
@@ -84,6 +85,7 @@ public class BeatMack extends Mack {
 		renderScatterplot(g);
 		renderTempoGraph(g);
 		//renderPhaseGraph(g);
+		renderRegions(g);
 		renderKnots(g);
 	}
 	
@@ -132,6 +134,23 @@ public class BeatMack extends Mack {
 		for (double time : beatFunction.getAllKnotTimes()) {
 			int pixelX = trackBounds.secondsToPixel(time);
 			g.drawLine(pixelX, height/2 - 4, pixelX, height/2 + 4);
+		}
+	}
+	
+	private void renderRegions(Graphics2D g) {
+		int pixelY = height/2;
+		for (int pixelX=0; pixelX<width; pixelX++) {
+			double time = trackBounds.pixelToSeconds(pixelX);
+			switch (beatFunction.getRegion(time).getType()) {
+			case Region.cubic:
+				g.setColor(new Color(0.0f, 0.5f, 0.5f));
+				break;
+			case Region.linear:
+				g.setColor(new Color(0.5f, 0.5f, 0.0f));
+				break;
+			}
+			
+			g.drawLine(pixelX, pixelY, pixelX, pixelY);
 		}
 	}
 	
@@ -465,6 +484,51 @@ public class BeatMack extends Mack {
 				minTempo = (minTempo - centerTempo) * zoomFactor + centerTempo;
 				maxTempo = (maxTempo - centerTempo) * zoomFactor + centerTempo;
 				
+				return true;
+			}
+			return false;
+		}
+	}
+	
+	private class RegionTypeCycleAction implements UserAction {
+		final Region region;
+		final int original;
+		final int desired;
+		
+		public RegionTypeCycleAction(Region region, int original, int desired) {
+			this.region = region;
+			this.original = original;
+			this.desired = desired;
+		}
+		
+		@Override
+		public void exec() {
+			beatFunction.setRegionType(region, desired);
+		}
+		
+		@Override
+		public void undo() {
+			beatFunction.setRegionType(region, original);
+		}
+	}
+	
+	private class CycleRegionType implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			if (isWithinView(pos)) {
+				double time = trackBounds.pixelToSeconds(pos.x);
+				Region region = beatFunction.getRegion(time);
+				int originalRegionType = region.getType();
+				int desiredRegionType = Region.cubic;
+				switch (originalRegionType) {
+				case Region.cubic:
+					desiredRegionType = Region.linear;
+					break;
+				case Region.linear:
+					desiredRegionType = Region.cubic;
+					break;
+				}
+				userActionList.applyAction(new RegionTypeCycleAction(region, originalRegionType, desiredRegionType));
 				return true;
 			}
 			return false;

@@ -61,6 +61,15 @@ public class BeatFunction {
 		return func.getKnot(regionBoundaries.endKnot).phase - func.getKnot(regionBoundaries.startKnot).phase;
 	}
 	
+	public Region getRegion(double time) {
+		return func.getRegion(time);
+	}
+	
+	public void setRegionType(Region region, int type) {
+		region.type = type;
+		createSpline();
+	}
+	
 	public void setRegionPhaseDisplacement(double time, double phaseDisplacement) {
 		double phaseDisplacementDelta = phaseDisplacement - getRegionPhaseDisplacement(time);
 		for (Knot knot : func.getLaterKnots(time)) {
@@ -284,10 +293,14 @@ public class BeatFunction {
 		public static final int cubic = 0;
 		public static final int linear = 1;
 		
-		public final int type;
+		private int type;
 		
 		public Region(int type) {
 			this.type = type;
+		}
+		
+		public int getType() {
+			return type;
 		}
 	}
 }
