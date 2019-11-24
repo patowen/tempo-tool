@@ -1,7 +1,6 @@
 package net.patowen.tempotool.deck.beatmack;
 /*
  * TODO before release:
- * Properly handle linear vs cubic in export, raising the tolerance back to 5 milliseconds
  * Allow user to change the visualization shown in a beat mack
  * Add application title
  * Add license

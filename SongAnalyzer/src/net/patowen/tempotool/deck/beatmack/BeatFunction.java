@@ -152,6 +152,14 @@ public class BeatFunction {
 		return timeForNextBeat;
 	}
 	
+	public boolean hasDiscontinuousTempo(double time) {
+		if (!func.isKnot(time) || func.isFirstKnot(time) || func.isLastKnot(time)) {
+			return false;
+		}
+		KnotNeighborhood<Region> knotNeighborhood = func.getKnotNeighborhood(time);
+		return knotNeighborhood.earlierRegion.type == Region.linear && knotNeighborhood.laterRegion.type == Region.linear;
+	}
+	
 	public double getPhaseFromTime(double time) {
 		return spline.eval(time);
 	}

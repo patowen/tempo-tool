@@ -34,7 +34,7 @@ public class DividedRealLine<Knot, Region> {
 	
 	public KnotNeighborhood<Region> getKnotNeighborhood(double knotPos) {
 		if (!knots.containsKey(knotPos)) {
-			throw new IllegalArgumentException("Tried to remove a knot that doesn't exist.");
+			throw new IllegalArgumentException("Tried to find the position of a knot that doesn't exist.");
 		}
 		
 		return new KnotNeighborhood<Region>(regions.lowerEntry(knotPos).getValue(), regions.get(knotPos));

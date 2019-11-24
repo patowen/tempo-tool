@@ -8,9 +8,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import net.patowen.tempotool.DividedRealLine.InsertionRemoval;
 import net.patowen.tempotool.Ticker;
 import net.patowen.tempotool.TickerSource;
-import net.patowen.tempotool.DividedRealLine.InsertionRemoval;
 import net.patowen.tempotool.bundle.DeckBundle;
 import net.patowen.tempotool.data.Dict;
 import net.patowen.tempotool.data.FileFormatException;
@@ -237,7 +237,7 @@ public class BeatMack extends Mack {
 	
 	public void beatsaberExport(FileWriter writer, double totalTime) throws IOException {
 		double lastBeat = -1e-6;
-		ArrayList<Double> beats = new ArrayList<Double>();
+		ArrayList<Double> beats = new ArrayList<>();
 		
 		while (true) {
 			double currentBeat = beatFunction.findTimeForNextBeat(lastBeat);
@@ -254,15 +254,16 @@ public class BeatMack extends Mack {
 		}
 		
 		int avgTempoBpm = (int)Math.round(((double)(beats.size() - 1)) / (beats.get(beats.size() - 1) - beats.get(0)) * 60);
-		avgTempoBpm = 75;
 		writer.write("Using display tempo: " + avgTempoBpm + System.lineSeparator());
 		double avgTempo = (double)avgTempoBpm / 60.0;
-		double tolerance = 0.000005;
+		double tolerance = 0.005;
 		
 		writer.write("\"_BPMChanges\":[");
 		int startIndex = 0;
 		for (int endIndex = 1; endIndex < beats.size(); endIndex++) {
-			if (endIndex + 1 == beats.size() || getDeviationFromAverageTempo(beats, startIndex, endIndex + 1) > tolerance) {
+			if (endIndex + 1 == beats.size()
+					|| getDeviationFromAverageTempo(beats, startIndex, endIndex + 1) > tolerance
+					|| beatFunction.hasDiscontinuousTempo(beats.get(endIndex))) {
 				double start = beats.get(startIndex);
 				double end = beats.get(endIndex);
 				double bpm = 60.0 * (double)(endIndex - startIndex) / (end - start);
