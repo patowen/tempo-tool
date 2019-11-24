@@ -3,6 +3,7 @@ package net.patowen.tempotool.deck.beatmack;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import net.patowen.tempotool.userinput.InputActionStandard;
 import net.patowen.tempotool.userinput.InputDictionary;
 import net.patowen.tempotool.userinput.InputMapping;
 import net.patowen.tempotool.userinput.InputType;
+import net.patowen.tempotool.userinput.InputTypeKeyboard;
 import net.patowen.tempotool.userinput.InputTypeMouse;
 import net.patowen.tempotool.userinput.InputTypeScroll;
 import net.patowen.tempotool.userinput.MouseHoverFeedback;
@@ -48,6 +50,13 @@ public class BeatMack extends Mack {
 	private double minTempo;
 	private double maxTempo;
 	
+	private enum VisualizationType {
+		BEATS,
+		BEAT_OFFSET_SCATTERPLOT,
+		TEMPO,
+	}
+	private VisualizationType visualizationType;
+	
 	private int selectionRange = 3;
 	
 	public BeatMack(DeckBundle bundle) {
@@ -58,6 +67,7 @@ public class BeatMack extends Mack {
 		inputDictionary.addInputMapping(new InputMapping(new CycleRegionType(), new InputTypeMouse(MouseEvent.BUTTON3, true, false, false), 1));
 		inputDictionary.addInputMapping(new InputMapping(new ChangeRegionPhaseDisplacement(), new InputTypeScroll(true, false, false), -1));
 		inputDictionary.addInputMapping(new InputMapping(new VerticalZoom(), new InputTypeScroll(false, true, false), 1));
+		inputDictionary.addInputMapping(new InputMapping(new CycleVisualizationType(), new InputTypeKeyboard(KeyEvent.VK_V, false, false, false), 1));
 		inputDictionary.constructDictionary();
 		
 		userActionList = bundle.userActionList;
@@ -70,6 +80,8 @@ public class BeatMack extends Mack {
 		minTempo = 0;
 		maxTempo = 5;
 		
+		visualizationType = VisualizationType.BEATS;
+		
 		tickerSource = new BeatMackTickerSource(beatFunction);
 		ticker.addSource(tickerSource);
 	}
@@ -81,15 +93,22 @@ public class BeatMack extends Mack {
 
 	@Override
 	public void render(Graphics2D g) {
-		//renderBeats(g);
-		renderScatterplot(g);
-		renderTempoGraph(g);
-		//renderPhaseGraph(g);
+		switch (visualizationType) {
+		case BEATS:
+			renderBeats(g);
+			break;
+		case BEAT_OFFSET_SCATTERPLOT:
+			renderScatterplot(g);
+			break;
+		case TEMPO:
+			renderTempoGraph(g);
+			break;
+		}
+		
 		renderRegions(g);
 		renderKnots(g);
 	}
 	
-	@SuppressWarnings("unused")
 	private void renderBeats(Graphics2D g) {
 		g.setColor(Color.GRAY);
 		double currentPhase = beatFunction.getPhaseFromTime(trackBounds.subpixelToSeconds(0));
@@ -123,7 +142,9 @@ public class BeatMack extends Mack {
 			}
 			double offset = closest - currentTime;
 			int x = trackBounds.secondsToPixel(currentTime);
-			int y = (int)Math.floor(height / 2 + offset * 1000);
+			
+			// 200 millisecond window hardcoded here
+			int y = (int)Math.floor((1 + offset / 0.2) * height / 2);
 			
 			g.drawLine(x, y, x, y);
 		}
@@ -167,29 +188,6 @@ public class BeatMack extends Mack {
 			xPrevious = x;
 			yPrevious = y;
 		}
-	}
-	
-	@SuppressWarnings("unused")
-	private void renderPhaseGraph(Graphics2D g) {
-		g.setColor(Color.CYAN);
-		double phasePrev = beatFunction.getPhaseFromTime(trackBounds.pixelToSeconds(-1));
-		double phaseBase = Math.floor(phasePrev);
-		for (int pixelX = 0; pixelX <= width; pixelX++) {
-			double phase = beatFunction.getPhaseFromTime(trackBounds.pixelToSeconds(pixelX));
-			while (true) {
-				g.drawLine(pixelX - 1, phaseToPixel(phasePrev - phaseBase), pixelX, phaseToPixel(phase - phaseBase));
-				if (phase - phaseBase > 1) {
-					phaseBase += 1;
-				} else {
-					break;
-				}
-			}
-			phasePrev = phase;
-		}
-	}
-	
-	private int phaseToPixel(double phase) {
-		return height - 1 - (int)(Math.floor(phase * height));
 	}
 	
 	@Override
@@ -483,7 +481,7 @@ public class BeatMack extends Mack {
 	private class VerticalZoom implements InputActionStandard {
 		@Override
 		public boolean onAction(Point pos, double value) {
-			if (isWithinView(pos)) {
+			if (isWithinView(pos) && visualizationType == VisualizationType.TEMPO) {
 				double centerTempo = maxTempo + pos.y * (minTempo - maxTempo) / (double)height;
 				double zoomFactor = Math.exp(value * 0.1);
 				
@@ -536,6 +534,26 @@ public class BeatMack extends Mack {
 				}
 				userActionList.applyAction(new RegionTypeCycleAction(region, originalRegionType, desiredRegionType));
 				return true;
+			}
+			return false;
+		}
+	}
+	
+	private class CycleVisualizationType implements InputActionStandard {
+		@Override
+		public boolean onAction(Point pos, double value) {
+			if (mackRefs.selectedMack == BeatMack.this) {
+				switch (visualizationType) {
+				case BEATS:
+					visualizationType = VisualizationType.BEAT_OFFSET_SCATTERPLOT;
+					return true;
+				case BEAT_OFFSET_SCATTERPLOT:
+					visualizationType = VisualizationType.TEMPO;
+					return true;
+				case TEMPO:
+					visualizationType = VisualizationType.BEATS;
+					return true;
+				}
 			}
 			return false;
 		}
