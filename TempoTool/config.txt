@@ -1,0 +1,4 @@
+DefaultBeatsaberExportFolder: "E:\Beta\Sandbox"
+defaultFile: "E:\Beta\Sandbox\small.tpt"
+defaultFolder: "E:\Beta\Sandbox"
+defaultSongFolder: "E:\Alpha\Music\Beyond the Network"
