@@ -1,6 +1,6 @@
 Purpose:
 
-This program should you help find the tempo of any song, especially if the tempo is not constant. Convenience is traded for potential accuracy, as it is a manual tool.
+This program should help you find the tempo of any song, especially if the tempo is not constant. Convenience is traded for potential accuracy, as it is a manual tool.
 
 How to use:
 
