@@ -1,7 +1,6 @@
 package net.patowen.tempotool.deck.beatmack;
 /*
  * TODO before release:
- * Add application title
  * Add license
  * 
  * TODO after release:
@@ -20,4 +19,5 @@ package net.patowen.tempotool.deck.beatmack;
  * Add support for thicker grid borders
  * Enforce a minimum size for grids (avoid negative center row/column sizes)
  * Save maximization state of window in config
+ * Make seek mack mutable (muting the actual sound file)
  */

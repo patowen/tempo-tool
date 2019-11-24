@@ -18,6 +18,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 
+import javax.swing.JFrame;
+
 import net.patowen.tempotool.DialogManager.DialogKind;
 import net.patowen.tempotool.bundle.RootBundle;
 import net.patowen.tempotool.data.Dict;
@@ -45,6 +47,7 @@ public class Root extends View {
 	private final Config config;
 	private final UserActionList userActionList;
 	private final DialogManager dialogManager;
+	private final WindowManager windowManager;
 	private final AnimationController animationController;
 	private final AudioPlayer audioPlayer;
 
@@ -60,12 +63,13 @@ public class Root extends View {
 	
 	private InputDictionary inputDictionary;
 	
-	public Root(Component component) {
-		bundle = new RootBundle(component);
+	public Root(JFrame frame, Component component) {
+		bundle = new RootBundle(frame, component);
 		
 		this.config = bundle.config;
 		this.userActionList = bundle.userActionList;
 		this.dialogManager = bundle.dialogManager;
+		this.windowManager = bundle.windowManager;
 		this.animationController = bundle.animationController;
 		this.audioPlayer = bundle.audioPlayer;
 		
@@ -111,6 +115,7 @@ public class Root extends View {
 		} else {
 			reset();
 		}
+		windowManager.setFile(currentFile);
 	}
 	
 	public void destroy() {
@@ -279,6 +284,7 @@ public class Root extends View {
 		currentFile = path;
 		config.setConfigEntryPath(Config.Keys.DEFAULT_FILE, currentFile);
 		config.setConfigEntryPath(Config.Keys.DEFAULT_FOLDER, currentFile.getParent());
+		windowManager.setFile(currentFile);
 		return path;
 	}
 	
@@ -348,6 +354,7 @@ public class Root extends View {
 			reset();
 			currentFile = null;
 			config.setConfigEntryPath(Config.Keys.DEFAULT_FILE, null);
+			windowManager.setFile(currentFile);
 			return true;
 		}
 	}

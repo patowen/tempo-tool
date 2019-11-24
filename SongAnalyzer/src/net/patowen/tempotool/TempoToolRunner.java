@@ -21,7 +21,7 @@ public class TempoToolRunner {
 	
 	@SuppressWarnings("serial")
 	public TempoToolRunner() {
-		frame = new JFrame();
+		frame = new JFrame("Tempo Tool");
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -46,7 +46,7 @@ public class TempoToolRunner {
 			}
 		});
 		
-		root = new Root(panel);
+		root = new Root(frame, panel);
 		root.setSizer(rootSizer);
 		
 		new InputController(panel, root);
